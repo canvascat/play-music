@@ -1,10 +1,10 @@
 <template>
-  <svg :class="svgClass" aria-hidden="true">
-    <use :xlink:href="iconName" />
-  </svg>
+  <component :is="icon" :class="svgClass" aria-hidden="true" />
 </template>
 
 <script>
+import icons from '@/assets/icons/all.js';
+
 export default {
   name: 'SvgIcon',
   props: {
@@ -18,8 +18,8 @@ export default {
     },
   },
   computed: {
-    iconName() {
-      return `#icon-${this.iconClass}`;
+    icon() {
+      return icons[this.iconClass] 
     },
     svgClass() {
       if (this.className) {

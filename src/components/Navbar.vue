@@ -8,7 +8,7 @@
           ><svg-icon icon-class="arrow-left"
         /></button-icon>
         <button-icon @click.native="go('forward')"
-          ><svg-icon icon-class="arrow-right"
+          ><icon-arrow-right 
         /></button-icon>
       </div>
       <div class="navigation-links">
@@ -86,6 +86,7 @@ import Win32Titlebar from '@/components/Win32Titlebar.vue';
 import LinuxTitlebar from '@/components/LinuxTitlebar.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import ButtonIcon from '@/components/ButtonIcon.vue';
+import IconArrowRight from '@/assets/icons/components/IconArrowRight.vue';
 
 export default {
   name: 'Navbar',
@@ -94,6 +95,7 @@ export default {
     LinuxTitlebar,
     ButtonIcon,
     ContextMenu,
+    IconArrowRight,
   },
   data() {
     return {

@@ -2,17 +2,17 @@ import router from '@/router';
 import { doLogout, getCookie } from '@/utils/auth';
 import axios from 'axios';
 
-let baseURL = '';
+let baseURL = '/api';
 // Web 和 Electron 跑在不同端口避免同时启动时冲突
-if (process.env.IS_ELECTRON) {
-  if (process.env.NODE_ENV === 'production') {
-    baseURL = process.env.VUE_APP_ELECTRON_API_URL;
-  } else {
-    baseURL = process.env.VUE_APP_ELECTRON_API_URL_DEV;
-  }
-} else {
-  baseURL = process.env.VUE_APP_NETEASE_API_URL;
-}
+// if (process.env.IS_ELECTRON) {
+//   if (process.env.NODE_ENV === 'production') {
+//     baseURL = process.env.VUE_APP_ELECTRON_API_URL;
+//   } else {
+//     baseURL = process.env.VUE_APP_ELECTRON_API_URL_DEV;
+//   }
+// } else {
+//   baseURL = process.env.VUE_APP_NETEASE_API_URL;
+// }
 
 const service = axios.create({
   baseURL,
