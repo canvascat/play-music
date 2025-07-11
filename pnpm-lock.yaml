@@ -119,8 +119,8 @@ importers:
         specifier: ^8.22.0
         version: 8.28.2(vue@3.5.17(typescript@5.8.3))
       vue-router:
-        specifier: ^3.4.3
-        version: 3.6.5(vue@3.5.17(typescript@5.8.3))
+        specifier: ^4.5.1
+        version: 4.5.1(vue@3.5.17(typescript@5.8.3))
       vue-slider-component:
         specifier: ^3.2.5
         version: 3.2.24(vue@3.5.17(typescript@5.8.3))
@@ -3223,10 +3223,10 @@ packages:
     peerDependencies:
       vue: '*'
 
-  vue-router@3.6.5:
-    resolution: {integrity: sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ==}
+  vue-router@4.5.1:
+    resolution: {integrity: sha512-ogAF3P97NPm8fJsE4by9dwSYtDwXIY1nFY9T6DyQnGHd1E2Da94w9JIolpe42LJGIl0DwOHBi8TcRPlPGwbTtw==}
     peerDependencies:
-      vue: ^2
+      vue: ^3.2.0
 
   vue-slider-component@3.2.24:
     resolution: {integrity: sha512-28hfotAL/CPXPwqHgVFyUwUEV0zweoc2wW0bgraGkoIcRZGlFjk8caYJLE8+Luug5t3b9tJm/NyDXpyIdmcYZg==}
@@ -6821,8 +6821,9 @@ snapshots:
       vue: 3.5.17(typescript@5.8.3)
       vue-class-component: 7.2.6(vue@3.5.17(typescript@5.8.3))
 
-  vue-router@3.6.5(vue@3.5.17(typescript@5.8.3)):
+  vue-router@4.5.1(vue@3.5.17(typescript@5.8.3)):
     dependencies:
+      '@vue/devtools-api': 6.6.4
       vue: 3.5.17(typescript@5.8.3)
 
   vue-slider-component@3.2.24(vue@3.5.17(typescript@5.8.3)):

@@ -40,8 +40,9 @@ console.log(
 NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
 dailyTask();
 
-createApp({
-  i18n,
-  router,
-  ...App,
-}).mount('#app');
+const app = createApp(App);
+
+app.use(i18n);
+app.use(store);
+app.use(router);
+app.mount('#app');
