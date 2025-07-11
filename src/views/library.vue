@@ -3,7 +3,7 @@
     <h1>
       <img
         class="avatar"
-        :src="data.user.avatarUrl | resizeImage"
+        :src="resizeImage(data.user.avatarUrl)"
         loading="lazy"
       />{{ data.user.nickname }}{{ $t('library.sLibrary') }}
     </h1>
@@ -221,6 +221,7 @@ import { uploadSong } from '@/api/user';
 import { getLyric } from '@/api/track';
 import NProgress from 'nprogress';
 import locale from '@/locale';
+import { resizeImage } from '@/utils/filters';
 
 import ContextMenu from '@/components/ContextMenu.vue';
 import TrackList from '@/components/TrackList.vue';
@@ -313,6 +314,7 @@ export default {
     dailyTask();
   },
   methods: {
+    resizeImage,
     ...mapActions(['showToast']),
     ...mapMutations(['updateModal', 'updateData']),
     loadData() {

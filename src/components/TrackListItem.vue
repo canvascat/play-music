@@ -79,7 +79,7 @@
       </button>
     </div>
     <div v-if="showTrackTime" class="time">
-      {{ track.dt | formatTime }}
+      {{ formatTime(track.dt) }}
     </div>
 
     <div v-if="track.playCount" class="count"> {{ track.playCount }}</div>
@@ -91,6 +91,7 @@ import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
 import { mapState } from 'vuex';
 import { isNil } from 'es-toolkit';
+import { formatTime } from '@/utils/filters';
 
 export default {
   name: 'TrackListItem',
@@ -211,6 +212,7 @@ export default {
   },
 
   methods: {
+    formatTime,
     goToAlbum() {
       if (this.track.al.id === 0) return;
       this.$router.push({ path: '/album/' + this.track.al.id });

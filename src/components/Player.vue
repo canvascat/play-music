@@ -26,7 +26,7 @@
       <div class="playing">
         <div class="container" @click.stop>
           <img
-            :src="currentTrack.al && currentTrack.al.picUrl | resizeImage(224)"
+            :src="resizeImage(currentTrack.al && currentTrack.al.picUrl, 224)"
             loading="lazy"
             @click="goToAlbum"
           />
@@ -188,6 +188,7 @@ import ButtonIcon from '@/components/ButtonIcon.vue';
 import VueSlider from 'vue-slider-component';
 import { goToListSource, hasListSource } from '@/utils/playList';
 import { formatTrackTime } from '@/utils/common';
+import { resizeImage } from '@/utils/filters';
 
 export default {
   name: 'Player',
@@ -225,6 +226,7 @@ export default {
     window.removeEventListener('keydown', this.handleKeydown);
   },
   methods: {
+    resizeImage,
     ...mapMutations(['toggleLyrics']),
     ...mapActions(['showToast', 'likeATrack']),
     playPrevTrack() {

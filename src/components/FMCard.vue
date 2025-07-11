@@ -3,7 +3,7 @@
     <img :src="nextTrackCover" style="display: none" loading="lazy" />
     <img
       class="cover"
-      :src="track.album && track.album.picUrl | resizeImage(512)"
+      :src="resizeImage(track.album && track.album.picUrl, 512)"
       loading="lazy"
       @click="goToAlbum"
     />
@@ -40,6 +40,7 @@ import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import { mapState } from 'vuex';
 import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
+import { resizeImage } from '@/utils/filters';
 
 export default {
   name: 'FMCard',
@@ -77,6 +78,7 @@ export default {
     window.ok = this.getColor;
   },
   methods: {
+    resizeImage,
     play() {
       this.player.playPersonalFM();
     },

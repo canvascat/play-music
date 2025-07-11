@@ -7,7 +7,7 @@
     title="添加到歌单"
     width="25vw"
   >
-    <template slot="default">
+    <template v-slot:default>
       <div class="new-playlist-button" @click="newPlaylist"
         ><svg-icon icon-class="plus" />新建歌单</div
       >
@@ -17,7 +17,7 @@
         class="playlist"
         @click="addTrackToPlaylist(playlist.id)"
       >
-        <img :src="playlist.coverImgUrl | resizeImage(224)" loading="lazy" />
+        <img :src="resizeImage(playlist.coverImgUrl, 224)" loading="lazy" />
         <div class="info">
           <div class="title">{{ playlist.name }}</div>
           <div class="track-count">{{ playlist.trackCount }} 首</div>
@@ -32,6 +32,7 @@ import { mapActions, mapMutations, mapState } from 'vuex';
 import Modal from '@/components/Modal.vue';
 import locale from '@/locale';
 import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
+import { resizeImage } from '@/utils/filters';
 
 export default {
   name: 'ModalAddTrackToPlaylist',
@@ -44,6 +45,7 @@ export default {
     };
   },
   computed: {
+    resizeImage,
     ...mapState(['modals', 'data', 'liked']),
     show: {
       get() {
