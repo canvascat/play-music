@@ -46,7 +46,7 @@
         <div class="buttons" style="margin-top: 32px">
           <ButtonTwoTone
             icon-class="play"
-            @click.native="playAlbumByID(album.id)"
+            v-on:click="playAlbumByID(album.id)"
           >
             {{ $t('common.play') }}
           </ButtonTwoTone>
@@ -59,7 +59,7 @@
             :background-color="
               dynamicDetail.isSub ? 'var(--color-secondary-bg)' : ''
             "
-            @click.native="likeAlbum"
+            v-on:click="likeAlbum"
           >
           </ButtonTwoTone>
           <ButtonTwoTone
@@ -67,7 +67,7 @@
             :icon-button="true"
             :horizontal-padding="0"
             color="grey"
-            @click.native="openMenu"
+            v-on:click="openMenu"
           >
           </ButtonTwoTone>
         </div>

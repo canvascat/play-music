@@ -56,7 +56,7 @@
         v-show="showLoadMoreButton && hasMore"
         color="grey"
         :loading="loadingMore"
-        @click.native="getPlaylist"
+        v-on:click="getPlaylist"
         >{{ $t('explore.loadMore') }}</ButtonTwoTone
       >
     </div>

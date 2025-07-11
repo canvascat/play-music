@@ -24,10 +24,10 @@
           {{ artist.briefDesc }}
         </div>
         <div class="buttons">
-          <ButtonTwoTone icon-class="play" @click.native="playPopularSongs()">
+          <ButtonTwoTone icon-class="play" v-on:click="playPopularSongs()">
             {{ $t('common.play') }}
           </ButtonTwoTone>
-          <ButtonTwoTone color="grey" @click.native="followArtist">
+          <ButtonTwoTone color="grey" v-on:click="followArtist">
             <span v-if="artist.followed">{{ $t('artist.following') }}</span>
             <span v-else>{{ $t('artist.follow') }}</span>
           </ButtonTwoTone>
@@ -36,7 +36,7 @@
             :icon-button="true"
             :horizontal-padding="0"
             color="grey"
-            @click.native="openMenu"
+            v-on:click="openMenu"
           >
           </ButtonTwoTone>
         </div>
