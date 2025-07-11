@@ -1070,7 +1070,7 @@ export default {
   transition: all 0.4s;
 }
 
-.slide-up-enter, .slide-up-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.slide-up-enter-from, .slide-up-leave-to /* .fade-leave-active below version 2.1.8 */ {
   transform: translateY(100%);
 }
 
@@ -1082,7 +1082,7 @@ export default {
   transition: all 0.5s cubic-bezier(0.2, 0.2, 0, 1);
 }
 
-.slide-fade-enter,
+.slide-fade-enter-from,
 .slide-fade-leave-to {
   transform: translateX(27vh);
   opacity: 0;
