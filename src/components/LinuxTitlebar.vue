@@ -26,8 +26,7 @@
 </template>
 
 <script>
-// icons by https://github.com/microsoft/vscode-codicons
-import 'vscode-codicons/dist/codicon.css';
+import '@vscode/codicons/dist/codicon.css';
 
 import { mapState } from 'vuex';
 

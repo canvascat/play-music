@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@unblockneteasemusic/rust-napi": "^0.4.0",
+    "@vscode/codicons": "^0.0.36",
     "NeteaseCloudMusicApi": "^4.23.3",
     "axios": "^0.26.1",
     "change-case": "^4.1.2",
@@ -28,7 +29,6 @@
     "howler": "^2.2.3",
     "js-cookie": "^2.2.1",
     "jsbi": "^4.1.0",
-    "lodash": "^4.17.20",
     "md5": "^2.3.0",
     "mpris-service": "^2.1.2",
     "music-metadata": "^7.5.3",
@@ -40,9 +40,7 @@
     "register-service-worker": "^1.7.1",
     "svg-sprite-loader": "^6.0.11",
     "tunnel": "^0.0.6",
-    "vscode-codicons": "^0.0.17",
     "vue": "^2.6.11",
-    "vue-clipboard2": "^0.3.1",
     "vue-gtag": "1",
     "vue-i18n": "^8.22.0",
     "vue-router": "^3.4.3",
@@ -54,7 +52,7 @@
     "@types/node": "^17.0.0",
     "@vitejs/plugin-vue2": "^2.3.3",
     "glob": "^11.0.3",
-    "sass": "^1.26.11", 
+    "sass": "^1.26.11",
     "svgo": "^4.0.0",
     "typescript": "^5.8.3",
     "unocss": "^66.3.3",
@@ -70,5 +68,5 @@
       "register-scheme"
     ]
   },
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184"
+  "packageManager": "pnpm@10.13.0+sha512.e08cbfa5d0c47e148d9d92965513af3d06a42ff99b6e0e82a7d10512858d0fb680a03c1e6772d369a2305c79306c9257989a3576b7057d6877469c9a1c7563f0"
 }

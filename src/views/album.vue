@@ -153,7 +153,7 @@ import locale from '@/locale';
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
 import NProgress from 'nprogress';
 import { isAccountLoggedIn } from '@/utils/auth';
-import { groupBy, toPairs, sortBy } from 'lodash';
+import { groupBy, toPairs, sortBy } from 'es-toolkit';
 
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
@@ -162,6 +162,7 @@ import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
 import Modal from '@/components/Modal.vue';
+import { copyText } from '@/utils/copy';
 
 export default {
   name: 'Album',
@@ -313,7 +314,7 @@ export default {
     },
     copyUrl(id) {
       let showToast = this.showToast;
-      this.$copyText(`https://music.163.com/#/album?id=${id}`)
+      copyText(`https://music.163.com/#/album?id=${id}`)
         .then(function () {
           showToast(locale.t('toast.copied'));
         })

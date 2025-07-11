@@ -54,6 +54,7 @@ import ButtonIcon from '@/components/ButtonIcon.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import MvRow from '@/components/MvRow.vue';
 import { mapActions } from 'vuex';
+import { copyText } from '@/utils/copy';
 
 export default {
   name: 'mv',
@@ -145,7 +146,7 @@ export default {
     },
     copyUrl(id) {
       let showToast = this.showToast;
-      this.$copyText(`https://music.163.com/#/mv?id=${id}`)
+       copyText(`https://music.163.com/#/mv?id=${id}`)
         .then(function () {
           showToast(locale.t('toast.copied'));
         })

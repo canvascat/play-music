@@ -197,6 +197,7 @@ import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
 import MvRow from '@/components/MvRow.vue';
 import Modal from '@/components/Modal.vue';
+import { copyText } from '@/utils/copy';
 
 export default {
   name: 'Artist',
@@ -353,7 +354,7 @@ export default {
     },
     copyUrl(id) {
       let showToast = this.showToast;
-      this.$copyText(`https://music.163.com/#/artist?id=${id}`)
+       copyText(`https://music.163.com/#/artist?id=${id}`)
         .then(function () {
           showToast(locale.t('toast.copied'));
         })

@@ -90,7 +90,7 @@
 import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
 import { mapState } from 'vuex';
-import { isNil } from 'lodash';
+import { isNil } from 'es-toolkit';
 
 export default {
   name: 'TrackListItem',

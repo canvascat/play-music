@@ -83,6 +83,7 @@ import { isAccountLoggedIn } from '@/utils/auth';
 import TrackListItem from '@/components/TrackListItem.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import locale from '@/locale';
+import { copyText } from '@/utils/copy';
 
 export default {
   name: 'TrackList',
@@ -273,7 +274,7 @@ export default {
       }
     },
     copyLink() {
-      this.$copyText(
+       copyText(
         `https://music.163.com/song?id=${this.rightClickedTrack.id}`
       )
         .then(() => {

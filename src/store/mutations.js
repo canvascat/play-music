@@ -1,5 +1,5 @@
 import shortcuts from '@/utils/shortcuts';
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'es-toolkit';
 
 export default {
   updateLikedXXX(state, { name, data }) {
