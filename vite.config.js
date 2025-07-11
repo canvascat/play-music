@@ -5,20 +5,11 @@ import process from 'node:process';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue({
-    template: {
-      compilerOptions: {
-        compatConfig: {
-          MODE: 3,
-        },
-      },
-    },
-  })],
+  plugins: [vue()],
   resolve: {
     // https://vitejs.dev/config/shared-options.html#resolve-alias
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      vue: '@vue/compat'
     },
     extensions: ['.js', '.json', '.jsx', '.mjs', '.ts', '.tsx', '.vue'],
   },

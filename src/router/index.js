@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
 import { isLooseLoggedIn, isAccountLoggedIn } from '@/utils/auth';
 
 const routes = [
@@ -133,7 +133,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.IS_ELECTRON ? 'hash' : 'history'),
+  history: process.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
   routes,
 });
 
