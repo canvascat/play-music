@@ -2,15 +2,13 @@
   <div id="app" :class="{ 'user-select-none': userSelectNone }">
     <Scrollbar v-show="!showLyrics" ref="scrollbar" />
     <Navbar v-show="showNavbar" ref="navbar" />
-    <main
-      ref="main"
-      :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }"
-      @scroll="handleScroll"
-    >
-      <keep-alive>
-        <router-view v-if="$route.meta.keepAlive"></router-view>
-      </keep-alive>
-      <router-view v-if="!$route.meta.keepAlive"></router-view>
+    <main ref="main" :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }" @scroll="handleScroll">
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component v-if="$route.meta.keepAlive" :is="Component" />
+        </keep-alive>
+        <component v-if="!$route.meta.keepAlive" :is="Component" />
+      </router-view>
     </main>
     <transition name="slide-up">
       <Player v-if="enablePlayer" v-show="showPlayer" ref="player" />
@@ -141,6 +139,7 @@ main::-webkit-scrollbar {
 .slide-up-leave-active {
   transition: transform 0.4s;
 }
+
 .slide-up-enter-from,
 .slide-up-leave-to {
   transform: translateY(100%);
