@@ -154,7 +154,7 @@ export default {
     }
     this.getQrCodeKey();
   },
-  beforeDestroy() {
+  beforeMount() {
     clearInterval(this.qrCodeCheckInterval);
   },
   methods: {

@@ -475,7 +475,7 @@ export default {
       this.isFullscreen = !!document.fullscreenElement;
     });
   },
-  beforeDestroy: function () {
+  beforeMount: function () {
     if (this.timer) {
       clearInterval(this.timer);
     }

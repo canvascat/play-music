@@ -222,7 +222,7 @@ export default {
     this.setupMediaControls();
     window.addEventListener('keydown', this.handleKeydown);
   },
-  beforeDestroy() {
+  beforeMount() {
     window.removeEventListener('keydown', this.handleKeydown);
   },
   methods: {
