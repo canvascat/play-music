@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import icons from '@/assets/icons/all.js';
+import icons from '@/assets/icons';
 
 export default {
   name: 'SvgIcon',

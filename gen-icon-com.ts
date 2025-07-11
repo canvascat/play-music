@@ -46,8 +46,9 @@ export default {
     input += `import ${comName} from './components/${comName}.vue'\n`;
     coms[name] = comName;
   }
+  input += `\nexport { ${Object.values(coms).join(', ')} }\n\n`;
   input += `export default ${JSON.stringify(coms, null, 2).replace(/",\n/g, ',\n').replace(/: "/g, ': ').replace(/"\n/g, '\n')}`
-  await fsp.writeFile(path.join(root, 'all.js'), input);
+  await fsp.writeFile(path.join(root, 'index.js'), input);
 }
 
 main();

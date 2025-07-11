@@ -4,13 +4,13 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import i18n from '@/locale';
-import '@/assets/icons';
 import '@/utils/filters';
 import './registerServiceWorker';
 import { dailyTask } from '@/utils/common';
 import '@/assets/css/global.scss';
 import NProgress from 'nprogress';
 import '@/assets/css/nprogress.css';
+import SvgIcon from '@/components/SvgIcon.vue';
 
 window.resetApp = () => {
   localStorage.clear();
@@ -42,6 +42,7 @@ dailyTask();
 
 const app = createApp(App);
 
+app.component('svg-icon', SvgIcon);
 app.use(i18n);
 app.use(store);
 app.use(router);
