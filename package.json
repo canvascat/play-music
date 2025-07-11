@@ -11,6 +11,7 @@
   "dependencies": {
     "@unblockneteasemusic/rust-napi": "^0.4.0",
     "@vscode/codicons": "^0.0.36",
+    "@vue/compat": "^3.5.17",
     "NeteaseCloudMusicApi": "^4.23.3",
     "axios": "^0.26.1",
     "change-case": "^4.1.2",
@@ -40,7 +41,7 @@
     "register-service-worker": "^1.7.1",
     "svg-sprite-loader": "^6.0.11",
     "tunnel": "^0.0.6",
-    "vue": "^2.6.11",
+    "vue": "^3.5.17",
     "vue-gtag": "1",
     "vue-i18n": "^8.22.0",
     "vue-router": "^3.4.3",
@@ -50,7 +51,8 @@
   },
   "devDependencies": {
     "@types/node": "^17.0.0",
-    "@vitejs/plugin-vue2": "^2.3.3",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/compiler-sfc": "^3.5.17",
     "glob": "^11.0.3",
     "sass": "^1.26.11",
     "svgo": "^4.0.0",
