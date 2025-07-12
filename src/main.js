@@ -1,4 +1,3 @@
-window.require = () => null;
 import 'virtual:uno.css'
 import { createApp } from 'vue'; 
 import App from './App.vue';
@@ -6,7 +5,6 @@ import router from './router';
 import store from './store';
 import i18n from '@/locale';
 import '@/utils/filters';
-import './registerServiceWorker';
 import { dailyTask } from '@/utils/common';
 import '@/assets/css/global.scss';
 import NProgress from 'nprogress';

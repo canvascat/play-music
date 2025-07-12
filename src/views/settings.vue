@@ -782,11 +782,6 @@ import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
 
-const electron =
-  process.env.IS_ELECTRON === true ? window.require('electron') : null;
-const ipcRenderer =
-  process.env.IS_ELECTRON === true ? electron.ipcRenderer : null;
-
 const validShortcutCodes = ['=', '-', '~', '[', ']', ';', "'", ',', '.', '/'];
 
 export default {
@@ -814,7 +809,7 @@ export default {
   computed: {
     ...mapState(['player', 'settings', 'data', 'lastfm']),
     isElectron() {
-      return process.env.IS_ELECTRON;
+      return window.IS_ELECTRON;
     },
     isMac() {
       return /macintosh|mac os x/i.test(navigator.userAgent);
@@ -1129,7 +1124,7 @@ export default {
         let config = this.settings.proxyConfig || {};
         config.protocol = value;
         if (value === 'noProxy') {
-          ipcRenderer.send('removeProxy');
+          window.ipcRenderer?.send('removeProxy');
           this.showToast('已关闭代理');
         }
         this.$store.commit('updateSettings', {
@@ -1284,11 +1279,11 @@ export default {
   },
   created() {
     this.countDBSize('tracks');
-    if (process.env.IS_ELECTRON) this.getAllOutputDevices();
+    if (window.IS_ELECTRON) this.getAllOutputDevices();
   },
   activated() {
     this.countDBSize('tracks');
-    if (process.env.IS_ELECTRON) this.getAllOutputDevices();
+    if (window.IS_ELECTRON) this.getAllOutputDevices();
   },
   methods: {
     ...mapActions(['showToast']),
@@ -1356,9 +1351,9 @@ export default {
         !config.port ||
         config.protocol === 'noProxy'
       ) {
-        ipcRenderer.send('removeProxy');
+        window.ipcRenderer?.send('removeProxy');
       } else {
-        ipcRenderer.send('setProxy', config);
+        window.ipcRenderer?.send('setProxy', config);
       }
       this.showToast('已更新代理设置');
     },
@@ -1393,7 +1388,7 @@ export default {
       }
       this.shortcutInput = { id, type, recording: true };
       this.recordedShortcut = [];
-      ipcRenderer.send('switchGlobalShortcutStatusTemporary', 'disable');
+      window.ipcRenderer?.send('switchGlobalShortcutStatusTemporary', 'disable');
     },
     handleShortcutKeydown(e) {
       if (this.shortcutInput.recording === false) return;
@@ -1425,7 +1420,7 @@ export default {
         shortcut: this.recordedShortcutComputed,
       };
       this.$store.commit('updateShortcut', payload);
-      ipcRenderer.send('updateShortcut', payload);
+      window.ipcRenderer?.send('updateShortcut', payload);
       this.showToast('快捷键已保存');
       this.recordedShortcut = [];
     },
@@ -1433,11 +1428,11 @@ export default {
       if (this.shortcutInput.recording === false) return;
       this.shortcutInput = { id: '', type: '', recording: false };
       this.recordedShortcut = [];
-      ipcRenderer.send('switchGlobalShortcutStatusTemporary', 'enable');
+      window.ipcRenderer?.send('switchGlobalShortcutStatusTemporary', 'enable');
     },
     restoreDefaultShortcuts() {
       this.$store.commit('restoreDefaultShortcuts');
-      ipcRenderer.send('restoreDefaultShortcuts');
+      window.ipcRenderer?.send('restoreDefaultShortcuts');
     },
   },
 };

@@ -145,7 +145,7 @@ export default {
   },
   computed: {
     isElectron() {
-      return process.env.IS_ELECTRON;
+      return window.IS_ELECTRON;
     },
   },
   created() {

@@ -3,8 +3,8 @@
 import axios from 'axios';
 import md5 from 'crypto-js/md5';
 
-const apiKey = process.env.VUE_APP_LASTFM_API_KEY;
-const apiSharedSecret = process.env.VUE_APP_LASTFM_API_SHARED_SECRET;
+const apiKey = import.meta.env.VUE_APP_LASTFM_API_KEY;
+const apiSharedSecret = import.meta.env.VUE_APP_LASTFM_API_SHARED_SECRET;
 const baseUrl = window.location.origin;
 const url = 'https://ws.audioscrobbler.com/2.0/';
 
@@ -22,7 +22,7 @@ const sign = params => {
 };
 
 export function auth() {
-  const url = process.env.IS_ELECTRON
+  const url = window.IS_ELECTRON
     ? `https://www.last.fm/api/auth/?api_key=${apiKey}&cb=${baseUrl}/#/lastfm/callback`
     : `https://www.last.fm/api/auth/?api_key=${apiKey}&cb=${baseUrl}/lastfm/callback`;
   window.open(url);

@@ -9,7 +9,7 @@ import saveToLocalStorage from './plugins/localStorage';
 import { getSendSettingsPlugin } from './plugins/sendSettings';
 
 let plugins = [saveToLocalStorage];
-if (process.env.IS_ELECTRON === true) {
+if (window.IS_ELECTRON === true) {
   let sendSettings = getSendSettingsPlugin();
   plugins.push(sendSettings);
 }

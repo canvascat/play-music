@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
+import { createRouter,  createWebHashHistory, type RouteRecordRaw } from 'vue-router';
 import { isLooseLoggedIn, isAccountLoggedIn } from '@/utils/auth';
 
 const routes = [
@@ -130,10 +130,10 @@ const routes = [
     name: 'lastfmCallback',
     component: () => import('@/views/lastfmCallback.vue'),
   },
-];
+] as const satisfies RouteRecordRaw[];
 
 const router = createRouter({
-  history: process.env.IS_ELECTRON ? createWebHashHistory() : createWebHistory(),
+  history:  createWebHashHistory() ,
   routes,
 });
 
@@ -155,7 +155,7 @@ router.beforeEach((to, from, next) => {
     if (isLooseLoggedIn()) {
       next();
     } else {
-      if (process.env.IS_ELECTRON === true) {
+      if (window.IS_ELECTRON === true) {
         next({ path: '/login/account' });
       } else {
         next({ path: '/login' });

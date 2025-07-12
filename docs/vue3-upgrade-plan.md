@@ -94,3 +94,7 @@
 - [Migration Build 兼容层](https://v3-migration.vuejs.org/migration-build.html)
 - [Vue Router 4.x 文档](https://router.vuejs.org/)
 - [Pinia 状态管理](https://pinia.vuejs.org/) 
+
+## TODO 
+
+- this.$parent.$refs

@@ -144,7 +144,7 @@
   </div>
 </template>
 
-<script>
+<script   lang="ts">
 import { mapMutations, mapActions, mapState } from 'vuex';
 import { getArtistAlbum } from '@/api/artist';
 import { getTrackDetail } from '@/api/track';
@@ -153,7 +153,7 @@ import locale from '@/locale';
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
 import NProgress from 'nprogress';
 import { isAccountLoggedIn } from '@/utils/auth';
-import { groupBy, sortBy } from 'es-toolkit';
+import { cloneDeep, groupBy, sortBy } from 'es-toolkit';
 import { toPairs } from 'es-toolkit/compat';
 import { resizeImage, formatDate, formatTime, formatAlbumType } from '@/utils/filters';
 
@@ -164,7 +164,7 @@ import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
 import Modal from '@/components/Modal.vue';
-import { copyText } from '@/utils/copy';
+import { copyText } from '@/utils/copy.ts';
 
 export default {
   name: 'Album',
@@ -283,6 +283,7 @@ export default {
         if (!this.show) NProgress.start();
       }, 1000);
       getAlbum(id).then(data => {
+        console.debug(cloneDeep(data))
         this.album = data.album;
         this.tracks = data.songs;
         this.formatTitle();

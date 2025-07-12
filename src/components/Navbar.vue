@@ -158,7 +158,7 @@ export default {
       window.open('https://github.com/qier222/YesPlayMusic');
     },
     toLogin() {
-      if (process.env.IS_ELECTRON === true) {
+      if (window.IS_ELECTRON === true) {
         this.$router.push({ name: 'loginAccount' });
       } else {
         this.$router.push({ name: 'login' });

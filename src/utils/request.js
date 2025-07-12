@@ -3,16 +3,6 @@ import { doLogout, getCookie } from '@/utils/auth';
 import axios from 'axios';
 
 let baseURL = '/api';
-// Web 和 Electron 跑在不同端口避免同时启动时冲突
-// if (process.env.IS_ELECTRON) {
-//   if (process.env.NODE_ENV === 'production') {
-//     baseURL = process.env.VUE_APP_ELECTRON_API_URL;
-//   } else {
-//     baseURL = process.env.VUE_APP_ELECTRON_API_URL_DEV;
-//   }
-// } else {
-//   baseURL = process.env.VUE_APP_NETEASE_API_URL;
-// }
 
 const service = axios.create({
   baseURL,
@@ -25,7 +15,7 @@ service.interceptors.request.use(function (config) {
   if (baseURL.length) {
     if (
       baseURL[0] !== '/' &&
-      !process.env.IS_ELECTRON &&
+      !window.IS_ELECTRON &&
       getCookie('MUSIC_U') !== null
     ) {
       config.params.cookie = `MUSIC_U=${getCookie('MUSIC_U')};`;
@@ -34,7 +24,7 @@ service.interceptors.request.use(function (config) {
     console.error("You must set up the baseURL in the service's config");
   }
 
-  if (!process.env.IS_ELECTRON && !config.url.includes('/login')) {
+  if (!window.IS_ELECTRON && !config.url.includes('/login')) {
     config.params.realIP = '211.161.244.70';
   }
 
@@ -43,8 +33,8 @@ service.interceptors.request.use(function (config) {
     localStorage.getItem('settings')
   ).enableRealIP;
   const realIP = JSON.parse(localStorage.getItem('settings')).realIP;
-  if (process.env.VUE_APP_REAL_IP) {
-    config.params.realIP = process.env.VUE_APP_REAL_IP;
+  if (import.meta.env.VUE_APP_REAL_IP) {
+    config.params.realIP = import.meta.env.VUE_APP_REAL_IP;
   } else if (enableRealIP) {
     config.params.realIP = realIP;
   }
@@ -87,7 +77,7 @@ service.interceptors.response.use(
       doLogout();
 
       // 導向登入頁面
-      if (process.env.IS_ELECTRON === true) {
+      if (window.IS_ELECTRON === true) {
         router.push({ name: 'loginAccount' });
       } else {
         router.push({ name: 'login' });

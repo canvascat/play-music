@@ -48,7 +48,7 @@ let localStorage = {
   },
 };
 
-if (process.env.IS_ELECTRON === true) {
+if (window.IS_ELECTRON === true) {
   localStorage.settings.automaticallyCacheSongs = true;
 }
 

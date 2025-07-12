@@ -2,6 +2,9 @@ import request from '@/utils/request';
 import { mapTrackPlayableStatus } from '@/utils/common';
 import { cacheAlbum, getAlbumFromCache } from '@/utils/db';
 
+// import * as api from 'NeteaseCloudMusicApi';
+// import type * as NCM from 'NeteaseCloudMusicApi';
+
 /**
  * 获取专辑内容
  * 说明 : 调用此接口 , 传入专辑 id, 可获得专辑内容

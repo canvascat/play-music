@@ -5,9 +5,8 @@
     <main ref="main" :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }" @scroll="handleScroll">
       <router-view v-slot="{ Component }">
         <keep-alive>
-          <component v-if="$route.meta.keepAlive" :is="Component" />
-        </keep-alive>
-        <component v-if="!$route.meta.keepAlive" :is="Component" />
+          <component :is="Component" />
+        </keep-alive> 
       </router-view>
     </main>
     <transition name="slide-up">
@@ -47,7 +46,7 @@ export default {
   },
   data() {
     return {
-      isElectron: process.env.IS_ELECTRON, // true || undefined
+      isElectron: false, // window.IS_ELECTRON, // true || undefined
       userSelectNone: false,
     };
   },
