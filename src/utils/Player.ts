@@ -4,7 +4,7 @@ import { trackScrobble, trackUpdateNowPlaying } from '@/api/lastfm';
 import { fmTrash, personalFM } from '@/api/others';
 import { getPlaylistDetail, intelligencePlaylist } from '@/api/playlist';
 import { getLyric, getMP3, getTrackDetail, scrobble } from '@/api/track';
-import store from '@/store';
+import { pinia, useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { cacheTrackSource, getTrackSource } from '@/utils/db';
 import { isCreateMpris, isCreateTray } from '@/utils/platform';
@@ -39,7 +39,7 @@ function setTitle(track) {
   if (isCreateTray) {
     window.ipcRenderer?.send('updateTrayTooltip', document.title);
   }
-  store.commit('updateTitle', document.title);
+  useStore().updateTitle(document.title);
 }
 
 function setTrayLikeState(isLiked) {
@@ -51,99 +51,59 @@ function setTrayLikeState(isLiked) {
 export default class Player {
   // 播放器状态
   /** 是否正在播放中 */
-  private declare _playing: boolean;
+  private _playing: boolean = false;
   /** 当前播放歌曲的进度 */
-  private declare _progress: number;
+  private   _progress: number = 0;
   /** 是否启用Player */
-  private declare _enabled: boolean;
+  private   _enabled: boolean = false;
   /** 循环模式 */
-  private declare _repeatMode: 'off' | 'on' | 'one';
+  private   _repeatMode: 'off' | 'on' | 'one' = 'off';
   /** 是否随机播放 */
-  private declare _shuffle: boolean;
+  private   _shuffle: boolean = false;
   /** 是否倒序播放 */
-  private declare _reversed: boolean;
+  private   _reversed: boolean = false;
   /** 音量 0-1 */
-  private declare _volume: number;
+  private   _volume: number = 1;
   /** 静音前的音量 */
-  private declare _volumeBeforeMuted: number; 
+  private   _volumeBeforeMuted: number = 1; 
   /** 是否正在私人FM中加载新的track */
-  private declare _personalFMLoading: boolean;
+  private   _personalFMLoading: boolean = false;
   /** 是否正在缓存私人FM的下一首歌曲 */
-  private declare _personalFMNextLoading: boolean;
+  private   _personalFMNextLoading: boolean = false;
 
   // 播放信息
   /** 播放列表 */
-  private declare _list: number[];
+  private _list: number[] = [];
   /** 当前播放歌曲在播放列表里的index */
-  private declare _current: number;
+  private _current: number = 0;
   /** 被随机打乱的播放列表，随机播放模式下会使用此播放列表 */
-  private declare _shuffledList: number[];
+  private _shuffledList: number[] = [];
   /** 当前播放歌曲在随机列表里面的index */
-  private declare _shuffledCurrent: number;
+  private _shuffledCurrent: number = 0;
   /** 当前播放列表的信息 */
-  private declare _playlistSource: { type: string; id: number };
+  private _playlistSource: { type: string; id: number } = { type: 'album', id: 123 };
   /** 当前播放歌曲的详细信息 */
-  private declare _currentTrack: { id: number };
+  private _currentTrack: { id: number } = { id: 86827685 };
   /** 当这个list不为空时，会优先播放这个list的歌 */
-  private declare _playNextList: number[];
+  private _playNextList: number[] = [];
   /** 是否是私人FM模式 */
-  private declare _isPersonalFM: boolean;
+  private _isPersonalFM: boolean = false;
   /** 私人FM当前歌曲 */
-  private declare _personalFMTrack: { id: number };
+  private _personalFMTrack: { id: number } = { id: 0 };
   /** 私人FM下一首歌曲信息（为了快速加载下一首） */
-  private declare _personalFMNextTrack: { id: number };
+  private _personalFMNextTrack: { id: number } = { id: 0 };
 
   /** The blob records for cleanup. */
-  private declare createdBlobRecords: string[];
+  private createdBlobRecords: string[] = [];
   /** howler (https://github.com/goldfire/howler.js) */
-  private declare _howler: Howl | null;
+  private _howler: Howl | null = null;
 
-  constructor() {
-    // 播放器状态
-    this._playing = false; // 是否正在播放中
-    this._progress = 0; // 当前播放歌曲的进度
-    this._enabled = false; // 是否启用Player
-    this._repeatMode = 'off'; // off | on | one
-    this._shuffle = false; // true | false
-    this._reversed = false;
-    this._volume = 1; // 0 to 1
-    this._volumeBeforeMuted = 1; // 用于保存静音前的音量
-    this._personalFMLoading = false; // 是否正在私人FM中加载新的track
-    this._personalFMNextLoading = false; // 是否正在缓存私人FM的下一首歌曲
-
-    // 播放信息
-    this._list = []; // 播放列表
-    this._current = 0; // 当前播放歌曲在播放列表里的index
-    this._shuffledList = []; // 被随机打乱的播放列表，随机播放模式下会使用此播放列表
-    this._shuffledCurrent = 0; // 当前播放歌曲在随机列表里面的index
-    this._playlistSource = { type: 'album', id: 123 }; // 当前播放列表的信息
-    this._currentTrack = { id: 86827685 }; // 当前播放歌曲的详细信息
-    this._playNextList = []; // 当这个list不为空时，会优先播放这个list的歌
-    this._isPersonalFM = false; // 是否是私人FM模式
-    this._personalFMTrack = { id: 0 }; // 私人FM当前歌曲
-    this._personalFMNextTrack = {
-      id: 0,
-    }; // 私人FM下一首歌曲信息（为了快速加载下一首）
-
-    /**
-     * The blob records for cleanup.
-     *
-     * @private
-     * @type {string[]}
-     */
-    this.createdBlobRecords = [];
-
-    // howler (https://github.com/goldfire/howler.js)
-    this._howler = null;
+  constructor() { 
     Object.defineProperty(this, '_howler', {
       enumerable: false,
     });
-
-    // init
+ 
     this._init();
-
-    // window.yesplaymusic = {};
-    // window.yesplaymusic.player = this;
   }
 
   get repeatMode() {
@@ -249,7 +209,7 @@ export default class Player {
     }
   }
   get isCurrentTrackLiked() {
-    return store.state.liked.songs.includes(this.currentTrack.id);
+    return useStore(pinia).liked.songs.includes(this.currentTrack.id);
   }
 
   private _init() {
@@ -355,7 +315,7 @@ export default class Player {
       time,
     });
     if (
-      store.state.lastfm.key !== undefined &&
+      useStore(pinia).lastfm.key !== undefined &&
       (time >= trackDuration / 2 || time >= 240)
     ) {
       const timestamp = ~~(new Date().getTime() / 1000) - time;
@@ -387,7 +347,7 @@ export default class Player {
         this._playNextTrack(this._isPersonalFM);
       } else if (errCode === 4) {
         // code 4: MEDIA_ERR_SRC_NOT_SUPPORTED
-        store.dispatch('showToast', `无法播放: 不支持的音频格式`);
+        useStore(pinia).showToast(`无法播放: 不支持的音频格式`);
         this._playNextTrack(this._isPersonalFM);
       } else {
         const t = this.progress;
@@ -408,7 +368,7 @@ export default class Player {
       if (this._currentTrack.name) {
         setTitle(this._currentTrack);
       }
-      setTrayLikeState(store.state.liked.songs.includes(this.currentTrack.id));
+      setTrayLikeState(useStore(pinia).liked.songs.includes(this.currentTrack.id));
     }
     this.setOutputDevice();
   }
@@ -442,7 +402,7 @@ export default class Player {
         if (!result.data[0].url) return null;
         if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
         const source = result.data[0].url.replace(/^http:/, 'https:');
-        if (store.state.settings.automaticallyCacheSongs) {
+        if (useStore(pinia).settings.automaticallyCacheSongs) {
           cacheTrackSource(track, source, result.data[0].br);
         }
         return source;
@@ -458,7 +418,7 @@ export default class Player {
 
     if (
       window.IS_ELECTRON !== true ||
-      store.state.settings.enableUnblockNeteaseMusic === false
+      useStore(pinia).settings.enableUnblockNeteaseMusic === false
     ) {
       return null;
     }
@@ -485,21 +445,21 @@ export default class Player {
 
     const retrieveSongInfo = await window.ipcRenderer?.invoke(
       'unblock-music',
-      store.state.settings.unmSource,
+      useStore(pinia).settings.unmSource,
       track,
       {
-        enableFlac: store.state.settings.unmEnableFlac || null,
-        proxyUri: store.state.settings.unmProxyUri || null,
-        searchMode: determineSearchMode(store.state.settings.unmSearchMode),
+        enableFlac: useStore(pinia).settings.unmEnableFlac || null,
+        proxyUri: useStore(pinia).settings.unmProxyUri || null,
+        searchMode: determineSearchMode(useStore(pinia).settings.unmSearchMode),
         config: {
-          'joox:cookie': store.state.settings.unmJooxCookie || null,
-          'qq:cookie': store.state.settings.unmQQCookie || null,
-          'ytdl:exe': store.state.settings.unmYtDlExe || null,
+          'joox:cookie': useStore(pinia).settings.unmJooxCookie || null,
+          'qq:cookie': useStore(pinia).settings.unmQQCookie || null,
+          'ytdl:exe': useStore(pinia).settings.unmYtDlExe || null,
         },
       }
     );
 
-    if (store.state.settings.automaticallyCacheSongs && retrieveSongInfo?.url) {
+    if (useStore(pinia).settings.automaticallyCacheSongs && retrieveSongInfo?.url) {
       // 对于来自 bilibili 的音源
       // retrieveSongInfo.url 是音频数据的base64编码
       // 其他音源为实际url
@@ -571,7 +531,7 @@ export default class Player {
         }
         return replaced;
       } else {
-        store.dispatch('showToast', `无法播放 ${track.name}`);
+        useStore(pinia).showToast(`无法播放 ${track.name}`);
         switch (ifUnplayableThen) {
           case UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK:
             this._playNextTrack(this.isPersonalFM);
@@ -580,8 +540,7 @@ export default class Player {
             this.playPrevTrack();
             break;
           default:
-            store.dispatch(
-              'showToast',
+            useStore(pinia).showToast(
               `undefined Unplayable condition: ${ifUnplayableThen}`
             );
             break;
@@ -672,7 +631,7 @@ export default class Player {
   }
   // OSDLyrics 会检测 Mpris 状态并寻找对应歌词文件，所以要在更新 Mpris 状态之前保证歌词下载完成
   private async _updateMprisState(track, metadata) {
-    if (!store.state.settings.enableOsdlyricsSupport) {
+    if (!useStore(pinia).settings.enableOsdlyricsSupport) {
       return window.ipcRenderer?.send('metadata', metadata);
     }
 
@@ -736,7 +695,7 @@ export default class Player {
   private _playDiscordPresence(track, seekTime = 0) {
     if (
       window.IS_ELECTRON !== true ||
-      store.state.settings.enableDiscordRichPresence === false
+      useStore(pinia).settings.enableDiscordRichPresence === false
     ) {
       return null;
     }
@@ -747,7 +706,7 @@ export default class Player {
   private _pauseDiscordPresence(track) {
     if (
       window.IS_ELECTRON !== true ||
-      store.state.settings.enableDiscordRichPresence === false
+      useStore(pinia).settings.enableDiscordRichPresence === false
     ) {
       return null;
     }
@@ -795,7 +754,7 @@ export default class Player {
         result = await personalFM().catch(() => null);
         if (!result) {
           this._personalFMLoading = false;
-          store.dispatch('showToast', 'personal fm timeout');
+          useStore(pinia).showToast('personal fm timeout');
           return false;
         }
         if (result.data?.length > 0) {
@@ -808,7 +767,7 @@ export default class Player {
 
       if (retryCount < 0) {
         let content = '获取私人FM数据时重试次数过多，请手动切换下一首';
-        store.dispatch('showToast', content);
+        useStore(pinia).showToast(content);
         console.log(content);
         return false;
       }
@@ -873,7 +832,7 @@ export default class Player {
         setTitle(this._currentTrack);
       }
       this._playDiscordPresence(this._currentTrack, this.seek());
-      if (store.state.lastfm.key !== undefined) {
+      if (useStore(pinia).lastfm.key !== undefined) {
         trackUpdateNowPlaying({
           artist: this.currentTrack.ar[0].name,
           track: this.currentTrack.name,
@@ -914,7 +873,7 @@ export default class Player {
     if (this._howler?._sounds.length <= 0 || !this._howler?._sounds[0]._node) {
       return;
     }
-    this._howler?._sounds[0]._node.setSinkId(store.state.settings.outputDevice);
+    this._howler?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
   }
 
   replacePlaylist(
@@ -1001,7 +960,7 @@ export default class Player {
 
   sendSelfToIpcMain() {
     if (window.IS_ELECTRON !== true) return false;
-    let liked = store.state.liked.songs.includes(this.currentTrack.id);
+    let liked = useStore(pinia).liked.songs.includes(this.currentTrack.id);
     window.ipcRenderer?.send('player', {
       playing: this.playing,
       likedCurrentTrack: liked,

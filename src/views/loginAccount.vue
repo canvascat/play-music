@@ -115,7 +115,8 @@
 import QRCode from 'qrcode';
 import md5 from 'crypto-js/md5';
 import NProgress from 'nprogress';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { setCookies } from '@/utils/auth';
 import nativeAlert from '@/utils/nativeAlert';
 import {
@@ -158,7 +159,7 @@ export default {
     clearInterval(this.qrCodeCheckInterval);
   },
   methods: {
-    ...mapMutations(['updateData']),
+    ...mapActions(useStore, ['updateData', 'fetchUserProfile', 'fetchLikedPlaylist']),
     validatePhone() {
       if (
         this.countryCode === '' ||
@@ -222,8 +223,8 @@ export default {
       if (data.code === 200) {
         setCookies(data.cookie);
         this.updateData({ key: 'loginMode', value: 'account' });
-        this.$store.dispatch('fetchUserProfile').then(() => {
-          this.$store.dispatch('fetchLikedPlaylist').then(() => {
+        this.fetchUserProfile().then(() => {
+          this.fetchLikedPlaylist().then(() => {
             this.$router.push({ path: '/library' });
           });
         });

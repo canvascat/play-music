@@ -2,14 +2,15 @@ import 'virtual:uno.css'
 import { createApp } from 'vue'; 
 import App from './App.vue';
 import router from './router';
-import store from './store';
-import i18n from '@/locale';
+import { pinia } from './store/pinia';
 import '@/utils/filters';
 import { dailyTask } from '@/utils/common';
 import '@/assets/css/global.scss';
 import NProgress from 'nprogress';
 import '@/assets/css/nprogress.css';
 import SvgIcon from '@/components/SvgIcon.vue';
+import i18n from './locale';
+
 
 window.resetApp = () => {
   localStorage.clear();
@@ -37,12 +38,14 @@ console.log(
 // Vue.config.productionTip = false;
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
-dailyTask();
+
 
 const app = createApp(App);
 
 app.component('svg-icon', SvgIcon);
+app.use(pinia);
+ 
+dailyTask();
 app.use(i18n);
-app.use(store);
 app.use(router);
 app.mount('#app');

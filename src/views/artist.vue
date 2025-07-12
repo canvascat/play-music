@@ -177,7 +177,8 @@
 </template>
 
 <script>
-import { mapMutations, mapActions, mapState } from 'vuex';
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import {
   getArtist,
   getArtistAlbum,
@@ -186,7 +187,6 @@ import {
   similarArtists,
 } from '@/api/artist';
 import { getTrackDetail } from '@/api/track';
-import locale from '@/locale';
 import { isAccountLoggedIn } from '@/utils/auth';
 import NProgress from 'nprogress';
 import { resizeImage, formatDate, formatAlbumType } from '@/utils/filters';
@@ -242,7 +242,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player']),
+    ...mapState(useStore, ['player']),
     albums() {
       return this.albumsData.filter(
         a => a.type === '专辑' || a.type === '精选集'
@@ -272,8 +272,7 @@ export default {
   },
   methods: {
     resizeImage, formatDate, formatAlbumType,
-    ...mapMutations(['appendTrackToPlayerList']),
-    ...mapActions(['playFirstTrackOnList', 'playTrackOnListByID', 'showToast']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
     loadData(id, next = undefined) {
       setTimeout(() => {
         if (!this.show) NProgress.start();
@@ -318,7 +317,7 @@ export default {
     },
     playPopularSongs(trackID = 'first') {
       let trackIDs = this.popularTracks.map(t => t.id);
-      this.$store.state.player.replacePlaylist(
+      this.player.replacePlaylist(
         trackIDs,
         this.artist.id,
         'artist',
@@ -327,7 +326,7 @@ export default {
     },
     followArtist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       followAArtist({
@@ -346,9 +345,9 @@ export default {
     toggleFullDescription() {
       this.showFullDescription = !this.showFullDescription;
       if (this.showFullDescription) {
-        this.$store.commit('enableScrolling', false);
+        this.setEnableScrolling(false);
       } else {
-        this.$store.commit('enableScrolling', true);
+        this.setEnableScrolling(true);
       }
     },
     openMenu(e) {
@@ -358,10 +357,10 @@ export default {
       let showToast = this.showToast;
        copyText(`https://music.163.com/#/artist?id=${id}`)
         .then(function () {
-          showToast(locale.t('toast.copied'));
+          showToast(this.$t('toast.copied'));
         })
         .catch(error => {
-          showToast(`${locale.t('toast.copyFailed')}${error}`);
+          showToast(`${this.$t('toast.copyFailed')}${error}`);
         });
     },
     openInBrowser(id) {

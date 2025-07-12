@@ -1,12 +1,12 @@
 <template>
   <div id="app" :class="{ 'user-select-none': userSelectNone }">
-    <Scrollbar v-show="!showLyrics" ref="scrollbar" />
+    <Scrollbar v-show="!showLyrics" ref="scrollbar" :main="main" v-model:user-select-none="userSelectNone" />
     <Navbar v-show="showNavbar" ref="navbar" />
-    <main ref="main" :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }" @scroll="handleScroll">
+    <main ref="main" :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }" @scroll="handleScroll" class="main">
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
-        </keep-alive> 
+        </keep-alive>
       </router-view>
     </main>
     <transition name="slide-up">
@@ -21,89 +21,85 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import ModalAddTrackToPlaylist from './components/ModalAddTrackToPlaylist.vue';
 import ModalNewPlaylist from './components/ModalNewPlaylist.vue';
 import Scrollbar from './components/Scrollbar.vue';
 import Navbar from './components/Navbar.vue';
 import Player from './components/Player.vue';
 import Toast from './components/Toast.vue';
-// import { ipcRenderer } from './electron/ipcRenderer';
-import { isAccountLoggedIn, isLooseLoggedIn } from '@/utils/auth';
-import Lyrics from './views/lyrics.vue';
-import { mapState } from 'vuex';
 
-export default {
-  name: 'App',
-  components: {
-    Navbar,
-    Player,
-    Toast,
-    ModalAddTrackToPlaylist,
-    ModalNewPlaylist,
-    Lyrics,
-    Scrollbar,
-  },
-  data() {
-    return {
-      isElectron: false, // window.IS_ELECTRON, // true || undefined
-      userSelectNone: false,
-    };
-  },
-  computed: {
-    ...mapState(['showLyrics', 'settings', 'player', 'enableScrolling']),
-    isAccountLoggedIn() {
-      return isAccountLoggedIn();
-    },
-    showPlayer() {
-      return (
-        [
-          'mv',
-          'loginUsername',
-          'login',
-          'loginAccount',
-          'lastfmCallback',
-        ].includes(this.$route.name) === false
-      );
-    },
-    enablePlayer() {
-      return this.player.enabled && this.$route.name !== 'lastfmCallback';
-    },
-    showNavbar() {
-      return this.$route.name !== 'lastfmCallback';
-    },
-  },
-  created() {
-    // if (this.isElectron) ipcRenderer(this);
-    window.addEventListener('keydown', this.handleKeydown);
-    this.fetchData();
-  },
-  methods: {
-    handleKeydown(e) {
-      if (e.code === 'Space') {
-        if (e.target.tagName === 'INPUT') return false;
-        if (this.$route.name === 'mv') return false;
-        e.preventDefault();
-        this.player.playOrPause();
-      }
-    },
-    fetchData() {
-      if (!isLooseLoggedIn()) return;
-      this.$store.dispatch('fetchLikedSongs');
-      this.$store.dispatch('fetchLikedSongsWithDetails');
-      this.$store.dispatch('fetchLikedPlaylist');
-      if (isAccountLoggedIn()) {
-        this.$store.dispatch('fetchLikedAlbums');
-        this.$store.dispatch('fetchLikedArtists');
-        this.$store.dispatch('fetchLikedMVs');
-        this.$store.dispatch('fetchCloudDisk');
-      }
-    },
-    handleScroll() {
-      this.$refs.scrollbar.handleScroll();
-    },
-  },
+import * as auth from '@/utils/auth';
+import Lyrics from './views/lyrics.vue';
+import { useStore } from '@/store/pinia';
+import { computed, onMounted, provide, ref, useTemplateRef } from 'vue';
+import { useRoute } from 'vue-router';
+import { restorePositionSymbol } from './injectionSymbols';
+
+const main = useTemplateRef('main');
+const scrollbar = useTemplateRef('scrollbar');
+
+defineOptions({ name: 'App' });
+
+const userSelectNone = ref(false);
+
+const store = useStore()
+
+const showLyrics = computed(() => store.showLyrics);
+const player = computed(() => store.player);
+const enableScrolling = computed(() => store.enableScrolling);
+
+const isAccountLoggedIn = computed(() => auth.isAccountLoggedIn());
+const route = useRoute();
+
+const showPlayer = computed(() => {
+  return !['mv', 'loginUsername', 'login', 'loginAccount', 'lastfmCallback'].includes(route.name as string);
+});
+
+const enablePlayer = computed(() => {
+  return player.value.enabled && route.name !== 'lastfmCallback';
+});
+
+const showNavbar = computed(() => {
+  return route.name !== 'lastfmCallback';
+});
+
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.code === 'Space') {
+    if (e.target && 'tagName' in e.target && e.target.tagName === 'INPUT') return false;
+    if (route.name === 'mv') return false;
+    e.preventDefault();
+    player.value.playOrPause();
+  }
 };
+
+function fetchData() {
+  if (!auth.isLooseLoggedIn()) return;
+  store.fetchLikedSongs();
+  store.fetchLikedSongsWithDetails();
+  store.fetchLikedPlaylist();
+  if (auth.isAccountLoggedIn()) {
+    store.fetchLikedAlbums();
+    store.fetchLikedArtists();
+    store.fetchLikedMVs();
+    store.fetchCloudDisk();
+  }
+}
+
+const handleScroll = (payload: Event) => {
+  scrollbar.value?.handleScroll(payload);
+};
+
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown);
+  fetchData();
+});
+
+defineExpose({
+  main, scrollbar
+});
+provide(restorePositionSymbol, () => scrollbar.value?.restorePosition());
 </script>
 
 <style lang="scss">

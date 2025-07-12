@@ -37,7 +37,8 @@
 <script>
 import ButtonIcon from '@/components/ButtonIcon.vue';
 import ArtistsInLine from '@/components/ArtistsInLine.vue';
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
 import { resizeImage } from '@/utils/filters';
@@ -51,7 +52,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player']),
+    ...mapState(useStore, ['player']),
     track() {
       return this.player.personalFMTrack;
     },

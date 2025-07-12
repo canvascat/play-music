@@ -218,7 +218,8 @@
 </template>
 
 <script>
-import { mapMutations, mapActions, mapState } from 'vuex';
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import NProgress from 'nprogress';
 import {
   getPlaylistDetail,
@@ -228,7 +229,6 @@ import {
 import { getTrackDetail } from '@/api/track';
 import { isAccountLoggedIn } from '@/utils/auth';
 import nativeAlert from '@/utils/nativeAlert';
-import locale from '@/locale';
 import { resizeImage, formatDate } from '@/utils/filters';
 
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
@@ -369,7 +369,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player', 'data']),
+    ...mapState(useStore, ['player', 'data']),
     isLikeSongsPage() {
       return this.$route.name === 'likedSongs';
     },
@@ -415,11 +415,10 @@ export default {
   },
   methods: {
     resizeImage, formatDate,
-    ...mapMutations(['appendTrackToPlayerList']),
-    ...mapActions(['playFirstTrackOnList', 'playTrackOnListByID', 'showToast']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
     playPlaylistByID(trackID = 'first') {
       let trackIDs = this.playlist.trackIds.map(t => t.id);
-      this.$store.state.player.replacePlaylist(
+      this.player.replacePlaylist(
         trackIDs,
         this.playlist.id,
         'playlist',
@@ -428,7 +427,7 @@ export default {
     },
     likePlaylist(toast = false) {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       subscribePlaylist({
@@ -492,7 +491,7 @@ export default {
     },
     deletePlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       let confirmation = confirm(`确定要删除歌单 ${this.playlist.name}？`);
@@ -523,7 +522,7 @@ export default {
     },
     removeTrack(trackID) {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       this.tracks = this.tracks.filter(t => t.id !== trackID);
@@ -537,9 +536,9 @@ export default {
     toggleFullDescription() {
       this.showFullDescription = !this.showFullDescription;
       if (this.showFullDescription) {
-        this.$store.commit('enableScrolling', false);
+        this.setEnableScrolling(false);
       } else {
-        this.$store.commit('enableScrolling', true);
+        this.setEnableScrolling(true);
       }
     },
   },

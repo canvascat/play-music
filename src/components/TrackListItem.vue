@@ -89,7 +89,8 @@
 <script>
 import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { isNil } from 'es-toolkit';
 import { formatTime } from '@/utils/filters';
 
@@ -111,7 +112,7 @@ export default {
   },
 
   computed: {
-    ...mapState(['settings']),
+    ...mapState(useStore, ['settings', 'player']),
     track() {
       return this.type === 'cloudDisk'
         ? this.trackProp.simpleSong
@@ -146,7 +147,7 @@ export default {
       }
 
       //优先显示alia
-      if (this.$store.state.settings.subTitleDefault) {
+      if (this.settings.subTitleDefault) {
         return this.track?.alia?.length > 0 ? this.track.alia[0] : tn;
       } else {
         return tn === undefined ? this.track.alia[0] : tn;
@@ -172,7 +173,7 @@ export default {
       return this.$parent.liked.songs.includes(this.track?.id);
     },
     isPlaying() {
-      return this.$store.state.player.currentTrack.id === this.track?.id;
+      return this.player.currentTrack.id === this.track?.id;
     },
     trackClass() {
       let trackClass = [this.type];
@@ -194,7 +195,7 @@ export default {
     },
     showUnavailableSongInGreyStyle() {
       return window.IS_ELECTRON
-        ? !this.$store.state.settings.enableUnblockNeteaseMusic
+        ? !this.settings.enableUnblockNeteaseMusic
         : true;
     },
     showLikeButton() {

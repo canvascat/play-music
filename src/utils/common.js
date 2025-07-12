@@ -2,7 +2,7 @@ import { isAccountLoggedIn } from './auth';
 import { refreshCookie } from '@/api/auth';
 import { dailySignin } from '@/api/user';
 import dayjs from 'dayjs';
-import store from '@/store';
+import { useStore } from '@/store/pinia';
 
 export function isTrackPlayable(track) {
   let result = {
@@ -17,7 +17,7 @@ export function isTrackPlayable(track) {
     return result;
   }
   if (track.fee === 1 || track.privilege?.fee === 1) {
-    if (isAccountLoggedIn() && store.state.data.user.vipType === 11) {
+    if (isAccountLoggedIn() && useStore().data.user.vipType === 11) {
       result.playable = true;
     } else {
       result.playable = false;
@@ -97,7 +97,8 @@ export function updateHttps(url) {
 }
 
 export function dailyTask() {
-  let lastDate = store.state.data.lastRefreshCookieDate;
+  const store = useStore();
+  let lastDate = store.data.lastRefreshCookieDate;
   if (
     isAccountLoggedIn() &&
     (lastDate === undefined || lastDate !== dayjs().date())
@@ -105,7 +106,7 @@ export function dailyTask() {
     console.debug('[debug][common.js] execute dailyTask');
     refreshCookie().then(() => {
       console.debug('[debug][common.js] 刷新cookie');
-      store.commit('updateData', {
+      store.updateData({
         key: 'lastRefreshCookieDate',
         value: dayjs().date(),
       });
@@ -209,7 +210,7 @@ export function bytesToSize(bytes) {
   let megaBytes = marker * marker;
   let gigaBytes = marker * marker * marker;
 
-  let lang = store.state.settings.lang;
+  let lang = useStore().settings.lang;
 
   if (bytes < kiloBytes) return bytes + (lang === 'en' ? ' Bytes' : '字节');
   else if (bytes < megaBytes)

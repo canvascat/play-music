@@ -18,9 +18,9 @@ import {
   cloudDisk,
   userAccount,
 } from '@/api/user';
-
-
-const pinia = createPinia()
+import { changeAppearance } from '@/utils/common';
+ 
+export const pinia = createPinia()
 // 将该插件交给 Pinia
 pinia.use(localStoragePiniaPlugin)
 if (window.IS_ELECTRON === true) {
@@ -28,7 +28,7 @@ if (window.IS_ELECTRON === true) {
 }
 
 export const useStore = defineStore('store', {
-  state: () => _state,
+  state: () =>  _state ,
   actions: {
     updateLikedXXX({ name, data }) {
       this.liked[name] = data;
@@ -97,15 +97,15 @@ export const useStore = defineStore('store', {
     restoreDefaultShortcuts() {
       this.settings.shortcuts = cloneDeep(shortcuts);
     },
-    enableScrolling(status = null) {
+    setEnableScrolling(status = null) {
       this.enableScrolling = status ? status : !this.enableScrolling;
     },
-    updateTitle(title) {
+    updateTitle(title: string) {
       this.title = title;
     },
 
 
-    showToast(text) {
+    showToast(text: string) {
       if (this.toast.timer !== null) {
         clearTimeout(this.toast.timer);
         this.updateToast({ show: false, text: '', timer: null });
@@ -289,3 +289,37 @@ export const useStore = defineStore('store', {
 
   }
 });
+
+ 
+  const store = useStore(pinia);
+
+  if ([undefined, null].includes(store.settings.lang)) {
+    const defaultLang = 'en';
+    const langMapper = new Map()
+      .set('zh', 'zh-CN')
+      .set('zh-TW', 'zh-TW')
+      .set('en', 'en')
+      .set('tr', 'tr');
+    store.settings.lang =
+      langMapper.get(
+        langMapper.has(navigator.language)
+          ? navigator.language
+          : navigator.language.slice(0, 2)
+      ) || defaultLang;
+    localStorage.setItem('settings', JSON.stringify(store.settings));
+  }
+
+  changeAppearance(store.settings.appearance);
+
+
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', () => {
+      if (store.settings.appearance === 'auto') {
+        changeAppearance(store.settings.appearance);
+      }
+    });
+
+
+
+ 

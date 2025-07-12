@@ -75,7 +75,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { isLooseLoggedIn, doLogout } from '@/utils/auth';
 import Win32Titlebar from '@/components/Win32Titlebar.vue';
 import LinuxTitlebar from '@/components/LinuxTitlebar.vue';
@@ -102,7 +103,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['settings', 'data']),
+    ...mapState(useStore, ['settings', 'data']),
     isLooseLoggedIn() {
       return isLooseLoggedIn();
     },

@@ -14,7 +14,8 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import NProgress from 'nprogress';
 import { dailyRecommendTracks } from '@/api/playlist';
 
@@ -31,7 +32,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player', 'data', 'dailyTracks']),
+    ...mapState(useStore, ['player', 'data', 'dailyTracks']),
   },
   created() {
     if (this.dailyTracks.length === 0) {
@@ -45,7 +46,7 @@ export default {
     // this.$parent.$refs.main.scrollTo(0, 0);
   },
   methods: {
-    ...mapMutations(['updateDailyTracks']),
+    ...mapActions(useStore, ['updateDailyTracks']),
     loadDailyTracks() {
       dailyRecommendTracks().then(result => {
         this.updateDailyTracks(result.data.dailySongs);

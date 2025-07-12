@@ -38,24 +38,24 @@
 ## 三、详细升级计划
 
 ### 1. 依赖与工具链升级
-- [ ] 升级 `vue` 到 `^3.x`，并安装 `@vue/compat`
-- [ ] 升级 `vue-router` 到 `^4.x`
-- [ ] 升级 `vuex` 到 `^4.x` 或迁移到 Pinia（官方推荐）
-- [ ] 升级 `vue-i18n` 到 `^9.x`
-- [ ] 替换 `@vitejs/plugin-vue2` 为 `@vitejs/plugin-vue`
+- [x] 升级 `vue` 到 `^3.x`，并安装 `@vue/compat`
+- [x] 升级 `vue-router` 到 `^4.x`
+- [x] 升级 `vuex` 到 `^4.x` 或迁移到 Pinia（官方推荐）
+- [x] 升级 `vue-i18n` 到 `^9.x`
+- [x] 替换 `@vitejs/plugin-vue2` 为 `@vitejs/plugin-vue`
 - [ ] 检查并升级/替换所有第三方 Vue 相关依赖（如 `vue-clipboard2`、`vue-gtag`、`vue-slider-component`）
     - https://reka-ui.com/examples/slider-number-field
 
 ### 2. 配置兼容层
-- [ ] 在 `vite.config.js` 配置 `vue: '@vue/compat'`，并启用 compat mode
-- [ ] 参考官方配置示例，设置 compilerOptions
+- [x] 在 `vite.config.js` 配置 `vue: '@vue/compat'`，并启用 compat mode
+- [x] 参考官方配置示例，设置 compilerOptions
 
 ### 3. 入口文件重构
-- [ ] `main.js` 用 `createApp` 创建应用，插件注册方式调整
+- [x] `main.js` 用 `createApp` 创建应用，插件注册方式调整
 - [ ] `App.vue`、`router`、`store`、`i18n` 初始化方式调整
 
 ### 4. 组件与业务代码迁移
-- [ ] 批量修复 filters、mixin、全局事件总线等不兼容用法
+- [x] 批量修复 filters、mixin、全局事件总线等不兼容用法
 - [ ] 组件语法迁移（生命周期、响应式、插槽、v-model 等）
 - [ ] 插件注册、全局组件注册方式调整
 - [ ] 重点功能（播放、登录、设置、歌词、歌单等）优先迁移

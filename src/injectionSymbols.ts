@@ -1,0 +1,1 @@
+export const restorePositionSymbol = Symbol('restorePosition');

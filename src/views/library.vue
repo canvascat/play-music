@@ -214,13 +214,13 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex';
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { randomNum, dailyTask } from '@/utils/common';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { uploadSong } from '@/api/user';
 import { getLyric } from '@/api/track';
 import NProgress from 'nprogress';
-import locale from '@/locale';
 import { resizeImage } from '@/utils/filters';
 
 import ContextMenu from '@/components/ContextMenu.vue';
@@ -252,7 +252,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['data', 'liked']),
+    ...mapState(useStore, ['data', 'liked']),
     /**
      * @returns {string[]}
      */
@@ -315,38 +315,37 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapActions(['showToast']),
-    ...mapMutations(['updateModal', 'updateData']),
+    ...mapActions(useStore, ['showToast', 'updateModal', 'updateData', 'fetchLikedSongsWithDetails', 'fetchLikedSongs', 'fetchLikedPlaylist', 'fetchLikedAlbums', 'fetchLikedArtists', 'fetchLikedMVs', 'fetchCloudDisk', 'fetchPlayHistory', 'updateLikedXXX'  ]),
     loadData() {
       if (this.liked.songsWithDetails.length > 0) {
         NProgress.done();
         this.show = true;
-        this.$store.dispatch('fetchLikedSongsWithDetails');
+        this.fetchLikedSongsWithDetails();
         this.getRandomLyric();
       } else {
-        this.$store.dispatch('fetchLikedSongsWithDetails').then(() => {
+        this.fetchLikedSongsWithDetails().then(() => {
           NProgress.done();
           this.show = true;
           this.getRandomLyric();
         });
       }
-      this.$store.dispatch('fetchLikedSongs');
-      this.$store.dispatch('fetchLikedPlaylist');
-      this.$store.dispatch('fetchLikedAlbums');
-      this.$store.dispatch('fetchLikedArtists');
-      this.$store.dispatch('fetchLikedMVs');
-      this.$store.dispatch('fetchCloudDisk');
-      this.$store.dispatch('fetchPlayHistory');
+      this.fetchLikedSongs();
+      this.fetchLikedPlaylist();
+      this.fetchLikedAlbums();
+      this.fetchLikedArtists();
+      this.fetchLikedMVs();
+      this.fetchCloudDisk();
+      this.fetchPlayHistory();
     },
     playLikedSongs() {
-      this.$store.state.player.playPlaylistByID(
+      this.player.playPlaylistByID(
         this.liked.playlists[0].id,
         'first',
         true
       );
     },
     playIntelligenceList() {
-      this.$store.state.player.playIntelligenceListById(
+      this.player.playIntelligenceListById(
         this.liked.playlists[0].id,
         'first',
         true
@@ -354,7 +353,7 @@ export default {
     },
     updateCurrentTab(tab) {
       if (!isAccountLoggedIn() && tab !== 'playlists') {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       this.currentTab = tab;
@@ -380,7 +379,7 @@ export default {
     },
     openAddPlaylistModal() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       this.updateModal({
@@ -408,7 +407,7 @@ export default {
         if (result.code === 200) {
           let newCloudDisk = this.liked.cloudDisk;
           newCloudDisk.unshift(result.privateCloud);
-          this.$store.commit('updateLikedXXX', {
+          this.updateLikedXXX({
             name: 'cloudDisk',
             data: newCloudDisk,
           });

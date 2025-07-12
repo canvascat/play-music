@@ -25,7 +25,8 @@
 <script>
 import '@vscode/codicons/dist/codicon.css';
 
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 
 export default {
   name: 'Win32Titlebar',
@@ -35,7 +36,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['title']),
+    ...mapState(useStore, ['title']),
   },
   created() {
     if (window.IS_ELECTRON === true) {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Dexie from 'dexie';
-import store from '@/store';
+import { useStore } from '@/store/pinia';
 // import pkg from "../../package.json";
 
 const db = new Dexie('yesplaymusic');
@@ -31,9 +31,10 @@ db.version(1).stores({
 let tracksCacheBytes = 0;
 
 async function deleteExcessCache() {
+  const store = useStore();
   if (
-    store.state.settings.cacheLimit === false ||
-    tracksCacheBytes < store.state.settings.cacheLimit * Math.pow(1024, 2)
+    store.settings.cacheLimit === false ||
+    tracksCacheBytes < store.settings.cacheLimit * Math.pow(1024, 2)
   ) {
     return;
   }

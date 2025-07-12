@@ -12,6 +12,8 @@
 
 <script>
 import { authGetSession } from '@/api/lastfm';
+import { mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 
 export default {
   name: 'LastfmCallback',
@@ -32,12 +34,13 @@ export default {
         return;
       }
       localStorage.setItem('lastfm', JSON.stringify(result.data.session));
-      this.$store.commit('updateLastfm', result.data.session);
+      this.updateLastfm(result.data.session);
       this.message = '已成功连接到 Last.fm';
       this.done = true;
     });
   },
   methods: {
+    ...mapActions(useStore, ['updateLastfm']),
     close() {
       window.close();
     },

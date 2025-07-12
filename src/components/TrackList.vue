@@ -75,7 +75,8 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex';
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
 import { cloudDiskTrackDelete } from '@/api/user';
 import { isAccountLoggedIn } from '@/utils/auth';
@@ -83,7 +84,6 @@ import { resizeImage } from '@/utils/filters';
 
 import TrackListItem from '@/components/TrackListItem.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
-import locale from '@/locale';
 import { copyText } from '@/utils/copy';
 
 export default {
@@ -157,7 +157,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['liked', 'player']),
+    ...mapState(useStore, ['liked', 'player']),
     isRightClickedTrackLiked() {
       return this.liked.songs.includes(this.rightClickedTrack?.id);
     },
@@ -183,8 +183,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapMutations(['updateModal']),
-    ...mapActions(['nextTrack', 'showToast', 'likeATrack']),
+    ...mapActions(useStore, ['updateModal', 'nextTrack', 'showToast', 'likeATrack', 'updateLikedXXX']),
     openMenu(e, track, index = -1) {
       this.rightClickedTrack = track;
       this.rightClickedTrackIndex = index;
@@ -240,7 +239,7 @@ export default {
     },
     addTrackToPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       this.updateModal({
@@ -256,7 +255,7 @@ export default {
     },
     removeTrackFromPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       if (confirm(`确定要从歌单删除 ${this.rightClickedTrack.name}？`)) {
@@ -268,7 +267,7 @@ export default {
         }).then(data => {
           this.showToast(
             data.body.code === 200
-              ? locale.t('toast.removedFromPlaylist')
+              ? this.$t('toast.removedFromPlaylist')
               : data.body.message
           );
           this.$parent.removeTrack(trackID);
@@ -280,14 +279,14 @@ export default {
         `https://music.163.com/song?id=${this.rightClickedTrack.id}`
       )
         .then(() => {
-          this.showToast(locale.t('toast.copied'));
+          this.showToast(this.$t('toast.copied'));
         })
         .catch(err => {
-          this.showToast(`${locale.t('toast.copyFailed')}${err}`);
+          this.showToast(`${this.$t('toast.copyFailed')}${err}`);
         });
     },
     removeTrackFromQueue() {
-      this.$store.state.player.removeTrackFromQueue(
+      this.player.removeTrackFromQueue(
         this.rightClickedTrackIndex
       );
     },
@@ -301,7 +300,7 @@ export default {
           let newCloudDisk = this.liked.cloudDisk.filter(
             t => t.songId !== trackID
           );
-          this.$store.commit('updateLikedXXX', {
+          this.updateLikedXXX({
             name: 'cloudDisk',
             data: newCloudDisk,
           });

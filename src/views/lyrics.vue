@@ -204,7 +204,7 @@
               <button-icon
                 v-show="
                   isShowLyricTypeSwitch &&
-                  $store.state.settings.showLyricsTranslation &&
+                   settings.showLyricsTranslation &&
                   lyricType === 'translation'
                 "
                 :title="$t('player.translationLyric')"
@@ -215,7 +215,7 @@
               <button-icon
                 v-show="
                   isShowLyricTypeSwitch &&
-                  $store.state.settings.showLyricsTranslation &&
+                   settings.showLyricsTranslation &&
                   lyricType === 'romaPronunciation'
                 "
                 :title="$t('player.PronunciationLyric')"
@@ -257,7 +257,7 @@
                 <span
                   v-if="
                     line.contents[1] &&
-                    $store.state.settings.showLyricsTranslation
+                     settings.showLyricsTranslation
                   "
                   class="translation"
                   @click.right="openLyricMenu($event, line, 1)"
@@ -273,7 +273,7 @@
                 v-if="
                   rightClickLyric &&
                   rightClickLyric.contents[1] &&
-                  $store.state.settings.showLyricsTranslation
+                  settings.showLyricsTranslation
                 "
                 class="item"
                 @click="copyLyric(true)"
@@ -302,7 +302,8 @@
 // The lyrics page of Apple Music is so gorgeous, so I copy the design.
 // Some of the codes are from https://github.com/sl1673495/vue-netease-music
 
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import VueSlider from 'vue-slider-component';
 import ContextMenu from '@/components/ContextMenu.vue';
 import { formatTrackTime } from '@/utils/common';
@@ -313,7 +314,6 @@ import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { hasListSource, getListSourcePath } from '@/utils/playList';
-import locale from '@/locale';
 
 export default {
   name: 'Lyrics',
@@ -338,7 +338,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player', 'settings', 'showLyrics']),
+    ...mapState(useStore, ['player', 'settings', 'showLyrics']),
     currentTrack() {
       return this.player.currentTrack;
     },
@@ -428,7 +428,7 @@ export default {
     },
     lyricFontSize() {
       return {
-        fontSize: `${this.$store.state.settings.lyricFontSize || 28}px`,
+        fontSize: `${this.settings.lyricFontSize || 28}px`,
       };
     },
     noLyric() {
@@ -454,10 +454,10 @@ export default {
     showLyrics(show) {
       if (show) {
         this.setLyricsInterval();
-        this.$store.commit('enableScrolling', false);
+        this.setEnableScrolling(false);
       } else {
         clearInterval(this.lyricsInterval);
-        this.$store.commit('enableScrolling', true);
+        this.setEnableScrolling(true);
       }
     },
   },
@@ -484,8 +484,7 @@ export default {
     clearInterval(this.lyricsInterval);
   },
   methods: {
-    ...mapMutations(['toggleLyrics', 'updateModal']),
-    ...mapActions(['likeATrack']),
+    ...mapActions(useStore, ['toggleLyrics', 'updateModal', 'likeATrack', 'setEnableScrolling', 'fetchLikedPlaylist']),
     initDate() {
       var _this = this;
       clearInterval(this.timer);
@@ -514,10 +513,10 @@ export default {
     },
     addToPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
-      this.$store.dispatch('fetchLikedPlaylist');
+      this.fetchLikedPlaylist();
       this.updateModal({
         modalName: 'addTrackToPlaylistModal',
         key: 'show',

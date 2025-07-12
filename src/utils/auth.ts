@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 import { logout } from '@/api/auth';
-import store from '@/store';
+import { useStore } from '@/store/pinia';
 
 export function setCookies(string: string) {
   const cookies = string.split(';;');
@@ -29,13 +29,13 @@ export function isLoggedIn() {
 export function isAccountLoggedIn() {
   return (
     getCookie('MUSIC_U') !== undefined &&
-    store.state.data.loginMode === 'account'
+    useStore().data.loginMode === 'account'
   );
 }
 
 // 用户名搜索（用户数据为只读）
 export function isUsernameLoggedIn() {
-  return store.state.data.loginMode === 'username';
+  return useStore().data.loginMode === 'username';
 }
 
 // 账户登录或者用户名搜索都判断为登录，宽松检查
@@ -47,10 +47,11 @@ export function doLogout() {
   logout();
   removeCookie('MUSIC_U');
   removeCookie('__csrf');
+  const store = useStore();
   // 更新状态仓库中的用户信息
-  store.commit('updateData', { key: 'user', value: {} });
+  store.updateData({ key: 'user', value: {} });
   // 更新状态仓库中的登录状态
-  store.commit('updateData', { key: 'loginMode', value: null });
+  store.updateData({ key: 'loginMode', value: null });
   // 更新状态仓库中的喜欢列表
-  store.commit('updateData', { key: 'likedSongPlaylistID', value: undefined });
+  store.updateData({ key: 'likedSongPlaylistID', value: undefined });
 }

@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import locale from '@/locale';
-import { mapMutations, mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia';
 import { dailyRecommendTracks } from '@/api/playlist';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { sample } from 'es-toolkit';
@@ -36,7 +36,7 @@ export default {
     return { useAnimation: false };
   },
   computed: {
-    ...mapState(['dailyTracks']),
+    ...mapState(useStore, ['dailyTracks', 'player']),
     coverUrl() {
       return `${
         this.dailyTracks[0]?.al.picUrl || sample(defaultCovers)
@@ -47,8 +47,7 @@ export default {
     if (this.dailyTracks.length === 0) this.loadDailyTracks();
   },
   methods: {
-    ...mapActions(['showToast']),
-    ...mapMutations(['updateDailyTracks']),
+    ...mapActions(useStore, ['showToast', 'updateDailyTracks']),
     loadDailyTracks() {
       if (!isAccountLoggedIn()) return;
       dailyRecommendTracks()
@@ -62,11 +61,11 @@ export default {
     },
     playDailyTracks() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       let trackIDs = this.dailyTracks.map(t => t.id);
-      this.$store.state.player.replacePlaylist(
+      this.player.replacePlaylist(
         trackIDs,
         '/daily/songs',
         'url',

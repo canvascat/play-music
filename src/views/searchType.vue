@@ -42,7 +42,6 @@
 <script>
 import { getTrackDetail } from '@/api/track';
 import { search } from '@/api/others';
-import locale from '@/locale';
 import { camelCase } from 'change-case';
 import NProgress from 'nprogress';
 
@@ -71,11 +70,11 @@ export default {
     },
     typeNameTable() {
       return {
-        musicVideos: locale.t('search.mv'),
-        tracks: locale.t('search.song'),
-        albums: locale.t('search.album'),
-        artists: locale.t('search.artist'),
-        playlists: locale.t('search.playlist'),
+        musicVideos: this.$t('search.mv'),
+        tracks: this.$t('search.song'),
+        albums: this.$t('search.album'),
+        artists: this.$t('search.artist'),
+        playlists: this.$t('search.playlist'),
       };
     },
   },

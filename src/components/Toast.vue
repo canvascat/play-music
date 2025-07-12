@@ -1,16 +1,19 @@
 <template>
   <transition name="fade">
-    <div v-show="toast.show" class="toast">{{ toast.text }}</div>
+    <!-- <div v-show="toast.show" class="toast">{{ toast.text }}</div> -->
+
+    <div class="toast"> toast.text </div>
   </transition>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 
 export default {
   name: 'Toast',
   computed: {
-    ...mapState(['toast']),
+    ...mapState(useStore, ['toast']),
   },
 };
 </script>

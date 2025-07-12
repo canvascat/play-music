@@ -144,12 +144,12 @@
   </div>
 </template>
 
-<script   lang="ts">
-import { mapMutations, mapActions, mapState } from 'vuex';
+<script >
+import { mapActions, mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { getArtistAlbum } from '@/api/artist';
 import { getTrackDetail } from '@/api/track';
 import { getAlbum, albumDynamicDetail, likeAAlbum } from '@/api/album';
-import locale from '@/locale';
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
 import NProgress from 'nprogress';
 import { isAccountLoggedIn } from '@/utils/auth';
@@ -201,7 +201,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player', 'data']),
+    ...mapState(useStore, ['player', 'data']),
     albumTime() {
       let time = 0;
       this.tracks.map(t => (time = time + t.dt));
@@ -238,14 +238,13 @@ export default {
   },
   methods: {
     resizeImage, formatDate, formatTime, formatAlbumType,
-    ...mapMutations(['appendTrackToPlayerList']),
-    ...mapActions(['playFirstTrackOnList', 'playTrackOnListByID', 'showToast']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
     playAlbumByID(id, trackID = 'first') {
-      this.$store.state.player.playAlbumByID(id, trackID);
+      this.player.playAlbumByID(id, trackID);
     },
     likeAlbum(toast = false) {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       likeAAlbum({
@@ -308,9 +307,9 @@ export default {
     toggleFullDescription() {
       this.showFullDescription = !this.showFullDescription;
       if (this.showFullDescription) {
-        this.$store.commit('enableScrolling', false);
+        this.setEnableScrolling(false);
       } else {
-        this.$store.commit('enableScrolling', true);
+        this.setEnableScrolling(true);
       }
     },
     openMenu(e) {
@@ -320,10 +319,10 @@ export default {
       let showToast = this.showToast;
       copyText(`https://music.163.com/#/album?id=${id}`)
         .then(function () {
-          showToast(locale.t('toast.copied'));
+          showToast(this.$t('toast.copied'));
         })
         .catch(error => {
-          showToast(`${locale.t('toast.copyFailed')}${error}`);
+          showToast(`${this.$t('toast.copyFailed')}${error}`);
         });
     },
     openInBrowser(id) {

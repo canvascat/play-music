@@ -29,6 +29,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia';
+import { useStore } from '@/store/pinia'; 
+
 export default {
   props: {
     id: { type: Number, required: true },
@@ -49,6 +52,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(useStore, ['player']),
     imageStyles() {
       let styles = {};
       if (this.fixedSize !== 0) {
@@ -73,7 +77,7 @@ export default {
   },
   methods: {
     play() {
-      const player = this.$store.state.player;
+      const player = this.player;
       const playActions = {
         album: player.playAlbumByID,
         playlist: player.playPlaylistByID,

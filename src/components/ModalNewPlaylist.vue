@@ -30,8 +30,8 @@
 
 <script>
 import Modal from '@/components/Modal.vue';
-import locale from '@/locale';
-import { mapMutations, mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { createPlaylist, addOrRemoveTrackFromPlaylist } from '@/api/playlist';
 
 export default {
@@ -46,7 +46,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['modals']),
+    ...mapState(useStore, ['modals']),
     show: {
       get() {
         return this.modals.newPlaylistModal.show;
@@ -58,16 +58,15 @@ export default {
           value,
         });
         if (value) {
-          this.$store.commit('enableScrolling', false);
+          this.setEnableScrolling(false);
         } else {
-          this.$store.commit('enableScrolling', true);
+          this.setEnableScrolling(true);
         }
       },
     },
   },
   methods: {
-    ...mapMutations(['updateModal', 'updateData']),
-    ...mapActions(['showToast', 'fetchLikedPlaylist']),
+    ...mapActions(useStore, ['updateModal', 'updateData', 'showToast', 'fetchLikedPlaylist', 'setEnableScrolling']),
     close() {
       this.show = false;
       this.title = '';
@@ -86,7 +85,7 @@ export default {
               tracks: this.modals.newPlaylistModal.afterCreateAddTrackID,
             }).then(data => {
               if (data.body.code === 200) {
-                this.showToast(locale.t('toast.savedToPlaylist'));
+                this.showToast(this.$t('toast.savedToPlaylist'));
               } else {
                 this.showToast(data.body.message);
               }

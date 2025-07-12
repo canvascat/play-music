@@ -85,7 +85,8 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { getTrackDetail } from '@/api/track';
 import { search } from '@/api/others';
 import NProgress from 'nprogress';
@@ -112,6 +113,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(useStore, ['player']),
     keywords() {
       return this.$route.params.keywords ?? '';
     },
@@ -136,10 +138,10 @@ export default {
     this.getData();
   },
   methods: {
-    ...mapActions(['showToast']),
+    ...mapActions(useStore, ['showToast']),
     playTrackInSearchResult(id) {
       let track = this.tracks.find(t => t.id === id);
-      this.$store.state.player.appendTrackToPlayerList(track, true);
+      this.player.appendTrackToPlayerList(track, true);
     },
     search(type = 'all') {
       let showToast = this.showToast;

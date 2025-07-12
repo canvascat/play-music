@@ -53,7 +53,8 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import NProgress from 'nprogress';
 import { search } from '@/api/others';
 import { userPlaylist } from '@/api/user';
@@ -79,7 +80,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapMutations(['updateData']),
+    ...mapActions(useStore, ['updateData']),
     search() {
       if (!this.keyword) return;
       search({ keywords: this.keyword, limit: 9, type: 1002 }).then(data => {

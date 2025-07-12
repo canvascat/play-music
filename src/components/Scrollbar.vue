@@ -1,21 +1,9 @@
 <template>
   <div>
     <transition name="fade">
-      <div
-        v-show="show"
-        id="scrollbar"
-        :class="{ 'on-drag': isOnDrag }"
-        @click="handleClick"
-      >
-        <div
-          id="thumbContainer"
-          :class="{ active }"
-          :style="thumbStyle"
-          @mouseenter="handleMouseenter"
-          @mouseleave="handleMouseleave"
-          @mousedown="handleDragStart"
-          @click.stop
-        >
+      <div v-show="state.show" id="scrollbar" :class="{ 'on-drag': state.isOnDrag }" @click="handleClick">
+        <div id="thumbContainer" :class="{ active: state.active }" :style="thumbStyle" @mouseenter="handleMouseenter"
+          @mouseleave="handleMouseleave" @mousedown="handleDragStart" @click.stop>
           <div></div>
         </div>
       </div>
@@ -23,131 +11,145 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Scrollbar',
-  data() {
-    return {
-      top: 0,
-      thumbHeight: 0,
-      active: false,
-      show: false,
-      hideTimer: null,
-      isOnDrag: false,
-      onDragClientY: 0,
-      positions: {
-        home: { scrollTop: 0, params: {} },
-      },
-    };
-  },
-  computed: {
-    thumbStyle() {
-      return {
-        transform: `translateY(${this.top}px)`,
-        height: `${this.thumbHeight}px`,
-      };
-    },
-    main() {
-      return this.$parent.$refs.main;
-    },
-  },
+<script setup lang="ts">
+import { computed, ref, shallowReactive, defineProps } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-  created() {
-    this.$router.beforeEach((to, from, next) => {
-      this.show = false;
-      next();
-    });
-  },
+const props = defineProps<{
+  main?: HTMLElement | null,
+}>();
 
-  methods: {
-    handleScroll() {
-      const clintHeight = this.main.clientHeight - 128;
-      const scrollHeight = this.main.scrollHeight - 128;
-      const scrollTop = this.main.scrollTop;
-      let top = ~~((scrollTop / scrollHeight) * clintHeight);
-      let thumbHeight = ~~((clintHeight / scrollHeight) * clintHeight);
 
-      if (thumbHeight < 24) thumbHeight = 24;
-      if (top > clintHeight - thumbHeight) {
-        top = clintHeight - thumbHeight;
-      }
-      this.top = top;
-      this.thumbHeight = thumbHeight;
+defineOptions({ name: 'Scrollbar' });
+const [userSelectNone] = defineModel<boolean>('userSelectNone')
 
-      if (!this.show && clintHeight !== thumbHeight) this.show = true;
-      this.setScrollbarHideTimeout();
 
-      const route = this.$route;
-      if (route.meta.savePosition) {
-        this.positions[route.name] = { scrollTop, params: route.params };
-      }
-    },
-    handleMouseenter() {
-      this.active = true;
-    },
-    handleMouseleave() {
-      this.active = false;
-      this.setScrollbarHideTimeout();
-    },
-    handleDragStart(e) {
-      this.onDragClientY = e.clientY;
-      this.isOnDrag = true;
-      this.$parent.userSelectNone = true;
-      document.addEventListener('mousemove', this.handleDragMove);
-      document.addEventListener('mouseup', this.handleDragEnd);
-    },
-    handleDragMove(e) {
-      if (!this.isOnDrag) return;
-      const clintHeight = this.main.clientHeight - 128;
-      const scrollHeight = this.main.scrollHeight - 128;
-      const clientY = e.clientY;
-      const scrollTop = this.main.scrollTop;
-      const offset = ~~(
-        ((clientY - this.onDragClientY) / clintHeight) *
-        scrollHeight
-      );
-      this.top = ~~((scrollTop / scrollHeight) * clintHeight);
-      this.main.scrollBy(0, offset);
-      this.onDragClientY = clientY;
-    },
-    handleDragEnd() {
-      this.isOnDrag = false;
-      this.$parent.userSelectNone = false;
-      document.removeEventListener('mousemove', this.handleDragMove);
-      document.removeEventListener('mouseup', this.handleDragEnd);
-    },
-    handleClick(e) {
-      let scrollTop;
-      if (e.clientY < this.top + 84) {
-        scrollTop = -256;
-      } else {
-        scrollTop = 256;
-      }
-      this.main.scrollBy({
-        top: scrollTop,
-        behavior: 'smooth',
-      });
-    },
-    setScrollbarHideTimeout() {
-      if (this.hideTimer !== null) clearTimeout(this.hideTimer);
-      this.hideTimer = setTimeout(() => {
-        if (!this.active) this.show = false;
-        this.hideTimer = null;
-      }, 4000);
-    },
-    restorePosition() {
-      const route = this.$route;
-      if (
-        !route.meta.savePosition ||
-        this.positions[route.name] === undefined ||
-        this.main === undefined
-      ) {
-        return;
-      }
-      this.main.scrollTo({ top: this.positions[route.name].scrollTop });
-    },
-  },
-};
+const route = useRoute();
+
+const state = shallowReactive({
+  top: 0,
+  thumbHeight: 0,
+  active: false,
+  show: false,
+
+  onDragClientY: 0,
+  isOnDrag: false,
+})
+
+
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+const positions = ref({
+  home: { scrollTop: 0, params: {} },
+});
+
+const thumbStyle = computed(() => ({
+  transform: `translateY(${state.top}px)`,
+  height: `${state.thumbHeight}px`,
+}));
+
+const main = computed(() => props.main);
+
+useRouter().beforeEach((_to, _from, next) => {
+  state.show = false;
+  next();
+});
+
+function handleScroll(e: Event) {
+  const target = e.target as HTMLElement;
+
+  const clintHeight = target.clientHeight - 128;
+  const scrollHeight = target.scrollHeight - 128;
+  const scrollTop = target.scrollTop;
+  let top = ~~((scrollTop / scrollHeight) * clintHeight);
+  let thumbHeight = ~~((clintHeight / scrollHeight) * clintHeight);
+
+  if (thumbHeight < 24) thumbHeight = 24;
+  if (top > clintHeight - thumbHeight) {
+    top = clintHeight - thumbHeight;
+  }
+  state.top = top;
+  state.thumbHeight = thumbHeight;
+
+  if (!state.show && clintHeight !== thumbHeight) state.show = true;
+  setScrollbarHideTimeout();
+
+
+  if (route.meta.savePosition) {
+    positions[route.name as string] = { scrollTop, params: route.params };
+  }
+}
+
+function handleMouseenter() {
+  state.active = true;
+}
+function handleMouseleave() {
+  state.active = false;
+  setScrollbarHideTimeout();
+}
+
+function handleDragStart(e: MouseEvent) {
+  state.onDragClientY = e.clientY;
+  state.isOnDrag = true;
+
+  userSelectNone.value = true;
+  document.addEventListener('mousemove', handleDragMove);
+  document.addEventListener('mouseup', handleDragEnd);
+}
+function handleDragMove(e: MouseEvent) {
+  if (!state.isOnDrag || !main.value) return;
+  const clintHeight = main.value.clientHeight - 128;
+  const scrollHeight = main.value.scrollHeight - 128;
+  const clientY = e.clientY;
+  const scrollTop = main.value.scrollTop;
+  const offset = ~~(
+    ((clientY - state.onDragClientY) / clintHeight) *
+    scrollHeight
+  );
+  state.top = ~~((scrollTop / scrollHeight) * clintHeight);
+  main.value.scrollBy(0, offset);
+  state.onDragClientY = clientY;
+}
+function handleDragEnd() {
+  state.isOnDrag = false;
+  userSelectNone.value = false;
+  document.removeEventListener('mousemove', handleDragMove);
+  document.removeEventListener('mouseup', handleDragEnd);
+}
+function handleClick(e: MouseEvent) {
+  let scrollTop: number;
+  if (e.clientY < state.top + 84) {
+    scrollTop = -256;
+  } else {
+    scrollTop = 256;
+  }
+  main.value?.scrollBy({
+    top: scrollTop,
+    behavior: 'smooth',
+  });
+}
+function setScrollbarHideTimeout() {
+  if (hideTimer !== null) clearTimeout(hideTimer);
+  hideTimer = setTimeout(() => {
+    if (!state.active) state.show = false;
+    hideTimer = null;
+  }, 4000);
+}
+function restorePosition() {
+  if (
+    !route.meta.savePosition ||
+    positions[route.name as string] === undefined ||
+    main.value === undefined
+  ) {
+    return;
+  }
+  main.value?.scrollTo({ top: positions[route.name as string].scrollTop });
+}
+
+defineExpose({
+  handleScroll,
+  restorePosition
+});
 </script>
 
 <style lang="scss" scoped>
@@ -161,6 +163,7 @@ export default {
 
   #thumbContainer {
     margin-top: 64px;
+
     div {
       transition: background 0.4s;
       position: absolute;
@@ -171,6 +174,7 @@ export default {
       background: rgba(128, 128, 128, 0.38);
     }
   }
+
   #thumbContainer.active div {
     background: rgba(128, 128, 128, 0.58);
   }
@@ -191,6 +195,7 @@ export default {
 .fade-leave-active {
   transition: opacity 0.2s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

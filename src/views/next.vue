@@ -30,7 +30,8 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { getTrackDetail } from '@/api/track';
 import TrackList from '@/components/TrackList.vue';
 
@@ -45,7 +46,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['player']),
+    ...mapState(useStore, ['player']),
     currentTrack() {
       return this.player.currentTrack;
     },
@@ -86,7 +87,7 @@ export default {
     // this.$parent.$refs.scrollbar.restorePosition();
   },
   methods: {
-    ...mapActions(['playTrackOnListByID']),
+    ...mapActions(useStore, ['playTrackOnListByID']),
     loadTracks() {
       // 获取播放列表当前歌曲后100首歌
       let trackIDs = this.player.list.slice(

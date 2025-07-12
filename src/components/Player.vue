@@ -181,7 +181,8 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions } from 'vuex';
+import { mapState, mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import '@/assets/css/slider.css';
 
 import ButtonIcon from '@/components/ButtonIcon.vue';
@@ -197,7 +198,7 @@ export default {
     VueSlider,
   },
   computed: {
-    ...mapState(['player', 'settings', 'data']),
+    ...mapState(useStore, ['player', 'settings', 'data']),
     currentTrack() {
       return this.player.currentTrack;
     },
@@ -227,8 +228,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapMutations(['toggleLyrics']),
-    ...mapActions(['showToast', 'likeATrack']),
+    ...mapActions(useStore, ['toggleLyrics', 'showToast', 'likeATrack']),
     playPrevTrack() {
       this.player.playPrevTrack();
     },

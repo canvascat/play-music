@@ -46,14 +46,14 @@
 import { mvDetail, mvUrl, simiMv, likeAMV } from '@/api/mv';
 import { isAccountLoggedIn } from '@/utils/auth';
 import NProgress from 'nprogress';
-import locale from '@/locale';
 import '@/assets/css/plyr.css';
 import Plyr from 'plyr';
 
 import ButtonIcon from '@/components/ButtonIcon.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import MvRow from '@/components/MvRow.vue';
-import { mapActions } from 'vuex';
+import { mapActions } from 'pinia';
+import { useStore } from '@/store/pinia'; 
 import { copyText } from '@/utils/copy';
 import { formatPlayCount } from '@/utils/filters';
 
@@ -79,7 +79,7 @@ export default {
           publishTime: '',
         },
       },
-      player: null,
+      mvPlayer: null,
       simiMvs: [],
     };
   },
@@ -93,17 +93,20 @@ export default {
       },
     };
     if (this.$route.query.autoplay === 'true') videoOptions.autoplay = true;
-    this.player = new Plyr(this.$refs.videoPlayer, videoOptions);
-    this.player.volume = this.$store.state.player.volume;
-    this.player.on('playing', () => {
-      this.$store.state.player.pause();
+    this.mvPlayer = new Plyr(this.$refs.videoPlayer, videoOptions);
+    this.mvPlayer.volume = this.player.volume;
+    this.mvPlayer.on('playing', () => {
+      this.player.pause();
     });
     this.getData(this.$route.params.id);
     console.log('网易云你这mv音频码率也太糊了吧🙄');
   },
+  computed: {
+    ...mapState(useStore, ['player']),
+  },
   methods: {
     resizeImage,
-    ...mapActions(['showToast']),
+    ...mapActions(useStore, ['showToast']),
     getData(id) {
       mvDetail(id).then(data => {
         this.mv = data;
@@ -118,7 +121,7 @@ export default {
               size: result.data.r,
             };
           });
-          this.player.source = {
+          this.mvPlayer.source = {
             type: 'video',
             title: this.mv.data.name,
             sources: sources,
@@ -133,7 +136,7 @@ export default {
     },
     likeMV() {
       if (!isAccountLoggedIn()) {
-        this.showToast(locale.t('toast.needToLogin'));
+        this.showToast(this.$t('toast.needToLogin'));
         return;
       }
       likeAMV({
@@ -150,10 +153,10 @@ export default {
       let showToast = this.showToast;
        copyText(`https://music.163.com/#/mv?id=${id}`)
         .then(function () {
-          showToast(locale.t('toast.copied'));
+          showToast(this.$t('toast.copied'));
         })
         .catch(error => {
-          showToast(`${locale.t('toast.copyFailed')}${error}`);
+          showToast(`${this.$t('toast.copyFailed')}${error}`);
         });
     },
     openInBrowser(id) {
