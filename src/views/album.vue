@@ -153,7 +153,8 @@ import locale from '@/locale';
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
 import NProgress from 'nprogress';
 import { isAccountLoggedIn } from '@/utils/auth';
-import { groupBy, toPairs, sortBy } from 'es-toolkit';
+import { groupBy, sortBy } from 'es-toolkit';
+import { toPairs } from 'es-toolkit/compat';
 import { resizeImage, formatDate, formatTime, formatAlbumType } from '@/utils/filters';
 
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';

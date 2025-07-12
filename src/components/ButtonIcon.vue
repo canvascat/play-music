@@ -1,23 +1,28 @@
 <template>
-  <button class="button-icon"><slot></slot></button>
+  <button class="button-icon flex items-center justify-center p-2 m-1 transition-all duration-200 active:scale-95">
+    <slot></slot>
+  </button>
 </template>
 
-<script>
-export default {
-  name: 'ButtonIcon',
-};
+<script setup lang="ts">
+import type { VNode } from 'vue';
+
+defineOptions({ name: 'ButtonIcon' });
+defineSlots<{
+  default: () => VNode;
+}>();
 </script>
 
 <style lang="scss" scoped>
 button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px;
-  background: transparent;
-  margin: 4px;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
+  // padding: 8px;
+  // background: transparent;
+  // margin: 4px;
   border-radius: 25%;
-  transition: 0.2s;
+  // transition: 0.2s;
   :deep(.svg-icon) {
     color: var(--color-text);
     height: 16px;
@@ -29,8 +34,8 @@ button {
   &:hover {
     background: var(--color-secondary-bg-for-transparent);
   }
-  &:active {
-    transform: scale(0.92);
-  }
+  // &:active {
+  //   transform: scale(0.92);
+  // }
 }
 </style>
