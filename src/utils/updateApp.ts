@@ -1,8 +1,8 @@
-import initLocalStorage from '@/store/initLocalStorage.js';
+import initLocalStorage from '@/store/initLocalStorage';
 import pkg from '../../package.json';
 
 const updateSetting = () => {
-  const parsedSettings = JSON.parse(localStorage.getItem('settings'));
+  const parsedSettings = JSON.parse(localStorage.getItem('settings') ?? '{}');
   const settings = {
     ...initLocalStorage.settings,
     ...parsedSettings,

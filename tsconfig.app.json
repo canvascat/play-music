@@ -17,9 +17,8 @@
     "noUncheckedSideEffectImports": true,
 
     "allowJs": true,
-    "checkJs": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
+    "checkJs": false,
+    "noImplicitAny": false, 
     "noImplicitReturns": false
   },
   "include": [
