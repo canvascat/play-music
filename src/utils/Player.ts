@@ -25,16 +25,8 @@ const UNPLAYABLE_CONDITION = {
   PLAY_PREV_TRACK: 'playPrevTrack',
 };
 
-const electron =
-  process.env.IS_ELECTRON === true ? window.require('electron') : null;
-const ipcRenderer =
-  process.env.IS_ELECTRON === true ? electron.ipcRenderer : null;
-const delay = ms =>
-  new Promise(resolve => {
-    setTimeout(() => {
-      resolve('');
-    }, ms);
-  });
+const ipcRenderer = Object.create(null)
+const delay = (ms = 0) => new Promise<void>(resolve => setTimeout(resolve, ms));
 const excludeSaveKeys = [
   '_playing',
   '_personalFMLoading',

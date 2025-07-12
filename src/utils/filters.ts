@@ -3,12 +3,7 @@ import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import locale from '@/locale';
 
-/**
- * @param {number} Milliseconds
- * @param {string} format
- * @returns {string}
- */
-export function formatTime(Milliseconds, format = 'HH:MM:SS') {
+export function formatTime(Milliseconds: number, format = 'HH:MM:SS') {
   if (!Milliseconds) return '';
   dayjs.extend(duration);
   dayjs.extend(relativeTime);
@@ -24,7 +19,7 @@ export function formatTime(Milliseconds, format = 'HH:MM:SS') {
       : `${mins}:${seconds}`;
   } else if (format === 'Human') {
     let hoursUnit, minitesUnit;
-    switch (locale.locale) {
+    switch (locale.global.locale) {
       case 'zh-CN':
         hoursUnit = '小时';
         minitesUnit = '分钟';
@@ -44,24 +39,15 @@ export function formatTime(Milliseconds, format = 'HH:MM:SS') {
   }
 }
 
-/**
- * @param {number|string} timestamp
- * @param {string} format
- * @returns {string}
- */
-export function formatDate(timestamp, format = 'MMM D, YYYY') {
+export function formatDate(timestamp: number, format = 'MMM D, YYYY') {
   if (!timestamp) return '';
-  if (locale.locale === 'zh-CN') format = 'YYYY年MM月DD日';
-  else if (locale.locale === 'zh-TW') format = 'YYYY年MM月DD日';
+  if (locale.global.locale === 'zh-CN') format = 'YYYY年MM月DD日';
+  else if (locale.global.locale === 'zh-TW') format = 'YYYY年MM月DD日';
   return dayjs(timestamp).format(format);
 }
 
-/**
- * @param {string} type
- * @param {object} album
- * @returns {string}
- */
-export function formatAlbumType(type, album) {
+
+export function formatAlbumType(type: string, album: any) {
   if (!type) return '';
   if (type === 'EP/Single') {
     return album.size === 1 ? 'Single' : 'EP';
@@ -74,12 +60,8 @@ export function formatAlbumType(type, album) {
   }
 }
 
-/**
- * @param {string} imgUrl
- * @param {number} size
- * @returns {string}
- */
-export function resizeImage(imgUrl, size = 512) {
+
+export function resizeImage(imgUrl: string, size = 512) {
   if (!imgUrl) return '';
   let httpsImgUrl = imgUrl;
   if (imgUrl.slice(0, 5) !== 'https') {
@@ -88,13 +70,9 @@ export function resizeImage(imgUrl, size = 512) {
   return `${httpsImgUrl}?param=${size}y${size}`;
 }
 
-/**
- * @param {number} count
- * @returns {string|number}
- */
-export function formatPlayCount(count) {
+export function formatPlayCount(count: number) {
   if (!count) return '';
-  if (locale.locale === 'zh-CN') {
+  if (locale.global.locale === 'zh-CN') {
     if (count > 100000000) {
       return `${Math.floor((count / 100000000) * 100) / 100}亿`; // 2.32 亿
     }
@@ -105,7 +83,7 @@ export function formatPlayCount(count) {
       return `${Math.floor((count / 10000) * 100) / 100}万`; // 2.3 万
     }
     return count;
-  } else if (locale.locale === 'zh-TW') {
+  } else if (locale.global.locale === 'zh-TW') {
     if (count > 100000000) {
       return `${Math.floor((count / 100000000) * 100) / 100}億`; // 2.32 億
     }
@@ -130,11 +108,7 @@ export function formatPlayCount(count) {
   }
 }
 
-/**
- * @param {string} url
- * @returns {string}
- */
-export function toHttps(url) {
+export function toHttps(url: string) {
   if (!url) return '';
   return url.replace(/^http:/, 'https:');
 }

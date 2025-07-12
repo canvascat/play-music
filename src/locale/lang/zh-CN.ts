@@ -255,4 +255,4 @@ export default {
     copyFailed: '复制失败：',
     needToLogin: '此操作需要登录网易云帐号',
   },
-};
+} as const;

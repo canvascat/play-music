@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import { logout } from '@/api/auth';
 import store from '@/store';
 
-export function setCookies(string) {
+export function setCookies(string: string) {
   const cookies = string.split(';;');
   cookies.map(cookie => {
     document.cookie = cookie;
@@ -11,11 +11,11 @@ export function setCookies(string) {
   });
 }
 
-export function getCookie(key) {
+export function getCookie(key: string) {
   return Cookies.get(key) ?? localStorage.getItem(`cookie-${key}`);
 }
 
-export function removeCookie(key) {
+export function removeCookie(key: string) {
   Cookies.remove(key);
   localStorage.removeItem(`cookie-${key}`);
 }

@@ -256,4 +256,4 @@ export default {
     copyFailed: 'Copy failed: ',
     needToLogin: 'Need to log into netease account',
   },
-};
+} as const;
