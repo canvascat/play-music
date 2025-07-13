@@ -1,16 +1,13 @@
-import request from '@/utils/request';
+import request, { noCacheParams } from '@/utils/request';
 import { mapTrackPlayableStatus } from '@/utils/common';
 import { cacheAlbum, getAlbumFromCache } from '@/utils/db';
-
-// import * as api from 'NeteaseCloudMusicApi';
-// import type * as NCM from 'NeteaseCloudMusicApi';
+import * as NCMAPI from './NCMAPI';
 
 /**
  * 获取专辑内容
- * 说明 : 调用此接口 , 传入专辑 id, 可获得专辑内容
- * @param {number} id
+ * 说明 : 调用此接口 , 传入专辑 id, 可获得专辑内容 
  */
-export function getAlbum(id) {
+export function getAlbum(id: NCMAPI.album[0]['id']) {
   const fetchLatest = () => {
     return request({
       url: '/album',
@@ -36,13 +33,9 @@ export function getAlbum(id) {
  * 说明 : 登录后调用此接口 ,可获取全部新碟
  * - limit - 返回数量 , 默认为 30
  * - offset - 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
- * - area - ALL:全部,ZH:华语,EA:欧美,KR:韩国,JP:日本
- * @param {Object} params
- * @param {number} params.limit
- * @param {number=} params.offset
- * @param {string} params.area
+ * - area - ALL:全部,ZH:华语,EA:欧美,KR:韩国,JP:日本 
  */
-export function newAlbums(params) {
+export function newAlbums(params: NCMAPI.album_new[0]) {
   return request({
     url: '/album/new',
     method: 'get',
@@ -56,11 +49,11 @@ export function newAlbums(params) {
  * - id - 专辑id
  * @param {number} id
  */
-export function albumDynamicDetail(id) {
+export function albumDynamicDetail(id: NCMAPI.album_detail_dynamic[0]['id']) {
   return request({
     url: '/album/detail/dynamic',
     method: 'get',
-    params: { id, timestamp: new Date().getTime() },
+    params: noCacheParams({ id }),
   });
 }
 
@@ -68,12 +61,9 @@ export function albumDynamicDetail(id) {
  * 收藏/取消收藏专辑
  * 说明 : 调用此接口,可收藏/取消收藏专辑
  * - id - 返专辑 id
- * - t - 1 为收藏,其他为取消收藏
- * @param {Object} params
- * @param {number} params.id
- * @param {number} params.t
+ * - t - 1 为收藏,其他为取消收藏 
  */
-export function likeAAlbum(params) {
+export function likeAAlbum(params: NCMAPI.album_sub[0]) {
   return request({
     url: '/album/sub',
     method: 'post',

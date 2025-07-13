@@ -1,29 +1,17 @@
 <template>
   <transition name="fade">
-    <!-- <div v-show="toast.show" class="toast">{{ toast.text }}</div> -->
-
-    <div class="toast"> toast.text </div>
+    <div v-show="toast.show" class="toast fixed bottom-16 left-1/2 transform -translate-x-1/2">{{ toast.text }}</div> 
   </transition>
 </template>
 
-<script>
-import { mapState } from 'pinia';
+<script setup lang="ts">
 import { useStore } from '@/store/pinia'; 
 
-export default {
-  name: 'Toast',
-  computed: {
-    ...mapState(useStore, ['toast']),
-  },
-};
+const { toast } = useStore(); 
 </script>
 
 <style lang="scss" scoped>
 .toast {
-  position: fixed;
-  bottom: 64px;
-  left: 50%;
-  transform: translate(-50%, -50%);
   font-size: 14px;
   color: var(--color-text);
   background: rgba(255, 255, 255, 0.88);

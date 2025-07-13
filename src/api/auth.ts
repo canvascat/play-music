@@ -1,4 +1,5 @@
-import request from '@/utils/request';
+import request, { noCacheParams } from '@/utils/request';
+import * as NCMAPI from './NCMAPI';
 
 /**
  * 手机登录
@@ -6,13 +7,8 @@ import request from '@/utils/request';
  * - password: 密码
  * - countrycode: 国家码，用于国外手机号登录，例如美国传入：1
  * - md5_password: md5加密后的密码,传入后 password 将失效
- * @param {Object} params
- * @param {string} params.phone
- * @param {string} params.password
- * @param {string=} params.countrycode
- * @param {string=} params.md5_password
  */
-export function loginWithPhone(params) {
+export function loginWithPhone(params: NCMAPI.login_cellphone_1[0] | NCMAPI.login_cellphone_2[0] | NCMAPI.login_cellphone[0]) {
   return request({
     url: '/login/cellphone',
     method: 'post',
@@ -25,12 +21,8 @@ export function loginWithPhone(params) {
  * - email: 163 网易邮箱
  * - password: 密码
  * - md5_password: md5加密后的密码,传入后 password 将失效
- * @param {Object} params
- * @param {string} params.email
- * @param {string} params.password
- * @param {string=} params.md5_password
  */
-export function loginWithEmail(params) {
+export function loginWithEmail(params: NCMAPI.login_1[0] | NCMAPI.login[0]) {
   return request({
     url: '/login',
     method: 'post',
@@ -45,9 +37,7 @@ export function loginQrCodeKey() {
   return request({
     url: '/login/qr/key',
     method: 'get',
-    params: {
-      timestamp: new Date().getTime(),
-    },
+    params: noCacheParams({}),
   });
 }
 
@@ -59,14 +49,11 @@ export function loginQrCodeKey() {
  * @param {string} params.key
  * @param {string=} params.qrimg 传入后会额外返回二维码图片base64编码
  */
-export function loginQrCodeCreate(params) {
+export function loginQrCodeCreate(params: NCMAPI.login_qr_create[0]) {
   return request({
     url: '/login/qr/create',
     method: 'get',
-    params: {
-      ...params,
-      timestamp: new Date().getTime(),
-    },
+    params: noCacheParams(params),
   });
 }
 
@@ -75,14 +62,11 @@ export function loginQrCodeCreate(params) {
  * 说明: 轮询此接口可获取二维码扫码状态,800为二维码过期,801为等待扫码,802为待确认,803为授权登录成功(803状态码下会返回cookies)
  * @param {string} key
  */
-export function loginQrCodeCheck(key) {
+export function loginQrCodeCheck(key: NCMAPI.login_qr_check[0]['key']) {
   return request({
     url: '/login/qr/check',
     method: 'get',
-    params: {
-      key,
-      timestamp: new Date().getTime(),
-    },
+    params: noCacheParams({ key }),
   });
 }
 

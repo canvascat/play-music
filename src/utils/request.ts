@@ -1,8 +1,8 @@
 import router from '@/router';
 import { doLogout, getCookie } from '@/utils/auth';
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 
-let baseURL = '/api';
+const baseURL = '/api';
 
 const service = axios.create({
   baseURL,
@@ -24,22 +24,22 @@ service.interceptors.request.use(function (config) {
     console.error("You must set up the baseURL in the service's config");
   }
 
-  if (!window.IS_ELECTRON && !config.url.includes('/login')) {
+  if (!window.IS_ELECTRON && config.url &&!config.url.includes('/login')) {
     config.params.realIP = '211.161.244.70';
   }
 
   // Force real_ip
   const enableRealIP = JSON.parse(
-    localStorage.getItem('settings')
+    localStorage.getItem('settings') ?? '{}'
   ).enableRealIP;
-  const realIP = JSON.parse(localStorage.getItem('settings')).realIP;
+  const realIP = JSON.parse(localStorage.getItem('settings') ?? '{}').realIP;
   if (import.meta.env.VUE_APP_REAL_IP) {
     config.params.realIP = import.meta.env.VUE_APP_REAL_IP;
   } else if (enableRealIP) {
     config.params.realIP = realIP;
   }
 
-  const proxy = JSON.parse(localStorage.getItem('settings')).proxyConfig;
+  const proxy = JSON.parse(localStorage.getItem('settings') ?? '{}').proxyConfig;
   if (['HTTP', 'HTTPS'].includes(proxy.protocol)) {
     config.params.proxy = `${proxy.protocol}://${proxy.server}:${proxy.port}`;
   }
@@ -54,15 +54,15 @@ service.interceptors.response.use(
   },
   async error => {
     /** @type {import('axios').AxiosResponse | null} */
-    let response;
-    let data;
+    let response: AxiosResponse | null = null;
+    let data: any;
     if (error === 'TypeError: baseURL is undefined') {
       response = error;
       data = error;
       console.error("You must set up the baseURL in the service's config");
     } else if (error.response) {
       response = error.response;
-      data = response.data;
+      data = response?.data;
     }
 
     if (
