@@ -1,6 +1,6 @@
 import router from '@/router';
 import { doLogout, getCookie } from '@/utils/auth';
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 
 const baseURL = '/api';
 
@@ -86,4 +86,10 @@ service.interceptors.response.use(
   }
 );
 
-export default service;
+const request = <T = any>(config: AxiosRequestConfig) => service(config) as Promise<T>;
+ 
+export const noCacheParams = <T>(params: T, noCache = true) => {
+  return { ...params, timestamp: noCache ? Date.now() : undefined };
+}
+
+export default request;
