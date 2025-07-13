@@ -82,7 +82,7 @@ import Win32Titlebar from '@/components/Win32Titlebar.vue';
 import LinuxTitlebar from '@/components/LinuxTitlebar.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import ButtonIcon from '@/components/ButtonIcon.vue';
-import IconArrowRight from '@/assets/icons/components/IconArrowRight.vue';
+import { IconArrowRight } from '@/components/icon';
 
 export default {
   name: 'Navbar',

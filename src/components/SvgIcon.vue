@@ -2,34 +2,22 @@
   <component :is="icon" :class="svgClass" aria-hidden="true" />
 </template>
 
-<script>
-import icons from '@/assets/icons';
+<script setup lang="ts">
+import { computed } from 'vue';
+import icons from './icon/map';
 
-export default {
+/** @deprecated */
+defineOptions({
   name: 'SvgIcon',
-  props: {
-    iconClass: {
-      type: String,
-      required: true,
-    },
-    className: {
-      type: String,
-      default: '',
-    },
-  },
-  computed: {
-    icon() {
-      return icons[this.iconClass] 
-    },
-    svgClass() {
-      if (this.className) {
-        return 'svg-icon ' + this.className;
-      } else {
-        return 'svg-icon';
-      }
-    },
-  },
-};
+})
+
+const props = defineProps<{
+  iconClass: keyof typeof icons;
+  className?: string;
+}>(); 
+
+const icon = computed(() => icons[props.iconClass]);
+const svgClass = computed(() => props.className ? `svg-icon ${props.className}` : 'svg-icon');
 </script>
 
 <style scoped>
