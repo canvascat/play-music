@@ -45,6 +45,7 @@
     "x11": "^2.3.0"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.12",
     "@types/node": "^24.0.13",
     "@vitejs/plugin-vue": "^6.0.0",
     "@vue/tsconfig": "^0.7.0",

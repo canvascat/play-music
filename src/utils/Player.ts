@@ -47,29 +47,30 @@ function setTrayLikeState(isLiked) {
     window.ipcRenderer?.send('updateTrayLikeState', isLiked);
   }
 }
+// TODO: 重构 分离播放器和播放列表
 
 export default class Player {
   // 播放器状态
   /** 是否正在播放中 */
   private _playing: boolean = false;
   /** 当前播放歌曲的进度 */
-  private   _progress: number = 0;
+  private _progress: number = 0;
   /** 是否启用Player */
-  private   _enabled: boolean = false;
+  private _enabled: boolean = false;
   /** 循环模式 */
-  private   _repeatMode: 'off' | 'on' | 'one' = 'off';
+  private _repeatMode: 'off' | 'on' | 'one' = 'off';
   /** 是否随机播放 */
-  private   _shuffle: boolean = false;
+  private _shuffle: boolean = false;
   /** 是否倒序播放 */
-  private   _reversed: boolean = false;
+  private _reversed: boolean = false;
   /** 音量 0-1 */
-  private   _volume: number = 1;
+  private _volume: number = 1;
   /** 静音前的音量 */
-  private   _volumeBeforeMuted: number = 1; 
+  private _volumeBeforeMuted: number = 1;
   /** 是否正在私人FM中加载新的track */
-  private   _personalFMLoading: boolean = false;
+  private _personalFMLoading: boolean = false;
   /** 是否正在缓存私人FM的下一首歌曲 */
-  private   _personalFMNextLoading: boolean = false;
+  private _personalFMNextLoading: boolean = false;
 
   // 播放信息
   /** 播放列表 */
@@ -98,11 +99,11 @@ export default class Player {
   /** howler (https://github.com/goldfire/howler.js) */
   private _howler: Howl | null = null;
 
-  constructor() { 
+  constructor() {
     Object.defineProperty(this, '_howler', {
       enumerable: false,
     });
- 
+
     this._init();
   }
 
