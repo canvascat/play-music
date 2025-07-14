@@ -70,7 +70,7 @@ export function resizeImage(imgUrl: string, size = 512) {
   return `${httpsImgUrl}?param=${size}y${size}`;
 }
 
-export function formatPlayCount(count: number) {
+export function formatPlayCount(count?: number) {
   if (!count) return '';
   if (locale.global.locale === 'zh-CN') {
     if (count > 100000000) {

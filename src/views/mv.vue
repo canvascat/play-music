@@ -8,7 +8,7 @@
         <div class="title">
           <router-link :to="'/artist/' + mv.data.artistId">{{
             mv.data.artistName
-          }}</router-link>
+            }}</router-link>
           -
           {{ mv.data.name }}
           <div class="buttons">
@@ -16,9 +16,16 @@
               <svg-icon v-if="mv.subed" icon-class="heart-solid"></svg-icon>
               <svg-icon v-else icon-class="heart"></svg-icon>
             </button-icon>
-            <button-icon class="button" v-on:click="openMenu">
-              <svg-icon icon-class="more"></svg-icon>
-            </button-icon>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child> <button-icon class="button">
+                  <svg-icon icon-class="more"></svg-icon>
+                </button-icon></DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem @click="copyUrl(mv.data.id)">{{ $t('contextMenu.copyUrl') }}</DropdownMenuItem>
+                <DropdownMenuItem @click="openInBrowser(mv.data.id)">{{ $t('contextMenu.openInBrowser') }}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         <div class="info">
@@ -31,14 +38,7 @@
       <div class="section-title">{{ $t('mv.moreVideo') }}</div>
       <MvRow :mvs="simiMvs" />
     </div>
-    <ContextMenu ref="mvMenu">
-      <div class="item" @click="copyUrl(mv.data.id)">{{
-        $t('contextMenu.copyUrl')
-      }}</div>
-      <div class="item" @click="openInBrowser(mv.data.id)">{{
-        $t('contextMenu.openInBrowser')
-      }}</div>
-    </ContextMenu>
+
   </div>
 </template>
 
@@ -50,7 +50,7 @@ import '@/assets/css/plyr.css';
 import Plyr from 'plyr';
 
 import ButtonIcon from '@/components/ButtonIcon.vue';
-import ContextMenu from '@/components/ContextMenu.vue';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import MvRow from '@/components/MvRow.vue';
 import { useStore } from '@/store/pinia';
 import { copyText } from '@/utils/copy';
@@ -67,7 +67,6 @@ defineOptions({
   name: 'mv',
 });
 const videoPlayer = ref<HTMLVideoElement | null>(null);
-const mvMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
 onBeforeRouteUpdate((to, _from, next) => {
   getData(to.params.id as string);
@@ -80,7 +79,7 @@ const mv = ref({
     id: '',
     name: '',
     artistName: '',
-    playCount: '',
+    playCount: undefined as number | undefined,
     publishTime: '',
     cover: '',
     artistId: '',
@@ -112,7 +111,7 @@ onMounted(() => {
 
 function getData(id: string) {
   mvDetail(id).then(data => {
-    mv.value = data; 
+    mv.value = data;
     Promise.all(data.data.brs.map(br => mvUrl({ id, r: br.br }))).then(results => {
       let sources = results.map(result => {
         return {
@@ -146,11 +145,8 @@ function likeMV() {
     if (data.code === 200) mv.value.subed = !mv.value.subed;
   });
 }
-function openMenu(e: Event) {
-  mvMenu.value?.openMenu(e as MouseEvent);
-}
-function copyUrl(id: string) {
 
+function copyUrl(id: string) {
   copyText(`https://music.163.com/#/mv?id=${id}`)
     .then(function () {
       toast(t('toast.copied'));

@@ -1923,8 +1923,8 @@ packages:
   regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
 
-  register-scheme@git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17:
-    resolution: {commit: e7cc9a63a1f512565da44cb57316d9fb10750e17, repo: git@github.com:devsnek/node-register-scheme.git, type: git}
+  register-scheme@https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17:
+    resolution: {tarball: https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17}
     version: 0.0.2
 
   reka-ui@2.3.2:
@@ -3346,7 +3346,7 @@ snapshots:
       node-fetch: 2.7.0
       ws: 7.5.10
     optionalDependencies:
-      register-scheme: git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17
+      register-scheme: https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -4134,7 +4134,7 @@ snapshots:
 
   regenerator-runtime@0.13.11: {}
 
-  register-scheme@git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17:
+  register-scheme@https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17:
     dependencies:
       bindings: 1.5.0
       node-addon-api: 1.7.2
