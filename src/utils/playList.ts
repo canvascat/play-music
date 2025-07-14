@@ -12,7 +12,7 @@ export function hasListSource() {
 }
 
 export function goToListSource() {
-  router.push({ path: getListSourcePath() });
+  router.push({ path: `${getListSourcePath()}` });
 }
 
 export function getListSourcePath() {

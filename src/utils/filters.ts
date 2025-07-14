@@ -18,7 +18,7 @@ export function formatTime(Milliseconds: number, format = 'HH:MM:SS') {
       ? `${hours}:${mins.padStart(2, '0')}:${seconds}`
       : `${mins}:${seconds}`;
   } else if (format === 'Human') {
-    let hoursUnit, minitesUnit;
+    let hoursUnit: string, minitesUnit: string;
     switch (locale.global.locale) {
       case 'zh-CN':
         hoursUnit = '小时';

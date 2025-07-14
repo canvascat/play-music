@@ -42,8 +42,8 @@
   </div>
 </template>
 
-<script>
-import { mvDetail, mvUrl, simiMv, likeAMV } from '@/api/mv';
+<script setup lang="ts">
+import { mvDetail, mvUrl, simiMv, likeAMV } from '@/api/mv.ts';
 import { isAccountLoggedIn } from '@/utils/auth';
 import NProgress from 'nprogress';
 import '@/assets/css/plyr.css';
@@ -52,119 +52,116 @@ import Plyr from 'plyr';
 import ButtonIcon from '@/components/ButtonIcon.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
 import MvRow from '@/components/MvRow.vue';
-import { mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+import { useStore } from '@/store/pinia';
 import { copyText } from '@/utils/copy';
 import { formatPlayCount } from '@/utils/filters';
 
-export default {
+import { onBeforeRouteUpdate, useRoute } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+defineOptions({
   name: 'mv',
-  components: {
-    MvRow,
-    ButtonIcon,
-    ContextMenu,
+});
+const videoPlayer = ref<HTMLVideoElement | null>(null);
+const mvMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
+
+onBeforeRouteUpdate((to, _from, next) => {
+  getData(to.params.id as string);
+  next();
+});
+
+const mv = ref({
+  url: '',
+  data: {
+    id: '',
+    name: '',
+    artistName: '',
+    playCount: '',
+    publishTime: '',
+    cover: '',
+    artistId: '',
   },
-  beforeRouteUpdate(to, from, next) {
-    this.getData(to.params.id);
-    next();
-  },
-  data() {
-    return {
-      mv: {
-        url: '',
-        data: {
-          name: '',
-          artistName: '',
-          playCount: '',
-          publishTime: '',
-        },
-      },
-      mvPlayer: null,
-      simiMvs: [],
-    };
-  },
-  mounted() {
-    let videoOptions = {
-      settings: ['quality'],
-      autoplay: false,
-      quality: {
-        default: 1080,
-        options: [1080, 720, 480, 240],
-      },
-    };
-    if (this.$route.query.autoplay === 'true') videoOptions.autoplay = true;
-    this.mvPlayer = new Plyr(this.$refs.videoPlayer, videoOptions);
-    this.mvPlayer.volume = this.player.volume;
-    this.mvPlayer.on('playing', () => {
-      this.player.pause();
+  subed: false,
+});
+let mvPlayer: Plyr | null = null;
+const simiMvs = ref<any[]>([]);
+
+const { player, showToast } = useStore();
+const route = useRoute();
+onMounted(() => {
+  let videoOptions = {
+    settings: ['quality'],
+    autoplay: false,
+    quality: {
+      default: 1080,
+      options: [1080, 720, 480, 240],
+    },
+  };
+  videoOptions.autoplay = route.query.autoplay === 'true';
+  mvPlayer = new Plyr(videoPlayer.value!, videoOptions);
+  mvPlayer.volume = player.volume;
+  mvPlayer.on('playing', () => {
+    player.pause();
+  });
+  getData(route.params.id as string);
+});
+
+function getData(id: string) {
+  mvDetail(id).then(data => {
+    mv.value = data; 
+    Promise.all(data.data.brs.map(br => mvUrl({ id, r: br.br }))).then(results => {
+      let sources = results.map(result => {
+        return {
+          src: result.data.url.replace(/^http:/, 'https:'),
+          type: 'video/mp4',
+          size: result.data.r,
+        };
+      });
+      mvPlayer!.source = {
+        type: 'video',
+        title: mv.value.data.name,
+        sources: sources,
+        poster: mv.value.data.cover.replace(/^http:/, 'https:'),
+      };
+      NProgress.done();
     });
-    this.getData(this.$route.params.id);
-    console.log('网易云你这mv音频码率也太糊了吧🙄');
-  },
-  computed: {
-    ...mapState(useStore, ['player']),
-  },
-  methods: {
-    resizeImage,
-    ...mapActions(useStore, ['showToast']),
-    getData(id) {
-      mvDetail(id).then(data => {
-        this.mv = data;
-        let requests = data.data.brs.map(br => {
-          return mvUrl({ id, r: br.br });
-        });
-        Promise.all(requests).then(results => {
-          let sources = results.map(result => {
-            return {
-              src: result.data.url.replace(/^http:/, 'https:'),
-              type: 'video/mp4',
-              size: result.data.r,
-            };
-          });
-          this.mvPlayer.source = {
-            type: 'video',
-            title: this.mv.data.name,
-            sources: sources,
-            poster: this.mv.data.cover.replace(/^http:/, 'https:'),
-          };
-          NProgress.done();
-        });
-      });
-      simiMv(id).then(data => {
-        this.simiMvs = data.mvs;
-      });
-    },
-    likeMV() {
-      if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
-        return;
-      }
-      likeAMV({
-        mvid: this.mv.data.id,
-        t: this.mv.subed ? 0 : 1,
-      }).then(data => {
-        if (data.code === 200) this.mv.subed = !this.mv.subed;
-      });
-    },
-    openMenu(e) {
-      this.$refs.mvMenu.openMenu(e);
-    },
-    copyUrl(id) {
-      let showToast = this.showToast;
-       copyText(`https://music.163.com/#/mv?id=${id}`)
-        .then(function () {
-          showToast(this.$t('toast.copied'));
-        })
-        .catch(error => {
-          showToast(`${this.$t('toast.copyFailed')}${error}`);
-        });
-    },
-    openInBrowser(id) {
-      const url = `https://music.163.com/#/mv?id=${id}`;
-      window.open(url);
-    },
-  },
-};
+  });
+  simiMv(id).then(data => {
+    simiMvs.value = data.mvs;
+  });
+}
+function likeMV() {
+  if (!isAccountLoggedIn()) {
+    showToast(t('toast.needToLogin'));
+    return;
+  }
+  likeAMV({
+    mvid: mv.value.data.id,
+    t: mv.value.subed ? 0 : 1,
+  }).then(data => {
+    if (data.code === 200) mv.value.subed = !mv.value.subed;
+  });
+}
+function openMenu(e: Event) {
+  mvMenu.value?.openMenu(e as MouseEvent);
+}
+function copyUrl(id: string) {
+
+  copyText(`https://music.163.com/#/mv?id=${id}`)
+    .then(function () {
+      showToast(t('toast.copied'));
+    })
+    .catch(error => {
+      showToast(`${t('toast.copyFailed')}${error}`);
+    });
+}
+function openInBrowser(id: string) {
+  const url = `https://music.163.com/#/mv?id=${id}`;
+  window.open(url);
+}
 </script>
 <style lang="scss" scoped>
 .video {
@@ -176,9 +173,11 @@ export default {
   width: 100%;
   margin-top: 32px;
 }
+
 .current-video {
   width: 100%;
 }
+
 .video {
   border-radius: 16px;
   background: transparent;
@@ -189,16 +188,19 @@ export default {
 .video-info {
   margin-top: 12px;
   color: var(--color-text);
+
   .title {
     font-size: 24px;
     font-weight: 600;
   }
+
   .artist {
     font-size: 14px;
     opacity: 0.88;
     margin-top: 2px;
     font-weight: 600;
   }
+
   .info {
     font-size: 12px;
     opacity: 0.68;
@@ -208,6 +210,7 @@ export default {
 
 .more-video {
   margin-top: 48px;
+
   .section-title {
     font-size: 18px;
     font-weight: 600;
@@ -219,9 +222,11 @@ export default {
 
 .buttons {
   display: inline-block;
+
   .button {
     display: inline-block;
   }
+
   .svg-icon {
     height: 18px;
     width: 18px;
