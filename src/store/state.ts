@@ -47,11 +47,6 @@ export default {
     clickObjectID: 0,
     showMenu: false,
   },
-  toast: {
-    show: false,
-    text: '',
-    timer: null,
-  },
   modals: {
     addTrackToPlaylistModal: {
       show: false,

@@ -59,6 +59,7 @@ import { formatPlayCount } from '@/utils/filters';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { toast } from 'vue-sonner'
 
 const { t } = useI18n();
 
@@ -89,7 +90,7 @@ const mv = ref({
 let mvPlayer: Plyr | null = null;
 const simiMvs = ref<any[]>([]);
 
-const { player, showToast } = useStore();
+const { player } = useStore();
 const route = useRoute();
 onMounted(() => {
   let videoOptions = {
@@ -135,7 +136,7 @@ function getData(id: string) {
 }
 function likeMV() {
   if (!isAccountLoggedIn()) {
-    showToast(t('toast.needToLogin'));
+    toast(t('toast.needToLogin'));
     return;
   }
   likeAMV({
@@ -152,10 +153,10 @@ function copyUrl(id: string) {
 
   copyText(`https://music.163.com/#/mv?id=${id}`)
     .then(function () {
-      showToast(t('toast.copied'));
+      toast(t('toast.copied'));
     })
     .catch(error => {
-      showToast(`${t('toast.copyFailed')}${error}`);
+      toast(`${t('toast.copyFailed')}${error}`);
     });
 }
 function openInBrowser(id: string) {

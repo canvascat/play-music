@@ -230,6 +230,7 @@ import { getTrackDetail } from '@/api/track';
 import { isAccountLoggedIn } from '@/utils/auth';
 import nativeAlert from '@/utils/nativeAlert';
 import { resizeImage, formatDate } from '@/utils/filters';
+import { toast } from 'vue-sonner'
 
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
@@ -415,7 +416,7 @@ export default {
   },
   methods: {
     resizeImage, formatDate,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'setEnableScrolling']),
     playPlaylistByID(trackID = 'first') {
       let trackIDs = this.playlist.trackIds.map(t => t.id);
       this.player.replacePlaylist(
@@ -427,7 +428,7 @@ export default {
     },
     likePlaylist(toast = false) {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       subscribePlaylist({
@@ -437,7 +438,7 @@ export default {
         if (data.code === 200) {
           this.playlist.subscribed = !this.playlist.subscribed;
           if (toast === true)
-            this.showToast(
+            toast(
               this.playlist.subscribed ? '已保存到音乐库' : '已从音乐库删除'
             );
         }
@@ -491,7 +492,7 @@ export default {
     },
     deletePlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       let confirmation = confirm(`确定要删除歌单 ${this.playlist.name}？`);
@@ -522,7 +523,7 @@ export default {
     },
     removeTrack(trackID) {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       this.tracks = this.tracks.filter(t => t.id !== trackID);

@@ -4,7 +4,7 @@
       v-if="settings.showPlaylistsByAppleMusic !== false"
       class="index-row first-row"
     >
-      <div class="title"> by Apple Music </div>
+      <div class="title" @click="toast('Hello')"> by Apple Music </div>
       <CoverRow
         :type="'playlist'"
         :items="byAppleMusic"
@@ -69,6 +69,7 @@
 </template>
 
 <script>
+import { toast } from 'vue-sonner'
 import { toplists } from '@/api/playlist';
 import { toplistOfArtists } from '@/api/artist';
 import { newAlbums } from '@/api/album';
@@ -110,6 +111,7 @@ export default {
     // this.$parent.$refs.scrollbar.restorePosition?.();
   },
   methods: {
+    toast,
     loadData() {
       setTimeout(() => {
         if (!this.show) NProgress.start();

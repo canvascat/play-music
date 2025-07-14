@@ -314,6 +314,7 @@ import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { hasListSource, getListSourcePath } from '@/utils/playList';
+import { toast } from 'vue-sonner'
 
 export default {
   name: 'Lyrics',
@@ -513,7 +514,7 @@ export default {
     },
     addToPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       this.fetchLikedPlaylist();

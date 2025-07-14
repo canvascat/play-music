@@ -199,6 +199,7 @@ import Cover from '@/components/Cover.vue';
 import MvRow from '@/components/MvRow.vue';
 import Modal from '@/components/Modal.vue';
 import { copyText } from '@/utils/copy';
+import { toast } from 'vue-sonner'
 
 export default {
   name: 'Artist',
@@ -272,7 +273,7 @@ export default {
   },
   methods: {
     resizeImage, formatDate, formatAlbumType,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'setEnableScrolling']),
     loadData(id, next = undefined) {
       setTimeout(() => {
         if (!this.show) NProgress.start();
@@ -326,7 +327,7 @@ export default {
     },
     followArtist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       followAArtist({
@@ -354,13 +355,12 @@ export default {
       this.$refs.artistMenu.openMenu(e);
     },
     copyUrl(id) {
-      let showToast = this.showToast;
        copyText(`https://music.163.com/#/artist?id=${id}`)
         .then(function () {
-          showToast(this.$t('toast.copied'));
+          toast(this.$t('toast.copied'));
         })
         .catch(error => {
-          showToast(`${this.$t('toast.copyFailed')}${error}`);
+          toast(`${this.$t('toast.copyFailed')}${error}`);
         });
     },
     openInBrowser(id) {

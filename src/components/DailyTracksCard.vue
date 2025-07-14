@@ -23,6 +23,7 @@ import { useStore } from '@/store/pinia';
 import { dailyRecommendTracks } from '@/api/playlist';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { sample } from 'es-toolkit';
+import { toast } from 'vue-sonner'
 
 const defaultCovers = [
   'https://p2.music.126.net/0-Ybpa8FrDfRgKYCTJD8Xg==/109951164796696795.jpg',
@@ -47,7 +48,7 @@ export default {
     if (this.dailyTracks.length === 0) this.loadDailyTracks();
   },
   methods: {
-    ...mapActions(useStore, ['showToast', 'updateDailyTracks']),
+    ...mapActions(useStore, ['updateDailyTracks']),
     loadDailyTracks() {
       if (!isAccountLoggedIn()) return;
       dailyRecommendTracks()
@@ -61,7 +62,7 @@ export default {
     },
     playDailyTracks() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       let trackIDs = this.dailyTracks.map(t => t.id);

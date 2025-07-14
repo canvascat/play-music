@@ -222,6 +222,7 @@ import { uploadSong } from '@/api/user';
 import { getLyric } from '@/api/track';
 import NProgress from 'nprogress';
 import { resizeImage } from '@/utils/filters';
+import { toast } from 'vue-sonner'
 
 import ContextMenu from '@/components/ContextMenu.vue';
 import TrackList from '@/components/TrackList.vue';
@@ -315,7 +316,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapActions(useStore, ['showToast', 'updateModal', 'updateData', 'fetchLikedSongsWithDetails', 'fetchLikedSongs', 'fetchLikedPlaylist', 'fetchLikedAlbums', 'fetchLikedArtists', 'fetchLikedMVs', 'fetchCloudDisk', 'fetchPlayHistory', 'updateLikedXXX'  ]),
+    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedSongsWithDetails', 'fetchLikedSongs', 'fetchLikedPlaylist', 'fetchLikedAlbums', 'fetchLikedArtists', 'fetchLikedMVs', 'fetchCloudDisk', 'fetchPlayHistory', 'updateLikedXXX'  ]),
     loadData() {
       if (this.liked.songsWithDetails.length > 0) {
         NProgress.done();
@@ -353,7 +354,7 @@ export default {
     },
     updateCurrentTab(tab) {
       if (!isAccountLoggedIn() && tab !== 'playlists') {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       this.currentTab = tab;
@@ -379,7 +380,7 @@ export default {
     },
     openAddPlaylistModal() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       this.updateModal({

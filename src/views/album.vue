@@ -165,6 +165,7 @@ import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
 import Modal from '@/components/Modal.vue';
 import { copyText } from '@/utils/copy.ts';
+import { toast } from 'vue-sonner'
 
 export default {
   name: 'Album',
@@ -238,13 +239,13 @@ export default {
   },
   methods: {
     resizeImage, formatDate, formatTime, formatAlbumType,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'showToast', 'setEnableScrolling']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'setEnableScrolling']),
     playAlbumByID(id, trackID = 'first') {
       this.player.playAlbumByID(id, trackID);
     },
     likeAlbum(toast = false) {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       likeAAlbum({
@@ -255,13 +256,13 @@ export default {
           if (data.code === 200) {
             this.dynamicDetail.isSub = !this.dynamicDetail.isSub;
             if (toast === true)
-              this.showToast(
+              toast(
                 this.dynamicDetail.isSub ? '已保存到音乐库' : '已从音乐库删除'
               );
           }
         })
         .catch(error => {
-          this.showToast(`${error.response.data.message || error}`);
+          toast(`${error.response.data.message || error}`);
         });
     },
     formatTitle() {
@@ -316,13 +317,12 @@ export default {
       this.$refs.albumMenu.openMenu(e);
     },
     copyUrl(id) {
-      let showToast = this.showToast;
       copyText(`https://music.163.com/#/album?id=${id}`)
         .then(function () {
-          showToast(this.$t('toast.copied'));
+          toast(this.$t('toast.copied'));
         })
         .catch(error => {
-          showToast(`${this.$t('toast.copyFailed')}${error}`);
+          toast(`${this.$t('toast.copyFailed')}${error}`);
         });
     },
     openInBrowser(id) {

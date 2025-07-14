@@ -228,7 +228,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapActions(useStore, ['toggleLyrics', 'showToast', 'likeATrack']),
+    ...mapActions(useStore, ['toggleLyrics', 'likeATrack']),
     playPrevTrack() {
       this.player.playPrevTrack();
     },

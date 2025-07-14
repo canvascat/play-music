@@ -11,6 +11,7 @@ import { isCreateMpris, isCreateTray } from '@/utils/platform';
 import { Howl, Howler } from 'howler';
 import { shuffle } from 'es-toolkit';
 import { decode as base642Buffer } from '@/utils/base64';
+import { toast } from 'vue-sonner'
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -348,7 +349,7 @@ export default class Player {
         this._playNextTrack(this._isPersonalFM);
       } else if (errCode === 4) {
         // code 4: MEDIA_ERR_SRC_NOT_SUPPORTED
-        useStore(pinia).showToast(`无法播放: 不支持的音频格式`);
+        toast(`无法播放: 不支持的音频格式`);
         this._playNextTrack(this._isPersonalFM);
       } else {
         const t = this.progress;
@@ -532,7 +533,7 @@ export default class Player {
         }
         return replaced;
       } else {
-        useStore(pinia).showToast(`无法播放 ${track.name}`);
+        toast(`无法播放 ${track.name}`);
         switch (ifUnplayableThen) {
           case UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK:
             this._playNextTrack(this.isPersonalFM);
@@ -541,7 +542,7 @@ export default class Player {
             this.playPrevTrack();
             break;
           default:
-            useStore(pinia).showToast(
+            toast(
               `undefined Unplayable condition: ${ifUnplayableThen}`
             );
             break;
@@ -755,7 +756,7 @@ export default class Player {
         result = await personalFM().catch(() => null);
         if (!result) {
           this._personalFMLoading = false;
-          useStore(pinia).showToast('personal fm timeout');
+          toast('personal fm timeout');
           return false;
         }
         if (result.data?.length > 0) {
@@ -768,7 +769,7 @@ export default class Player {
 
       if (retryCount < 0) {
         let content = '获取私人FM数据时重试次数过多，请手动切换下一首';
-        useStore(pinia).showToast(content);
+        toast(content);
         console.log(content);
         return false;
       }

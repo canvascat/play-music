@@ -782,6 +782,7 @@ import { auth as lastfmAuth } from '@/api/lastfm';
 import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
+import { toast } from 'vue-sonner'
 
 const validShortcutCodes = ['=', '-', '~', '[', ']', ';', "'", ',', '.', '/'];
 
@@ -1126,7 +1127,7 @@ export default {
         config.protocol = value;
         if (value === 'noProxy') {
           window.ipcRenderer?.send('removeProxy');
-          this.showToast('已关闭代理');
+          toast('已关闭代理');
         }
         this.updateSettings({
           key: 'proxyConfig',
@@ -1288,7 +1289,6 @@ export default {
   },
   methods: {
     ...mapActions(useStore, [
-      'showToast',
       'updateSettings',
       'changeLang',
       'changeMusicQuality',
@@ -1366,7 +1366,7 @@ export default {
       } else {
         window.ipcRenderer?.send('setProxy', config);
       }
-      this.showToast('已更新代理设置');
+      toast('已更新代理设置');
     },
     clickOutside() {
       this.exitRecordShortcut();
@@ -1432,7 +1432,7 @@ export default {
       };
       this.updateShortcut(payload);
       window.ipcRenderer?.send('updateShortcut', payload);
-      this.showToast('快捷键已保存');
+      toast('快捷键已保存');
       this.recordedShortcut = [];
     },
     exitRecordShortcut() {

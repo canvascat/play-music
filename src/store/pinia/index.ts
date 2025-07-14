@@ -19,6 +19,7 @@ import {
   userAccount,
 } from '@/api/user';
 import { changeAppearance } from '@/utils/common';
+import { toast } from 'vue-sonner'
  
 export const pinia = createPinia()
 // 将该插件交给 Pinia
@@ -103,28 +104,9 @@ export const useStore = defineStore('store', {
     updateTitle(title: string) {
       this.title = title;
     },
-
-
-    showToast(text: string) {
-      if (this.toast.timer !== null) {
-        clearTimeout(this.toast.timer);
-        this.updateToast({ show: false, text: '', timer: null });
-      }
-      this.updateToast({
-        show: true,
-        text,
-        timer: setTimeout(() => {
-          this.updateToast({
-            show: false,
-            text: this.toast.text,
-            timer: null,
-          });
-        }, 3200),
-      });
-    },
     likeATrack(id) {
       if (!isAccountLoggedIn()) {
-        this.showToast('此操作需要登录网易云账号');
+        toast('此操作需要登录网易云账号');
         return;
       }
       let like = true;
@@ -147,7 +129,7 @@ export const useStore = defineStore('store', {
           this.fetchLikedSongsWithDetails();
         })
         .catch(() => {
-          this.showToast('操作失败，专辑下架或版权锁定');
+          toast('操作失败，专辑下架或版权锁定');
         });
     },
     fetchLikedSongs() {

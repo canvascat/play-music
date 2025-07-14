@@ -33,6 +33,7 @@ import Modal from '@/components/Modal.vue';
 import { mapState, mapActions } from 'pinia';
 import { useStore } from '@/store/pinia'; 
 import { createPlaylist, addOrRemoveTrackFromPlaylist } from '@/api/playlist';
+import { toast } from 'vue-sonner'
 
 export default {
   name: 'ModalNewPlaylist',
@@ -66,7 +67,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useStore, ['updateModal', 'updateData', 'showToast', 'fetchLikedPlaylist', 'setEnableScrolling']),
+    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedPlaylist', 'setEnableScrolling']),
     close() {
       this.show = false;
       this.title = '';
@@ -85,15 +86,15 @@ export default {
               tracks: this.modals.newPlaylistModal.afterCreateAddTrackID,
             }).then(data => {
               if (data.body.code === 200) {
-                this.showToast(this.$t('toast.savedToPlaylist'));
+                toast(this.$t('toast.savedToPlaylist'));
               } else {
-                this.showToast(data.body.message);
+                toast(data.body.message);
               }
               this.resetAfterCreateAddTrackID();
             });
           }
           this.close();
-          this.showToast('成功创建歌单');
+          toast('成功创建歌单');
           this.updateData({ key: 'libraryPlaylistFilter', value: 'mine' });
           this.fetchLikedPlaylist();
         }

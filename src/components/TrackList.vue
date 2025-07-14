@@ -81,6 +81,7 @@ import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
 import { cloudDiskTrackDelete } from '@/api/user';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { resizeImage } from '@/utils/filters';
+import { toast } from 'vue-sonner'
 
 import TrackListItem from '@/components/TrackListItem.vue';
 import ContextMenu from '@/components/ContextMenu.vue';
@@ -183,7 +184,7 @@ export default {
   },
   methods: {
     resizeImage,
-    ...mapActions(useStore, ['updateModal', 'nextTrack', 'showToast', 'likeATrack', 'updateLikedXXX']),
+    ...mapActions(useStore, ['updateModal', 'nextTrack', 'likeATrack', 'updateLikedXXX']),
     openMenu(e, track, index = -1) {
       this.rightClickedTrack = track;
       this.rightClickedTrackIndex = index;
@@ -239,7 +240,7 @@ export default {
     },
     addTrackToPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       this.updateModal({
@@ -255,7 +256,7 @@ export default {
     },
     removeTrackFromPlaylist() {
       if (!isAccountLoggedIn()) {
-        this.showToast(this.$t('toast.needToLogin'));
+        toast(this.$t('toast.needToLogin'));
         return;
       }
       if (confirm(`确定要从歌单删除 ${this.rightClickedTrack.name}？`)) {
@@ -265,7 +266,7 @@ export default {
           pid: this.id,
           tracks: trackID,
         }).then(data => {
-          this.showToast(
+          toast(
             data.body.code === 200
               ? this.$t('toast.removedFromPlaylist')
               : data.body.message
@@ -279,10 +280,10 @@ export default {
         `https://music.163.com/song?id=${this.rightClickedTrack.id}`
       )
         .then(() => {
-          this.showToast(this.$t('toast.copied'));
+          toast(this.$t('toast.copied'));
         })
         .catch(err => {
-          this.showToast(`${this.$t('toast.copyFailed')}${err}`);
+          toast(`${this.$t('toast.copyFailed')}${err}`);
         });
     },
     removeTrackFromQueue() {
@@ -294,7 +295,7 @@ export default {
       if (confirm(`确定要从云盘删除 ${this.rightClickedTrack.songName}？`)) {
         let trackID = this.rightClickedTrack.songId;
         cloudDiskTrackDelete(trackID).then(data => {
-          this.showToast(
+          toast(
             data.code === 200 ? '已将此歌曲从云盘删除' : data.message
           );
           let newCloudDisk = this.liked.cloudDisk.filter(

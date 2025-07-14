@@ -33,6 +33,7 @@ import { useStore } from '@/store/pinia';
 import Modal from '@/components/Modal.vue';
 import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
 import { resizeImage } from '@/utils/filters';
+import { toast } from 'vue-sonner'
 
 export default {
   name: 'ModalAddTrackToPlaylist',
@@ -73,7 +74,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useStore, ['updateModal', 'showToast', 'setEnableScrolling']),
+    ...mapActions(useStore, ['updateModal', 'setEnableScrolling']),
     close() {
       this.show = false;
     },
@@ -85,9 +86,9 @@ export default {
       }).then(data => {
         if (data.body.code === 200) {
           this.show = false;
-          this.showToast(this.$t('toast.savedToPlaylist'));
+          toast(this.$t('toast.savedToPlaylist'));
         } else {
-          this.showToast(data.body.message);
+          toast(data.body.message);
         }
       });
     },

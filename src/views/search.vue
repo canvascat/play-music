@@ -90,6 +90,7 @@ import { useStore } from '@/store/pinia';
 import { getTrackDetail } from '@/api/track';
 import { search } from '@/api/others';
 import NProgress from 'nprogress';
+import { toast } from 'vue-sonner'
 
 import TrackList from '@/components/TrackList.vue';
 import MvRow from '@/components/MvRow.vue';
@@ -137,14 +138,12 @@ export default {
   created() {
     this.getData();
   },
-  methods: {
-    ...mapActions(useStore, ['showToast']),
+  methods: { 
     playTrackInSearchResult(id) {
       let track = this.tracks.find(t => t.id === id);
       this.player.appendTrackToPlayerList(track, true);
     },
     search(type = 'all') {
-      let showToast = this.showToast;
       const typeTable = {
         all: 1018,
         musicVideos: 1004,
@@ -162,7 +161,7 @@ export default {
           return { result: result.result, type };
         })
         .catch(err => {
-          showToast(err.response.data.msg || err.response.data.message);
+          toast(err.response.data.msg || err.response.data.message);
         });
     },
     getData() {

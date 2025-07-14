@@ -112,6 +112,9 @@ importers:
       vue-slider-component:
         specifier: 4.1.0-beta.7
         version: 4.1.0-beta.7
+      vue-sonner:
+        specifier: ^2.0.1
+        version: 2.0.1
       x11:
         specifier: ^2.3.0
         version: 2.3.0
@@ -1920,8 +1923,8 @@ packages:
   regenerator-runtime@0.13.11:
     resolution: {integrity: sha512-kY1AZVr2Ra+t+piVaJ4gxaFaReZVH40AKNo7UCX6W+dEwBo/2oZJzqfuN1qLq1oL45o56cPaTXELwrTh8Fpggg==}
 
-  register-scheme@https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17:
-    resolution: {tarball: https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17}
+  register-scheme@git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17:
+    resolution: {commit: e7cc9a63a1f512565da44cb57316d9fb10750e17, repo: git@github.com:devsnek/node-register-scheme.git, type: git}
     version: 0.0.2
 
   reka-ui@2.3.2:
@@ -2229,6 +2232,9 @@ packages:
 
   vue-slider-component@4.1.0-beta.7:
     resolution: {integrity: sha512-Qb7K920ZG7PoQswoF6Ias+i3W2rd3k4fpk04JUl82kEUcN86Yg6et7bVSKWt/7VpQe8a5IT3BqCKSCOZ7AJgCA==}
+
+  vue-sonner@2.0.1:
+    resolution: {integrity: sha512-sn4vjCRzRcnMaxaLa9aNSyZQi6S+gshiea5Lc3eqpkj0ES9LH8ljg+WJCkxefr28V4PZ9xkUXBIWpxGfQxstIg==}
 
   vue-tsc@3.0.1:
     resolution: {integrity: sha512-UvMLQD0hAGL1g/NfEQelnSVB4H5gtf/gz2lJKjMMwWNOUmSNyWkejwJagAxEbSjtV5CPPJYslOtoSuqJ63mhdg==}
@@ -3340,7 +3346,7 @@ snapshots:
       node-fetch: 2.7.0
       ws: 7.5.10
     optionalDependencies:
-      register-scheme: https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17
+      register-scheme: git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -4128,7 +4134,7 @@ snapshots:
 
   regenerator-runtime@0.13.11: {}
 
-  register-scheme@https://codeload.github.com/devsnek/node-register-scheme/tar.gz/e7cc9a63a1f512565da44cb57316d9fb10750e17:
+  register-scheme@git+https://git@github.com:devsnek/node-register-scheme.git#e7cc9a63a1f512565da44cb57316d9fb10750e17:
     dependencies:
       bindings: 1.5.0
       node-addon-api: 1.7.2
@@ -4444,6 +4450,8 @@ snapshots:
       vue: 3.5.17(typescript@5.8.3)
 
   vue-slider-component@4.1.0-beta.7: {}
+
+  vue-sonner@2.0.1: {}
 
   vue-tsc@3.0.1(typescript@5.8.3):
     dependencies:
