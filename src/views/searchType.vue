@@ -42,7 +42,7 @@
 <script>
 import { getTrackDetail } from '@/api/track';
 import { search } from '@/api/others';
-import { camelCase } from 'change-case';
+import { camelCase } from 'es-toolkit';
 import NProgress from 'nprogress';
 
 import TrackList from '@/components/TrackList.vue';

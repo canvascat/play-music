@@ -1,69 +1,70 @@
 <template>
-  <div ref="contextMenu" class="context-menu">
-    <div
-      v-if="showMenu"
-      ref="menu"
-      class="menu"
-      tabindex="-1"
-      :style="{ top: top, left: left }"
-      @blur="closeMenu"
-      @click="closeMenu"
-    >
+  <div class="context-menu">
+    <div v-if="state.showMenu" ref="menuRef" class="menu" tabindex="-1" :style="{ top: state.top, left: state.left }"
+      @blur="closeMenu" @click="closeMenu">
       <slot></slot>
     </div>
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia';
-import { useStore } from '@/store/pinia'; 
-
-export default {
+<script setup lang="ts">
+defineOptions({
   name: 'ContextMenu',
-  data() {
-    return {
-      showMenu: false,
-      top: '0px',
-      left: '0px',
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['player']),
-  },
-  methods: {
-    ...mapActions(useStore, ['setEnableScrolling']),
-    setMenu(top, left) {
-      let heightOffset = this.player.enabled ? 64 : 0;
-      let largestHeight =
-        window.innerHeight - this.$refs.menu.offsetHeight - heightOffset;
-      let largestWidth = window.innerWidth - this.$refs.menu.offsetWidth - 25;
-      if (top > largestHeight) top = largestHeight;
-      if (left > largestWidth) left = largestWidth;
-      this.top = top + 'px';
-      this.left = left + 'px';
-    },
+});
 
-    closeMenu() {
-      this.showMenu = false;
-      if (this.$parent.closeMenu !== undefined) {
-        this.$parent.closeMenu();
-      }
-      this.setEnableScrolling(true);
-    },
+const emit = defineEmits<{
+  closeMenu: []
+}>();
 
-    openMenu(e) {
-      this.showMenu = true;
-      this.$nextTick(
-        function () {
-          this.$refs.menu.focus();
-          this.setMenu(e.y, e.x);
-        }.bind(this)
-      );
-      e.preventDefault();
-      this.setEnableScrolling(false);
-    },
-  },
-};
+import { useStore } from '@/store/pinia';
+import { nextTick, reactive, ref } from 'vue';
+
+const { player, setEnableScrolling } = useStore();
+
+const menuRef = ref<HTMLDivElement | null>(null); 
+
+const state = reactive({
+  showMenu: false,
+  top: '0px',
+  left: '0px',
+});
+
+
+function setMenu(top: number, left: number) {
+  let heightOffset = player.enabled ? 64 : 0;
+  let largestHeight =
+    window.innerHeight - menuRef.value!.offsetHeight - heightOffset;
+  let largestWidth = window.innerWidth - menuRef.value!.offsetWidth - 25;
+  if (top > largestHeight) top = largestHeight;
+  if (left > largestWidth) left = largestWidth;
+  state.top = top + 'px';
+  state.left = left + 'px';
+}
+
+function closeMenu() {
+  state.showMenu = false;
+  emit('closeMenu');
+
+  setEnableScrolling(true);
+}
+
+function openMenu(e: MouseEvent) {
+  state.showMenu = true;
+  nextTick(() => {
+    menuRef.value!.focus();
+    setMenu(e.y, e.x);
+  });
+  e.preventDefault();
+  setEnableScrolling(false);
+}
+
+
+
+defineExpose({
+  openMenu,
+  closeMenu,
+});
+
 </script>
 
 <style lang="scss" scoped>
@@ -102,6 +103,7 @@ export default {
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 0 6px rgba(255, 255, 255, 0.08);
   }
+
   .menu .item:hover {
     color: var(--color-text);
   }
@@ -122,11 +124,13 @@ export default {
   color: var(--color-text);
   display: flex;
   align-items: center;
+
   &:hover {
     color: var(--color-primary);
     background: var(--color-primary-bg-for-transparent);
     transition: opacity 125ms ease-out, transform 125ms ease-out;
   }
+
   &:active {
     opacity: 0.75;
     transform: scale(0.95);
@@ -153,14 +157,17 @@ hr {
   align-items: center;
   color: var(--color-text);
   cursor: default;
+
   img {
     height: 38px;
     width: 38px;
     border-radius: 4px;
   }
+
   .info {
     margin-left: 10px;
   }
+
   .title {
     font-size: 16px;
     font-weight: 600;
@@ -170,6 +177,7 @@ hr {
     overflow: hidden;
     word-break: break-all;
   }
+
   .subtitle {
     font-size: 12px;
     opacity: 0.68;

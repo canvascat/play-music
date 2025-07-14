@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, shallowReactive, defineProps } from 'vue';
+import { computed, ref, shallowReactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const props = defineProps<{

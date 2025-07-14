@@ -97,7 +97,7 @@ export const useStore = defineStore('store', {
     restoreDefaultShortcuts() {
       this.settings.shortcuts = cloneDeep(shortcuts);
     },
-    setEnableScrolling(status = null) {
+    setEnableScrolling(status: boolean | null = null) {
       this.enableScrolling = status ? status : !this.enableScrolling;
     },
     updateTitle(title: string) {
