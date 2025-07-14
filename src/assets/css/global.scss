@@ -60,6 +60,11 @@
   --color-secondary-bg-for-transparent: rgba(255, 255, 255, 0.08);
 }
 
+#app {
+  width: 100%;
+  transition: all 0.4s;
+}
+
 #app,
 input {
   font-family: 'Barlow', ui-sans-serif, system-ui, -apple-system,

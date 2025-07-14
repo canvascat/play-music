@@ -1,4 +1,4 @@
-import { createRouter,  createWebHashHistory, type RouteRecordRaw } from 'vue-router';
+import { createRouter,  createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { isLooseLoggedIn, isAccountLoggedIn } from '@/utils/auth';
 
 const routes = [
@@ -133,8 +133,15 @@ const routes = [
 ] as const satisfies RouteRecordRaw[];
 
 const router = createRouter({
-  history:  createWebHashHistory() ,
+  history:  createWebHistory() ,
   routes,
+  scrollBehavior(_to, _from, savedPosition) {
+    console.log(savedPosition?.top, _to);
+    return {
+      el: document.querySelector('main'), 
+      top: savedPosition?.top,
+    }
+  },
 });
 
 // const originalPush = VueRouter.prototype.push;

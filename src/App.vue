@@ -1,24 +1,23 @@
 <template>
-  <div id="app" :class="{ 'user-select-none': userSelectNone }">
-    <Scrollbar v-show="!showLyrics" ref="scrollbar" :main="main" v-model:user-select-none="userSelectNone" />
-    <Navbar v-show="showNavbar" ref="navbar" />
-    <main ref="main" :style="{ overflow: enableScrolling ? 'auto' : 'hidden' }" @scroll="handleScroll" class="main">
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-    </main>
-    <transition name="slide-up">
-      <Player v-if="enablePlayer" v-show="showPlayer" ref="player" />
-    </transition>
+  <Navbar v-show="showNavbar" ref="navbar" />
+  <ScrollArea as="main" :viewport-class="enableScrolling ? '' : 'overflow-hidden'"
+    class="fixed! left-0 right-0 top-0 bottom-0">
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+  </ScrollArea>
+  <transition name="slide-up">
+    <Player v-if="enablePlayer" v-show="showPlayer" ref="player" />
+  </transition>
 
-    <ModalAddTrackToPlaylist v-if="isAccountLoggedIn" />
-    <ModalNewPlaylist v-if="isAccountLoggedIn" />
-    <transition v-if="enablePlayer" name="slide-up">
-      <Lyrics v-show="showLyrics" />
-    </transition>
-  </div>
+  <ModalAddTrackToPlaylist v-if="isAccountLoggedIn" />
+  <ModalNewPlaylist v-if="isAccountLoggedIn" />
+  <transition v-if="enablePlayer" name="slide-up">
+    <Lyrics v-show="showLyrics" />
+  </transition>
+
   <Toaster />
 </template>
 
@@ -27,23 +26,18 @@ import { Toaster } from '@/components/ui/sonner'
 import 'vue-sonner/style.css'
 import ModalAddTrackToPlaylist from './components/ModalAddTrackToPlaylist.vue';
 import ModalNewPlaylist from './components/ModalNewPlaylist.vue';
-import Scrollbar from './components/Scrollbar.vue';
+// import Scrollbar from './components/Scrollbar.vue';
 import Navbar from './components/Navbar.vue';
 import Player from './components/Player.vue';
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 import * as auth from '@/utils/auth';
 import Lyrics from './views/lyrics.vue';
 import { useStore } from '@/store/pinia';
-import { computed, onMounted, provide, ref, useTemplateRef } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { restorePositionSymbol } from './injectionSymbols';
-
-const main = useTemplateRef('main');
-const scrollbar = useTemplateRef('scrollbar');
 
 defineOptions({ name: 'App' });
-
-const userSelectNone = ref(false);
 
 const store = useStore()
 
@@ -88,48 +82,22 @@ function fetchData() {
   }
 }
 
-const handleScroll = (payload: Event) => {
-  scrollbar.value?.handleScroll(payload);
-};
-
-
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown);
   fetchData();
 });
-
-defineExpose({
-  main, scrollbar
-});
-provide(restorePositionSymbol, () => scrollbar.value?.restorePosition());
 </script>
 
-<style lang="scss">
-#app {
-  width: 100%;
-  transition: all 0.4s;
-}
-
-main {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  overflow: auto;
+<style>
+main > [data-reka-scroll-area-viewport] {
   padding: 64px 10vw 96px 10vw;
   box-sizing: border-box;
-  scrollbar-width: none; // firefox
 }
 
 @media (max-width: 1336px) {
-  main {
+  main > [data-reka-scroll-area-viewport] {
     padding: 64px 5vw 96px 5vw;
   }
-}
-
-main::-webkit-scrollbar {
-  width: 0px;
 }
 
 .slide-up-enter-active,
