@@ -1,4 +1,4 @@
-import 'virtual:uno.css'
+import '@/index.css'
 import { createApp } from 'vue'; 
 import App from './App.vue';
 import router from './router';
