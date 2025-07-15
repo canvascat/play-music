@@ -103,3 +103,5 @@
 - [ ] ContextMenu -> shadcn DropdownMenu
 - [ ] vue-slider-component -> shadcn Slider
 - [ ] restorePosition
+
+https://github.com/Steve-xmh/applemusic-like-lyrics

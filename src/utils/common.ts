@@ -82,7 +82,7 @@ export function dailyTask() {
   }
 }
 
-export function changeAppearance(appearance) {
+export function changeAppearance(appearance?: 'auto' | 'dark' | 'light') {
   if (appearance === 'auto' || appearance === undefined) {
     appearance = window.matchMedia('(prefers-color-scheme: dark)').matches
       ? 'dark'
@@ -94,7 +94,7 @@ export function changeAppearance(appearance) {
     ?.setAttribute('content', appearance === 'dark' ? '#222' : '#fff');
 }
 
-export function splitSoundtrackAlbumTitle(title) {
+export function splitSoundtrackAlbumTitle(title: string) {
   let keywords = [
     'Music from the Original Motion Picture Score',
     'The Original Motion Picture Soundtrack',
@@ -139,7 +139,7 @@ export function splitSoundtrackAlbumTitle(title) {
   };
 }
 
-export function splitAlbumTitle(title) {
+export function splitAlbumTitle(title: string) {
   let keywords = [
     'Bonus Tracks Edition',
     'Complete Edition',
@@ -165,7 +165,7 @@ export function splitAlbumTitle(title) {
   };
 }
 
-export function bytesToSize(bytes) {
+export function bytesToSize(bytes: number) {
   let marker = 1024; // Change to 1000 if required
   let decimal = 2; // Change as required
   let kiloBytes = marker;
@@ -182,7 +182,7 @@ export function bytesToSize(bytes) {
   else return (bytes / gigaBytes).toFixed(decimal) + ' GB';
 }
 
-export function formatTrackTime(value) {
+export function formatTrackTime(value?: number) {
   if (!value) return '';
   let min = ~~(value / 60);
   let sec = (~~(value % 60)).toString().padStart(2, '0');

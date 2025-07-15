@@ -86,7 +86,7 @@ export function cacheTrackSource(trackInfo, url, bitRate, from = 'netease') {
     });
 }
 
-export function getTrackSource(id) {
+export function getTrackSource(id: number | string) {
   return db.trackSources.get(Number(id)).then(track => {
     if (!track) return null;
     console.debug(
@@ -105,7 +105,7 @@ export function cacheTrackDetail(track, privileges) {
   });
 }
 
-export function getTrackDetailFromCache(ids) {
+export function getTrackDetailFromCache(ids: string[]) {
   return db.trackDetail
     .filter(track => {
       return ids.includes(String(track.id));
@@ -175,7 +175,7 @@ export function countDBSize() {
 }
 
 export function clearDB() {
-  return new Promise(resolve => {
+  return new Promise<void>(resolve => {
     db.tables.forEach(function (table) {
       table.clear();
     });
