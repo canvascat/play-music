@@ -138,7 +138,7 @@ const router = createRouter({
   scrollBehavior(_to, _from, savedPosition) {
     console.log(savedPosition?.top, _to);
     return {
-      el: document.querySelector('main'), 
+      el: document.querySelector('main > [data-reka-scroll-area-viewport]'), 
       top: savedPosition?.top,
     }
   },

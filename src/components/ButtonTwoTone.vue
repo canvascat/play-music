@@ -1,3 +1,41 @@
+<script setup lang="ts">
+import { computed, type CSSProperties } from 'vue';
+
+interface Props {
+  iconClass: string | null;
+  iconButton: boolean;
+  horizontalPadding: number;
+  color: string;
+  backgroundColor: string;
+  textColor: string;
+  shape: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  iconClass: null,
+  iconButton: false,
+  horizontalPadding: 16,
+  color: 'blue',
+  backgroundColor: '',
+  textColor: '',
+  shape: 'square',
+});
+
+const buttonStyle = computed(() => {
+
+  const styles: CSSProperties = {
+    borderRadius: props.shape === 'round' ? '50%' : '8px',
+    padding: `8px ${props.horizontalPadding}px`,
+    // height: "38px",
+    width: props.shape === 'round' ? '38px' : 'auto',
+  };
+  if (props.backgroundColor !== '')
+    styles.backgroundColor = props.backgroundColor;
+  if (props.textColor !== '') styles.color = props.textColor;
+  return styles;
+});
+</script>
+
 <template>
   <button :style="buttonStyle" :class="color">
     <svg-icon
@@ -8,56 +46,6 @@
     <slot></slot>
   </button>
 </template>
-
-<script>
-export default {
-  name: 'ButtonTwoTone',
-  props: {
-    iconClass: {
-      type: String,
-      default: null,
-    },
-    iconButton: {
-      type: Boolean,
-      default: false,
-    },
-    horizontalPadding: {
-      type: Number,
-      default: 16,
-    },
-    color: {
-      type: String,
-      default: 'blue',
-    },
-    backgroundColor: {
-      type: String,
-      default: '',
-    },
-    textColor: {
-      type: String,
-      default: '',
-    },
-    shape: {
-      type: String,
-      default: 'square',
-    },
-  },
-  computed: {
-    buttonStyle() {
-      let styles = {
-        borderRadius: this.shape === 'round' ? '50%' : '8px',
-        padding: `8px ${this.horizontalPadding}px`,
-        // height: "38px",
-        width: this.shape === 'round' ? '38px' : 'auto',
-      };
-      if (this.backgroundColor !== '')
-        styles.backgroundColor = this.backgroundColor;
-      if (this.textColor !== '') styles.color = this.textColor;
-      return styles;
-    },
-  },
-};
-</script>
 
 <style lang="scss" scoped>
 button {

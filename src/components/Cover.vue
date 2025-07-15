@@ -1,95 +1,96 @@
 <template>
-  <div
-    class="cover"
-    :class="{ 'cover-hover': coverHover }"
-    @mouseover="focus = true"
-    @mouseleave="focus = false"
-    @click="clickCoverToPlay ? play() : goTo()"
-  >
+  <div class="cover" :class="{ 'cover-hover': coverHover }" @mouseover="focus = true" @mouseleave="focus = false"
+    @click="clickCoverToPlay ? play() : goTo()">
     <div class="cover-container">
       <div class="shade">
-        <button
-          v-show="focus"
-          class="play-button"
-          :style="playButtonStyles"
-          @click.stop="play()"
-          ><svg-icon icon-class="play" />
+        <button v-show="focus" class="play-button" :style="playButtonStyles" @click.stop="play()">
+          <IconPlay />
         </button>
       </div>
       <img :src="imageUrl" :style="imageStyles" loading="lazy" />
       <transition v-if="coverHover || alwaysShowShadow" name="fade">
-        <div
-          v-show="focus || alwaysShowShadow"
-          class="shadow"
-          :style="shadowStyles"
-        ></div>
+        <div v-show="focus || alwaysShowShadow" class="shadow" :style="shadowStyles"></div>
       </transition>
     </div>
   </div>
 </template>
 
-<script>
-import { mapState } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+<script setup lang="ts">
+import { computed, ref, type CSSProperties } from 'vue';
+import { useStore } from '@/store/pinia';
+import { useRouter } from 'vue-router';
+import { IconPlay } from '@/components/icon';
 
-export default {
-  props: {
-    id: { type: Number, required: true },
-    type: { type: String, required: true },
-    imageUrl: { type: String, required: true },
-    fixedSize: { type: Number, default: 0 },
-    playButtonSize: { type: Number, default: 22 },
-    coverHover: { type: Boolean, default: true },
-    alwaysShowPlayButton: { type: Boolean, default: true },
-    alwaysShowShadow: { type: Boolean, default: false },
-    clickCoverToPlay: { type: Boolean, default: false },
-    shadowMargin: { type: Number, default: 12 },
-    radius: { type: Number, default: 12 },
-  },
-  data() {
-    return {
-      focus: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['player']),
-    imageStyles() {
-      let styles = {};
-      if (this.fixedSize !== 0) {
-        styles.width = this.fixedSize + 'px';
-        styles.height = this.fixedSize + 'px';
-      }
-      if (this.type === 'artist') styles.borderRadius = '50%';
-      return styles;
-    },
-    playButtonStyles() {
-      let styles = {};
-      styles.width = this.playButtonSize + '%';
-      styles.height = this.playButtonSize + '%';
-      return styles;
-    },
-    shadowStyles() {
-      let styles = {};
-      styles.backgroundImage = `url(${this.imageUrl})`;
-      if (this.type === 'artist') styles.borderRadius = '50%';
-      return styles;
-    },
-  },
-  methods: {
-    play() {
-      const player = this.player;
-      const playActions = {
-        album: player.playAlbumByID,
-        playlist: player.playPlaylistByID,
-        artist: player.playArtistByID,
-      };
-      playActions[this.type].bind(player)(this.id);
-    },
-    goTo() {
-      this.$router.push({ name: this.type, params: { id: this.id } });
-    },
-  },
+const { player } = useStore();
+const playActions = {
+  album: player.playAlbumByID,
+  playlist: player.playPlaylistByID,
+  artist: player.playArtistByID,
 };
+
+interface Props {
+  id: number;
+  type: keyof typeof playActions;
+  imageUrl: string;
+  fixedSize: number;
+  playButtonSize: number;
+  coverHover: boolean;
+  alwaysShowPlayButton: boolean;
+  alwaysShowShadow: boolean;
+  clickCoverToPlay: boolean;
+  shadowMargin: number;
+  radius: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+
+  fixedSize: 0,
+  playButtonSize: 22,
+  coverHover: true,
+  alwaysShowPlayButton: true,
+  alwaysShowShadow: false,
+  clickCoverToPlay: false,
+  shadowMargin: 12,
+  radius: 12,
+});
+
+const router = useRouter();
+
+const focus = ref(false);
+
+const imageStyles = computed(() => {
+  let styles: CSSProperties = {};
+  if (props.fixedSize !== 0) {
+    styles.width = props.fixedSize + 'px';
+    styles.height = props.fixedSize + 'px';
+  }
+  if (props.type === 'artist') styles.borderRadius = '50%';
+  return styles;
+});
+
+const playButtonStyles = computed(() => {
+  let styles: CSSProperties = {};
+  styles.width = props.playButtonSize + '%';
+  styles.height = props.playButtonSize + '%';
+  return styles;
+});
+
+const shadowStyles = computed(() => {
+  let styles: CSSProperties = {};
+  styles.backgroundImage = `url(${props.imageUrl})`;
+  if (props.type === 'artist') styles.borderRadius = '50%';
+  return styles;
+});
+
+const play = () => {
+  playActions[props.type].bind(player)(props.id);
+};
+
+const goTo = () => {
+  router.push({ name: props.type, params: { id: props.id } });
+};
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -97,9 +98,11 @@ export default {
   position: relative;
   transition: transform 0.3s;
 }
+
 .cover-container {
   position: relative;
 }
+
 img {
   border-radius: 0.75em;
   width: 100%;
@@ -125,6 +128,7 @@ img {
   justify-content: center;
   align-items: center;
 }
+
 .play-button {
   display: flex;
   justify-content: center;
@@ -138,15 +142,19 @@ img {
   border-radius: 50%;
   cursor: default;
   transition: 0.2s;
+
   .svg-icon {
     width: 50%;
+
     margin: {
       left: 4px;
     }
   }
+
   &:hover {
     background: rgba(255, 255, 255, 0.28);
   }
+
   &:active {
     transform: scale(0.94);
   }
@@ -169,7 +177,12 @@ img {
 .fade-leave-active {
   transition: opacity 0.3s;
 }
-.fade-enter-from, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+
+.fade-enter-from,
+.fade-leave-to
+
+/* .fade-leave-active below version 2.1.8 */
+  {
   opacity: 0;
 }
 </style>
