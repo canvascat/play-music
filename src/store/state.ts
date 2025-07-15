@@ -28,6 +28,7 @@ Object.assign(player, JSON.parse(localStorage.getItem('player')));
 
 export default {
   showLyrics: false,
+  /** @deprecated */
   enableScrolling: true,
   title: 'YesPlayMusic',
   liked: {
