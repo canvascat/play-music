@@ -19,7 +19,7 @@ const emit = defineEmits<{
 import { useStore } from '@/store/pinia';
 import { nextTick, reactive, ref } from 'vue';
 
-const { player, setEnableScrolling } = useStore();
+const { player } = useStore();
 
 const menuRef = ref<HTMLDivElement | null>(null); 
 
@@ -44,8 +44,6 @@ function setMenu(top: number, left: number) {
 function closeMenu() {
   state.showMenu = false;
   emit('closeMenu');
-
-  setEnableScrolling(true);
 }
 
 function openMenu(e: MouseEvent) {
@@ -55,7 +53,6 @@ function openMenu(e: MouseEvent) {
     setMenu(e.y, e.x);
   });
   e.preventDefault();
-  setEnableScrolling(false);
 }
 
 

@@ -57,17 +57,12 @@ export default {
           modalName: 'newPlaylistModal',
           key: 'show',
           value,
-        });
-        if (value) {
-          this.setEnableScrolling(false);
-        } else {
-          this.setEnableScrolling(true);
-        }
+        }); 
       },
     },
   },
   methods: {
-    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedPlaylist', 'setEnableScrolling']),
+    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedPlaylist']),
     close() {
       this.show = false;
       this.title = '';

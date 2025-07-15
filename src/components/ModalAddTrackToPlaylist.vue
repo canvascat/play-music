@@ -58,11 +58,6 @@ export default {
           key: 'show',
           value,
         });
-        if (value) {
-          this.setEnableScrolling(false);
-        } else {
-          this.setEnableScrolling(true);
-        }
       },
     },
     ownPlaylists() {
@@ -74,7 +69,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useStore, ['updateModal', 'setEnableScrolling']),
+    ...mapActions(useStore, ['updateModal']),
     close() {
       this.show = false;
     },

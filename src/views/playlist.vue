@@ -416,7 +416,7 @@ export default {
   },
   methods: {
     resizeImage, formatDate,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'setEnableScrolling']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID']),
     playPlaylistByID(trackID = 'first') {
       let trackIDs = this.playlist.trackIds.map(t => t.id);
       this.player.replacePlaylist(
@@ -536,11 +536,6 @@ export default {
     },
     toggleFullDescription() {
       this.showFullDescription = !this.showFullDescription;
-      if (this.showFullDescription) {
-        this.setEnableScrolling(false);
-      } else {
-        this.setEnableScrolling(true);
-      }
     },
   },
 };

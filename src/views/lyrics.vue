@@ -453,13 +453,8 @@ export default {
       this.getCoverColor();
     },
     showLyrics(show) {
-      if (show) {
-        this.setLyricsInterval();
-        this.setEnableScrolling(false);
-      } else {
-        clearInterval(this.lyricsInterval);
-        this.setEnableScrolling(true);
-      }
+      if (show) this.setLyricsInterval();
+      else clearInterval(this.lyricsInterval);
     },
   },
   created() {
@@ -485,7 +480,7 @@ export default {
     clearInterval(this.lyricsInterval);
   },
   methods: {
-    ...mapActions(useStore, ['toggleLyrics', 'updateModal', 'likeATrack', 'setEnableScrolling', 'fetchLikedPlaylist']),
+    ...mapActions(useStore, ['toggleLyrics', 'updateModal', 'likeATrack',  'fetchLikedPlaylist']),
     initDate() {
       var _this = this;
       clearInterval(this.timer);

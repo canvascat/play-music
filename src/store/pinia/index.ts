@@ -71,12 +71,6 @@ export const useStore = defineStore('store', {
     },
     updateModal({ modalName, key, value }) {
       this.modals[modalName][key] = value;
-      if (key === 'show') {
-        // 100ms的延迟是为等待右键菜单blur之后再disableScrolling
-        value === true
-          ? setTimeout(() => (this.enableScrolling = false), 100)
-          : (this.enableScrolling = true);
-      }
     },
     toggleLyrics() {
       this.showLyrics = !this.showLyrics;
@@ -97,10 +91,6 @@ export const useStore = defineStore('store', {
     },
     restoreDefaultShortcuts() {
       this.settings.shortcuts = cloneDeep(shortcuts);
-    },
-    /** @deprecated */
-    setEnableScrolling(status: boolean | null = null) {
-      this.enableScrolling = status ? status : !this.enableScrolling;
     },
     updateTitle(title: string) {
       this.title = title;

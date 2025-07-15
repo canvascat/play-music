@@ -273,7 +273,7 @@ export default {
   },
   methods: {
     resizeImage, formatDate, formatAlbumType,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID', 'setEnableScrolling']),
+    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID']),
     loadData(id, next = undefined) {
       setTimeout(() => {
         if (!this.show) NProgress.start();
@@ -345,11 +345,6 @@ export default {
     },
     toggleFullDescription() {
       this.showFullDescription = !this.showFullDescription;
-      if (this.showFullDescription) {
-        this.setEnableScrolling(false);
-      } else {
-        this.setEnableScrolling(true);
-      }
     },
     openMenu(e) {
       this.$refs.artistMenu.openMenu(e);
