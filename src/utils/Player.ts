@@ -1,9 +1,9 @@
 import { getAlbum } from '@/api/album';
 import { getArtist } from '@/api/artist';
-import { trackScrobble, trackUpdateNowPlaying } from '@/api/lastfm';
+import { trackUpdateNowPlaying } from '@/api/lastfm';
 import { fmTrash, personalFM } from '@/api/others';
 import { getPlaylistDetail, intelligencePlaylist } from '@/api/playlist';
-import { getLyric, getMP3, getTrackDetail, scrobble } from '@/api/track';
+import { getLyric, getMP3, getTrackDetail } from '@/api/track';
 import { pinia, useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { cacheTrackSource, getTrackSource } from '@/utils/db';
@@ -305,32 +305,7 @@ export default class Player {
     this._shuffledList = shuffle(list);
     if (firstTrackID !== 'first') this._shuffledList.unshift(firstTrackID);
   }
-  async _scrobble(track, time, completed = false) {
-    console.debug(
-      `[debug][Player.js] scrobble track 👉 ${track.name} by ${track.ar[0].name} 👉 time:${time} completed: ${completed}`
-    );
-    const trackDuration = ~~(track.dt / 1000);
-    time = completed ? trackDuration : ~~time;
-    scrobble({
-      id: track.id,
-      sourceid: this.playlistSource.id,
-      time,
-    });
-    if (
-      useStore(pinia).lastfm.key !== undefined &&
-      (time >= trackDuration / 2 || time >= 240)
-    ) {
-      const timestamp = ~~(new Date().getTime() / 1000) - time;
-      trackScrobble({
-        artist: track.ar[0].name,
-        track: track.name,
-        timestamp,
-        album: track.al.name,
-        trackNumber: track.no,
-        duration: trackDuration,
-      });
-    }
-  }
+ 
   private _playAudioSource(source, autoplay = true) {
     Howler.unload();
     this._howler = new Howl({
@@ -497,9 +472,6 @@ export default class Player {
     autoplay = true,
     ifUnplayableThen = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
   ) {
-    if (autoplay && this._currentTrack.name) {
-      this._scrobble(this.currentTrack, this._howler?.seek());
-    }
     return getTrackDetail(id).then(data => {
       const track = data.songs[0];
       this._currentTrack = track;
@@ -665,7 +637,6 @@ export default class Player {
     }
   }
   private _nextTrackCallback() {
-    this._scrobble(this._currentTrack, 0, true);
     if (!this.isPersonalFM && this.repeatMode === 'one') {
       this._replaceCurrentTrack(this.currentTrackID);
     } else {

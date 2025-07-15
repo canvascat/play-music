@@ -71,6 +71,7 @@ export function userLikedSongsIDs(uid: NCMAPI.likelist[0]['uid']) {
 
 /**
  * 每日签到
+ * @deprecated  - 容易被封号，不建议使用
  * 说明 : 调用此接口可签到获取积分
  * -  type: 签到类型 , 默认 0, 其中 0 为安卓端签到 ,1 为 web/PC 签到
  */

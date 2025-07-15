@@ -62,6 +62,9 @@ export function trackUpdateNowPlaying(params) {
   });
 }
 
+/**
+ * @deprecated 容易被封号，不建议使用
+ */
 export function trackScrobble(params) {
   params.api_key = apiKey;
   params.method = 'track.scrobble';

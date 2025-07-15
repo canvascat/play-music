@@ -4,7 +4,6 @@ import App from './App.vue';
 import router from './router';
 import { pinia } from './store/pinia';
 import '@/utils/filters';
-import { dailyTask } from '@/utils/common';
 import '@/assets/css/global.scss';
 import NProgress from 'nprogress';
 import '@/assets/css/nprogress.css';
@@ -44,8 +43,7 @@ const app = createApp(App);
 
 app.component('svg-icon', SvgIcon);
 app.use(pinia);
- 
-dailyTask();
+
 app.use(i18n);
 app.use(router);
 app.mount('#app');

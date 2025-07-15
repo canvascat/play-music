@@ -127,14 +127,11 @@ export function likeATrack(params: NCMAPI.like[0]) {
 
 /**
  * 听歌打卡
+ * @deprecated 容易被封号，不建议使用
  * 说明 : 调用此接口 , 传入音乐 id, 来源 id，歌曲时间 time，更新听歌排行数据
  * - id - 歌曲 id
  * - sourceid - 歌单或专辑 id
  * - time - 歌曲播放时间,单位为秒
- * @param {Object} params
- * @param {number} params.id
- * @param {number} params.sourceid
- * @param {number=} params.time
  */
 export function scrobble(params: NCMAPI.scrobble[0]) {
   return request({

@@ -55,47 +55,9 @@ export function mapTrackPlayableStatus(tracks, privileges = []) {
   });
 }
 
-export function randomNum(minNum, maxNum) {
-  switch (arguments.length) {
-    case 1:
-      return parseInt(Math.random() * minNum + 1, 10);
-    case 2:
-      return parseInt(Math.random() * (maxNum - minNum + 1) + minNum, 10);
-    default:
-      return 0;
-  }
-}
-
-export function shuffleAList(list) {
-  let sortsList = list.map(t => t.sort);
-  for (let i = 1; i < sortsList.length; i++) {
-    const random = Math.floor(Math.random() * (i + 1));
-    [sortsList[i], sortsList[random]] = [sortsList[random], sortsList[i]];
-  }
-  let newSorts = {};
-  list.map(track => {
-    newSorts[track.id] = sortsList.pop();
-  });
-  return newSorts;
-}
-
-export function throttle(fn, time) {
-  let isRun = false;
-  return function () {
-    if (isRun) return;
-    isRun = true;
-    fn.apply(this, arguments);
-    setTimeout(() => {
-      isRun = false;
-    }, time);
-  };
-}
-
-export function updateHttps(url) {
-  if (!url) return '';
-  return url.replace(/^http:/, 'https:');
-}
-
+/**
+ * @deprecated 容易被封号，不建议使用
+ */
 export function dailyTask() {
   const store = useStore();
   let lastDate = store.data.lastRefreshCookieDate;

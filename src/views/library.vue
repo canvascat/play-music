@@ -215,8 +215,7 @@
 
 <script>
 import { mapActions, mapState } from 'pinia';
-import { useStore } from '@/store/pinia'; 
-import { randomNum, dailyTask } from '@/utils/common';
+import { useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { uploadSong } from '@/api/user';
 import { getLyric } from '@/api/track';
@@ -229,6 +228,7 @@ import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
 import MvRow from '@/components/MvRow.vue';
+import { randomInt } from 'es-toolkit';
 
 /**
  * Pick the lyric part from a string formed in `[timecode] lyric`.
@@ -273,7 +273,7 @@ export default {
 
       // The upperBound of the lyric line to pick
       const randomUpperBound = lyricLine.length - lyricsToPick;
-      const startLyricLineIndex = randomNum(0, randomUpperBound - 1);
+      const startLyricLineIndex = randomInt(0, randomUpperBound - 1);
 
       // Pick lyric lines to render.
       return lyricLine
@@ -312,7 +312,6 @@ export default {
   activated() {
     // this.$parent.$refs.scrollbar.restorePosition();
     this.loadData();
-    dailyTask();
   },
   methods: {
     resizeImage,
@@ -366,7 +365,7 @@ export default {
     getRandomLyric() {
       if (this.liked.songs.length === 0) return;
       getLyric(
-        this.liked.songs[randomNum(0, this.liked.songs.length - 1)]
+        this.liked.songs[randomInt(0, this.liked.songs.length - 1)]
       ).then(data => {
         if (data.lrc !== undefined) {
           const isInstrumental = data.lrc.lyric

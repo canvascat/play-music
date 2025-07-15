@@ -58,7 +58,7 @@ import { useStore } from '@/store/pinia';
 import NProgress from 'nprogress';
 import { search } from '@/api/others';
 import { userPlaylist } from '@/api/user';
-import { throttle } from '@/utils/common';
+import { throttle } from 'es-toolkit';
 import { resizeImage } from '@/utils/filters';
 
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
