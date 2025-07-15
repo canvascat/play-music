@@ -32,14 +32,14 @@ interface Props {
   id: number;
   type: keyof typeof playActions;
   imageUrl: string;
-  fixedSize: number;
-  playButtonSize: number;
+  fixedSize?: number;
+  playButtonSize?: number;
   coverHover: boolean;
-  alwaysShowPlayButton: boolean;
-  alwaysShowShadow: boolean;
-  clickCoverToPlay: boolean;
-  shadowMargin: number;
-  radius: number;
+  alwaysShowPlayButton?: boolean;
+  alwaysShowShadow?: boolean;
+  clickCoverToPlay?: boolean;
+  shadowMargin?: number;
+  radius?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {

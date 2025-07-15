@@ -3,12 +3,12 @@ import { computed, type CSSProperties } from 'vue';
 
 interface Props {
   iconClass: string | null;
-  iconButton: boolean;
-  horizontalPadding: number;
-  color: string;
-  backgroundColor: string;
-  textColor: string;
-  shape: string;
+  iconButton?: boolean;
+  horizontalPadding?: number;
+  color?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  shape?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
