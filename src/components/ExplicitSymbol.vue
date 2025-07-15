@@ -1,35 +1,21 @@
-<template>
-  <svg-icon icon-class="explicit" :style="svgStyle"></svg-icon>
-</template>
+<script setup lang="ts">
+import { IconExplicit } from '@/components/icon';
+import { computed } from 'vue';
 
-<script>
-import SvgIcon from '@/components/SvgIcon.vue';
+const props = withDefaults(defineProps<{
+  size?: number;
+}>(), {
+  size: 16,
+});
 
-export default {
-  name: 'ExplicitSymbol',
-  components: {
-    SvgIcon,
-  },
-  props: {
-    size: {
-      type: Number,
-      default: 16,
-    },
-  },
-  data() {
-    return {
-      svgStyle: {},
-    };
-  },
-  created() {
-    this.svgStyle = {
-      height: this.size + 'px',
-      width: this.size + 'px',
-      position: 'relative',
-      left: '-1px',
-    };
-  },
-};
+const svgStyle = computed(() => ({
+  height: props.size + 'px',
+  width: props.size + 'px',
+  position: 'relative',
+  left: '-1px',
+}));
 </script>
 
-<style lang="scss" scoped></style>
+<template>
+  <IconExplicit :style="svgStyle" />
+</template>

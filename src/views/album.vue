@@ -134,7 +134,6 @@ import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
 import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
-import Modal from '@/components/Modal.vue';
 import { copyText } from '@/utils/copy.ts';
 import { toast } from 'vue-sonner'
 import { computed, ref } from 'vue';
