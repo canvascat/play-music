@@ -28,13 +28,13 @@
         </div>
 
         <Dialog>
-          <DialogTrigger as-child>
+          <DialogTrigger>
             <!-- TODO: 放在DialogTrigger里会不显示？？ -->
             <div class="description line-clamp-3">
               {{ album.description }}
             </div>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent class="bg-white/78 backdrop-blur-sm" overlayClass="bg-white/58">
             <DialogHeader>
               <DialogTitle>
                 {{ $t('album.albumDesc') }}

@@ -20,7 +20,7 @@ import {
 } from '@/api/user';
 import { changeAppearance } from '@/utils/common';
 import { toast } from 'vue-sonner'
- 
+
 export const pinia = createPinia()
 // 将该插件交给 Pinia
 pinia.use(localStoragePiniaPlugin)
@@ -29,7 +29,7 @@ if (window.IS_ELECTRON === true) {
 }
 
 export const useStore = defineStore('store', {
-  state: () =>  _state ,
+  state: () => _state,
   actions: {
     updateLikedXXX({ name, data }) {
       this.liked[name] = data;
@@ -263,36 +263,35 @@ export const useStore = defineStore('store', {
   }
 });
 
- 
-  const store = useStore(pinia);
 
-  if ([undefined, null].includes(store.settings.lang)) {
-    const defaultLang = 'en';
-    const langMapper = new Map()
-      .set('zh', 'zh-CN')
-      .set('zh-TW', 'zh-TW')
-      .set('en', 'en')
-      .set('tr', 'tr');
-    store.settings.lang =
-      langMapper.get(
-        langMapper.has(navigator.language)
-          ? navigator.language
-          : navigator.language.slice(0, 2)
-      ) || defaultLang;
-    localStorage.setItem('settings', JSON.stringify(store.settings));
-  }
+const store = useStore(pinia);
 
-  changeAppearance(store.settings.appearance);
+if ([undefined, null].includes(store.settings.lang)) {
+  const defaultLang = 'en';
+  const langMapper = new Map()
+    .set('zh', 'zh-CN')
+    .set('zh-TW', 'zh-TW')
+    .set('en', 'en')
+    .set('tr', 'tr');
+  store.settings.lang =
+    langMapper.get(
+      langMapper.has(navigator.language)
+        ? navigator.language
+        : navigator.language.slice(0, 2)
+    ) || defaultLang;
+  localStorage.setItem('settings', JSON.stringify(store.settings));
+}
 
-
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', () => {
-      if (store.settings.appearance === 'auto') {
-        changeAppearance(store.settings.appearance);
-      }
-    });
+changeAppearance(store.settings.appearance);
 
 
+window
+  .matchMedia('(prefers-color-scheme: dark)')
+  .addEventListener('change', () => {
+    if (store.settings.appearance === 'auto') {
+      changeAppearance(store.settings.appearance);
+    }
+  });
 
- 
+
+

@@ -1,6 +1,7 @@
 <template>
   <Navbar v-show="showNavbar" ref="navbar" />
   <ScrollArea as="main"
+    scroll-bar-class="top-[64px]! bottom-[64px]! h-[auto]!"
     class="fixed! left-0 right-0 top-0 bottom-0">
     <router-view v-slot="{ Component }">
       <keep-alive>
