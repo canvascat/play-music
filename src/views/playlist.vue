@@ -170,6 +170,7 @@
       :extra-context-menu-item="
         isUserOwnPlaylist ? ['removeTrackFromPlaylist'] : []
       "
+      @removeTrack="removeTrack"
     />
 
     <div class="load-more">

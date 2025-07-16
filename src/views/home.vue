@@ -108,7 +108,7 @@ export default {
   },
   activated() {
     this.loadData();
-    // this.$parent.$refs.scrollbar.restorePosition?.();
+    // TODO scrollbar.restorePosition?.();
   },
   methods: {
     toast,

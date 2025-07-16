@@ -84,7 +84,7 @@ export default {
   },
   activated() {
     this.loadTracks();
-    // this.$parent.$refs.scrollbar.restorePosition();
+    // TODO scrollbar.restorePosition();
   },
   methods: {
     ...mapActions(useStore, ['playTrackOnListByID']),

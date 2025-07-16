@@ -89,6 +89,7 @@ import { copyText } from '@/utils/copy';
 
 export default {
   name: 'TrackList',
+  emits: ['removeTrack'],
   components: {
     TrackListItem,
     ContextMenu,
@@ -271,7 +272,7 @@ export default {
               ? this.$t('toast.removedFromPlaylist')
               : data.body.message
           );
-          this.$parent.removeTrack(trackID);
+          this.$emit('removeTrack', trackID);
         });
       }
     },

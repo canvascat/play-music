@@ -131,7 +131,7 @@
           $t('home.seeMore')
         }}</router-link>
       </div>
-      <MvRow :mvs="mvs" subtitle="publishTime" />
+      <MvRow :mvs="mvs" subtitle="publishTime" :playing="player?.playing" />
     </div>
     <div v-if="eps.length !== 0" class="eps">
       <div class="section-title">{{ $t('artist.EPsSingles') }}</div>
@@ -268,7 +268,7 @@ export default {
     if (this.artist?.id?.toString() !== this.$route.params.id) {
       this.loadData(this.$route.params.id);
     } else {
-      // this.$parent.$refs.scrollbar.restorePosition();
+      // TODO scrollbar.restorePosition();
     }
   },
   methods: {
@@ -279,7 +279,7 @@ export default {
         if (!this.show) NProgress.start();
       }, 1000);
       this.show = false;
-      // this.$parent.$refs.main.scrollTo({ top: 0 });
+      // TODO scrollTo({ top: 0 });
       getArtist(id).then(data => {
         this.artist = data.artist;
         this.setPopularTracks(data.hotSongs);

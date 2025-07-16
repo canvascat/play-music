@@ -43,7 +43,7 @@ export default {
     } else {
       this.show = true;
     }
-    // this.$parent.$refs.main.scrollTo(0, 0);
+    // TODO scrollTo(0, 0);
   },
   methods: {
     ...mapActions(useStore, ['updateDailyTracks']),

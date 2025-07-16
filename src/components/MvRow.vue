@@ -30,6 +30,7 @@
 export default {
   name: 'CoverVideo',
   props: {
+    playing: Boolean,
     mvs: Array,
     subtitle: {
       type: String,
@@ -45,8 +46,8 @@ export default {
   methods: {
     goToMv(id) {
       let query = {};
-      if (this.$parent.player !== undefined) {
-        query = { autoplay: this.$parent.player.playing };
+      if (typeof this.playing === 'boolean') {
+        query = { autoplay: this.playing };
       }
       this.$router.push({ path: '/mv/' + id, query });
     },
