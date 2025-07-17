@@ -5,61 +5,43 @@
     </div>
     <div class="title">{{ title }}</div>
     <div class="controls">
-      <div
-        class="button minimize codicon codicon-chrome-minimize"
-        @click="windowMinimize"
-      ></div>
-      <div
-        class="button max-restore codicon"
-        :class="{
-          'codicon-chrome-restore': isMaximized,
-          'codicon-chrome-maximize': !isMaximized,
-        }"
-        @click="windowMaxRestore"
-      ></div>
-      <div
-        class="button close codicon codicon-chrome-close"
-        @click="windowClose"
-      ></div>
+      <div class="button minimize codicon codicon-chrome-minimize" @click="windowMinimize"></div>
+      <div class="button max-restore codicon" :class="{
+        'codicon-chrome-restore': isMaximized,
+        'codicon-chrome-maximize': !isMaximized,
+      }" @click="windowMaxRestore"></div>
+      <div class="button close codicon codicon-chrome-close" @click="windowClose"></div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import '@vscode/codicons/dist/codicon.css';
+import { ref, computed } from 'vue';
 
-import { mapState } from 'pinia';
-import { useStore } from '@/store/pinia';  
+import { useStore } from '@/store/pinia';
 
-export default {
-  name: 'LinuxTitlebar',
-  data() {
-    return {
-      isMaximized: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['title']),
-  },
-  created() {
-    if (window.IS_ELECTRON === true) {
-      window.ipcRenderer?.on('isMaximized', (_, value) => {
-        this.isMaximized = value;
-      });
-    }
-  },
-  methods: {
-    windowMinimize() {
-      window.ipcRenderer?.send('minimize');
-    },
-    windowMaxRestore() {
-      window.ipcRenderer?.send('maximizeOrUnmaximize');
-    },
-    windowClose() {
-      window.ipcRenderer?.send('close');
-    },
-  },
+const isMaximized = ref(false);
+
+const title = computed(() => useStore().title);
+
+if (window.IS_ELECTRON === true) {
+  window.ipcRenderer?.on('isMaximized', (_, value) => {
+    isMaximized.value = value;
+  });
+}
+
+
+const windowMinimize = () => {
+  window.ipcRenderer?.send('minimize');
 };
+const windowMaxRestore = () => {
+  window.ipcRenderer?.send('maximizeOrUnmaximize');
+};
+const windowClose = () => {
+  window.ipcRenderer?.send('close');
+};
+
 </script>
 
 <style lang="scss" scoped>
@@ -86,11 +68,13 @@ export default {
     justify-self: center;
     margin: 0 auto;
   }
+
   .controls {
     height: 32px;
     //margin-left: auto;
     justify-content: flex-end;
     display: flex;
+
     .button {
       height: 100%;
       width: 46px;
@@ -99,17 +83,21 @@ export default {
       justify-content: center;
       align-items: center;
       -webkit-app-region: no-drag;
+
       &:hover {
         background: var(--hover);
       }
+
       &:active {
         background: var(--active);
       }
+
       &.close {
         &:hover {
           background: #c42c1b;
           color: rgba(255, 255, 255, 0.8);
         }
+
         &:active {
           background: #f1707a;
           color: #000;
@@ -118,6 +106,7 @@ export default {
     }
   }
 }
+
 [data-theme='dark'] .linux-titlebar {
   --hover: #191919;
   --active: #333333;

@@ -9,7 +9,7 @@
       @click.stop
     >
       <vue-slider
-        v-model="player.progress"
+        v-model="player._progress"
         :min="0"
         :max="player.currentTrackDuration"
         :interval="1"
@@ -35,7 +35,7 @@
               :class="['name', { 'has-list': hasList() }]"
               @click="hasList() && goToList()"
             >
-              {{ currentTrack.name }}
+              {{ currentTrack.name }} {{  player.progress }}
             </div>
             <div class="artist">
               <span

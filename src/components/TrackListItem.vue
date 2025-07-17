@@ -6,6 +6,7 @@
     :title="showUnavailableSongInGreyStyle ? track.reason : ''"
     @mouseover="hover = true"
     @mouseleave="hover = false"
+    tabindex="-1"
   >
     <img
       v-if="!isAlbum"
@@ -39,7 +40,7 @@
           <span v-if="isAlbum" class="featured">
             <ArtistsInLine
               :artists="track.ar"
-              :exclude="$parent.albumObject.artist.name"
+              :exclude="albumArtistName"
               prefix="-"
           /></span>
           <span
@@ -105,6 +106,8 @@ export default {
       type: Boolean,
       default: true,
     },
+    type: String,
+    albumArtistName: String,
   },
 
   data() {
@@ -153,9 +156,7 @@ export default {
         return tn === undefined ? this.track.alia[0] : tn;
       }
     },
-    type() {
-      return this.$parent.type;
-    },
+ 
     isAlbum() {
       return this.type === 'album';
     },
@@ -170,7 +171,8 @@ export default {
       return this.type === 'playlist';
     },
     isLiked() {
-      return this.$parent.liked.songs.includes(this.track?.id);
+      return false;
+      // return this.$parent.liked.songs.includes(this.track?.id);
     },
     isPlaying() {
       return this.player.currentTrack.id === this.track?.id;
@@ -184,13 +186,12 @@ export default {
       if (this.focus) trackClass.push('focus');
       return trackClass;
     },
-    isMenuOpened() {
-      return this.$parent.rightClickedTrack.id === this.track.id ? true : false;
-    },
+    // isMenuOpened() {
+    //   return this.$parent.rightClickedTrack.id === this.track.id ? true : false;
+    // },
     focus() {
       return (
-        (this.hover && this.$parent.rightClickedTrack.id === 0) ||
-        this.isMenuOpened
+        (this.hover)
       );
     },
     showUnavailableSongInGreyStyle() {
@@ -219,10 +220,10 @@ export default {
       this.$router.push({ path: '/album/' + this.track.al.id });
     },
     playTrack() {
-      this.$parent.playThisList(this.track.id);
+      // this.$parent.playThisList(this.track.id);
     },
     likeThisSong() {
-      this.$parent.likeATrack(this.track.id);
+      // this.$parent.likeATrack(this.track.id);
     },
   },
 };
@@ -379,7 +380,7 @@ button {
   }
 }
 
-.track.focus {
+.track:focus {
   transition: all 0.3s;
   background: var(--color-secondary-bg);
 }

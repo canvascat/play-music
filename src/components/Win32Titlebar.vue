@@ -22,41 +22,32 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import '@vscode/codicons/dist/codicon.css';
-
-import { mapState } from 'pinia';
+import { ref, computed } from 'vue';
 import { useStore } from '@/store/pinia'; 
 
-export default {
-  name: 'Win32Titlebar',
-  data() {
-    return {
-      isMaximized: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['title']),
-  },
-  created() {
-    if (window.IS_ELECTRON === true) {
-      window.ipcRenderer?.on('isMaximized', (_, value) => {
-        this.isMaximized = value;
-      });
-    }
-  },
-  methods: {
-    windowMinimize() {
-      window.ipcRenderer?.send('minimize');
-    },
-    windowMaxRestore() {
-      window.ipcRenderer?.send('maximizeOrUnmaximize');
-    },
-    windowClose() {
-      window.ipcRenderer?.send('close');
-    },
-  },
+const isMaximized = ref(false);
+
+const title = computed(() => useStore().title);
+
+if (window.IS_ELECTRON === true) {
+  window.ipcRenderer?.on('isMaximized', (_, value) => {
+    isMaximized.value = value;
+  });
+}
+
+
+const windowMinimize = () => {
+  window.ipcRenderer?.send('minimize');
 };
+const windowMaxRestore = () => {
+  window.ipcRenderer?.send('maximizeOrUnmaximize');
+};
+const windowClose = () => {
+  window.ipcRenderer?.send('close');
+};
+
 </script>
 
 <style lang="scss" scoped>
