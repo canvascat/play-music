@@ -73,6 +73,10 @@ function playDailyTracks() {
 
 
 if (dailyTracks.length === 0) loadDailyTracks();
+
+defineExpose({
+  loadDailyTracks
+})
 </script>
 
 <style lang="scss" scoped>

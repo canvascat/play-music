@@ -1,109 +1,82 @@
 <template>
-  <Modal
-    class="add-playlist-modal"
-    :show="show"
-    :close="close"
-    title="新建歌单"
-    width="25vw"
-  >
+  <Modal class="add-playlist-modal" :show="show" :close="close" title="新建歌单" width="25vw">
     <template v-slot:default>
-      <input
-        v-model="title"
-        type="text"
-        placeholder="歌单标题"
-        maxlength="40"
-      />
+      <input v-model="title" type="text" placeholder="歌单标题" maxlength="40" />
       <div class="checkbox">
-        <input
-          id="checkbox-private"
-          v-model="privatePlaylist"
-          type="checkbox"
-        />
+        <input id="checkbox-private" v-model="privatePlaylist" type="checkbox" />
         <label for="checkbox-private">设置为隐私歌单</label>
       </div>
     </template>
     <template v-slot:footer>
-      <button class="primary block" @click="createPlaylist">创建</button>
+      <button class="primary block" @click="_createPlaylist">创建</button>
     </template>
   </Modal>
 </template>
 
-<script>
+<script setup lang="ts">
 import Modal from '@/components/Modal.vue';
-import { mapState, mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+import { useStore } from '@/store/pinia';
 import { createPlaylist, addOrRemoveTrackFromPlaylist } from '@/api/playlist';
 import { toast } from 'vue-sonner'
+import { ref, computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
-export default {
-  name: 'ModalNewPlaylist',
-  components: {
-    Modal,
+const { t } = useI18n();
+
+const title = ref('')
+const privatePlaylist = ref(false)
+const { modals, updateModal, updateData, fetchLikedPlaylist } = useStore()
+
+const show = computed({
+  get() {
+    return modals.newPlaylistModal.show
   },
-  data() {
-    return {
-      title: '',
-      privatePlaylist: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['modals']),
-    show: {
-      get() {
-        return this.modals.newPlaylistModal.show;
-      },
-      set(value) {
-        this.updateModal({
-          modalName: 'newPlaylistModal',
-          key: 'show',
-          value,
-        }); 
-      },
-    },
-  },
-  methods: {
-    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedPlaylist']),
-    close() {
-      this.show = false;
-      this.title = '';
-      this.privatePlaylist = false;
-      this.resetAfterCreateAddTrackID();
-    },
-    createPlaylist() {
-      let params = { name: this.title };
-      if (this.private) params.type = 10;
-      createPlaylist(params).then(data => {
-        if (data.code === 200) {
-          if (this.modals.newPlaylistModal.afterCreateAddTrackID !== 0) {
-            addOrRemoveTrackFromPlaylist({
-              op: 'add',
-              pid: data.id,
-              tracks: this.modals.newPlaylistModal.afterCreateAddTrackID,
-            }).then(data => {
-              if (data.body.code === 200) {
-                toast(this.$t('toast.savedToPlaylist'));
-              } else {
-                toast(data.body.message);
-              }
-              this.resetAfterCreateAddTrackID();
-            });
+  set(value) {
+    updateModal({ modalName: 'newPlaylistModal', key: 'show', value })
+  }
+})
+
+
+
+function close() {
+  show.value = false
+  title.value = ''
+  privatePlaylist.value = false
+  resetAfterCreateAddTrackID()
+}
+
+function _createPlaylist() {
+  createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 }).then(data => {
+    if (data.code === 200) {
+      if (modals.newPlaylistModal.afterCreateAddTrackID !== 0) {
+        addOrRemoveTrackFromPlaylist({
+          op: 'add',
+          pid: data.id,
+          tracks: modals.newPlaylistModal.afterCreateAddTrackID,
+        }).then(data => {
+          if (data.body.code === 200) {
+            toast(t('toast.savedToPlaylist'));
+          } else {
+            toast(data.body.message);
           }
-          this.close();
-          toast('成功创建歌单');
-          this.updateData({ key: 'libraryPlaylistFilter', value: 'mine' });
-          this.fetchLikedPlaylist();
-        }
-      });
-    },
-    resetAfterCreateAddTrackID() {
-      this.updateModal({
-        modalName: 'newPlaylistModal',
-        key: 'AfterCreateAddTrackID',
-        value: 0,
-      });
-    },
-  },
-};
+          resetAfterCreateAddTrackID();
+        });
+      }
+      close();
+      toast('成功创建歌单');
+      updateData({ key: 'libraryPlaylistFilter', value: 'mine' });
+      fetchLikedPlaylist();
+    }
+  });
+}
+function resetAfterCreateAddTrackID() {
+  updateModal({
+    modalName: 'newPlaylistModal',
+    key: 'afterCreateAddTrackID',
+    value: 0,
+  });
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -111,9 +84,11 @@ export default {
   .content {
     display: flex;
     flex-direction: column;
+
     input {
       margin-bottom: 12px;
     }
+
     input[type='text'] {
       width: calc(100% - 24px);
       flex: 1;
@@ -125,23 +100,29 @@ export default {
       border-radius: 8px;
       margin-top: -1px;
       color: var(--color-text);
+
       &:focus {
         background: var(--color-primary-bg-for-transparent);
         opacity: 1;
       }
+
       [data-theme='light'] &:focus {
         color: var(--color-primary);
       }
     }
+
     .checkbox {
       input[type='checkbox' i] {
         margin: 3px 3px 3px 4px;
       }
+
       display: flex;
       align-items: center;
+
       label {
         font-size: 12px;
       }
+
       user-select: none;
     }
   }
