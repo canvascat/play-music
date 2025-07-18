@@ -48,6 +48,7 @@
     "xgplayer": "^3.0.22"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/howler": "^2.2.12",
     "@types/node": "^24.0.13",
     "@vitejs/plugin-vue": "^6.0.0",
