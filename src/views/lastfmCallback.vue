@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import { authGetSession } from '@/api/lastfm';
+import { useStore } from '@/store/pinia';
+import { ref, onMounted } from 'vue';
+
+const message = ref('请稍等...');
+const done = ref(false);
+const { updateLastfm } = useStore();
+
+onMounted(() => {
+  const token = new URLSearchParams(window.location.search).get('token');
+  if (!token) {
+    message.value = '连接失败，请重试或联系开发者（无Token）';
+    done.value = true;
+    return;
+  }
+  authGetSession(token).then(result => {
+    if (!result.data.session) {
+      message.value = '连接失败，请重试或联系开发者（无Session）';
+      done.value = true;
+      return;
+    }
+    localStorage.setItem('lastfm', JSON.stringify(result.data.session));
+    updateLastfm(result.data.session);
+    message.value = '已成功连接到 Last.fm';
+    done.value = true;
+  });
+});
+
+function close() {
+  window.close();
+}
+</script>
+
 <template>
   <div class="lastfm-callback">
     <div class="section-1">
@@ -10,44 +44,6 @@
   </div>
 </template>
 
-<script>
-import { authGetSession } from '@/api/lastfm';
-import { mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
-
-export default {
-  name: 'LastfmCallback',
-  data() {
-    return { message: '请稍等...', done: false };
-  },
-  created() {
-    const token = new URLSearchParams(window.location.search).get('token');
-    if (!token) {
-      this.message = '连接失败，请重试或联系开发者（无Token）';
-      this.done = true;
-      return;
-    }
-    authGetSession(token).then(result => {
-      if (!result.data.session) {
-        this.message = '连接失败，请重试或联系开发者（无Session）';
-        this.done = true;
-        return;
-      }
-      localStorage.setItem('lastfm', JSON.stringify(result.data.session));
-      this.updateLastfm(result.data.session);
-      this.message = '已成功连接到 Last.fm';
-      this.done = true;
-    });
-  },
-  methods: {
-    ...mapActions(useStore, ['updateLastfm']),
-    close() {
-      window.close();
-    },
-  },
-};
-</script>
-
 <style lang="scss" scoped>
 .lastfm-callback {
   display: flex;
@@ -56,14 +52,17 @@ export default {
   align-items: center;
   height: calc(100vh - 192px);
 }
+
 .section-1 {
   margin-bottom: 16px;
   display: flex;
   align-items: center;
+
   img {
     height: 64px;
     margin: 20px;
   }
+
   .svg-icon {
     height: 24px;
     width: 24px;
@@ -89,9 +88,11 @@ button {
   margin-top: 24px;
   transition: 0.2s;
   padding: 8px 16px;
+
   &:hover {
     transform: scale(1.06);
   }
+
   &:active {
     transform: scale(0.94);
   }

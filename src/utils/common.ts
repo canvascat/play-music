@@ -182,7 +182,8 @@ export function bytesToSize(bytes: number) {
   else return (bytes / gigaBytes).toFixed(decimal) + ' GB';
 }
 
-export function formatTrackTime(value?: number) {
+export function formatTrackTime(value?: number | string) {
+  value = Number(value);
   if (!value) return '';
   let min = ~~(value / 60);
   let sec = (~~(value % 60)).toString().padStart(2, '0');

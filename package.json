@@ -5,6 +5,10 @@
   "type": "module",
   "description": "A third party music player for Netease Music",
   "author": "qier222<qier222@outlook.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qier222/YesPlayMusic"
+  },
   "scripts": {
     "dev": "vite",
     "netease_api:run": "npx NeteaseCloudMusicApi"
@@ -29,6 +33,7 @@
     "js-cookie": "^2.2.1",
     "lucide-vue-next": "^0.525.0",
     "md5": "^2.3.0",
+    "mitt": "^3.0.1",
     "music-metadata": "^7.5.3",
     "node-vibrant": "^3.2.1-alpha.1",
     "nprogress": "^0.2.0",
@@ -36,6 +41,7 @@
     "plyr": "^3.6.2",
     "qrcode": "^1.4.4",
     "reka-ui": "^2.3.2",
+    "rxjs": "^7.8.2",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
     "tw-animate-css": "^1.3.5",

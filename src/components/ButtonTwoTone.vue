@@ -2,7 +2,7 @@
 import { computed, type CSSProperties } from 'vue';
 
 interface Props {
-  iconClass: string | null;
+  iconClass?: string;
   iconButton?: boolean;
   horizontalPadding?: number;
   color?: string;
@@ -12,7 +12,6 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  iconClass: null,
   iconButton: false,
   horizontalPadding: 16,
   color: 'blue',
@@ -39,7 +38,7 @@ const buttonStyle = computed(() => {
 <template>
   <button :style="buttonStyle" :class="color">
     <svg-icon
-      v-if="iconClass !== null"
+      v-if="iconClass"
       :icon-class="iconClass"
       :style="{ marginRight: iconButton ? '0px' : '8px' }"
     />

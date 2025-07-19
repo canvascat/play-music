@@ -49,7 +49,7 @@ const isAccountLoggedIn = computed(() => auth.isAccountLoggedIn());
 const route = useRoute();
 
 const showPlayer = computed(() => {
-  return !['mv', 'loginUsername', 'login', 'loginAccount', 'lastfmCallback'].includes(route.name as string);
+  return !['mv', 'loginUsername', 'login',  'lastfmCallback'].includes(route.name as string);
 });
 
 const enablePlayer = computed(() => {

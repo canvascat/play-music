@@ -8,13 +8,13 @@
             @dblclick.native="playThisList(track.id || track.songId)" />
         </ContextMenuTrigger>
         <ContextMenuContent>
-          <div v-show="type !== 'cloudDisk'" class="item-info">
-            <img :src="resizeImage(track.al.picUrl, 224)" loading="lazy" />
-            <div class="info">
-              <div class="title">{{ track.name }}</div>
-              <div class="subtitle">{{ track.ar[0].name }}</div>
-            </div>
-          </div>
+          <ContextMenuItem  v-show="type !== 'cloudDisk'" class="pointer-events-none flex items-center gap-2">
+            <img :src="resizeImage(track.al.picUrl, 224)" loading="lazy" class="w-10 h-10 rounded-sm" />
+            <div class="pr-2">
+              <div class="line-clamp-1 font-bold text-base">{{ track.name }}</div>
+              <div class="line-clamp-1 text-xs text-muted-foreground">{{ track.ar[0].name }}</div>
+            </div> 
+          </ContextMenuItem>
           <ContextMenuSeparator v-show="type !== 'cloudDisk'" />
 
           <ContextMenuItem @click="play(track.id)">{{ $t('contextMenu.play') }}</ContextMenuItem>

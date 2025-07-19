@@ -2,20 +2,11 @@
   <div class="explore-page">
     <h1>{{ $t('explore.explore') }}</h1>
     <div class="buttons">
-      <div
-        v-for="category in settings.enabledPlaylistCategories"
-        :key="category"
-        class="button"
-        :class="{ active: category === activeCategory && !showCatOptions }"
-        @click="goToCategory(category)"
-      >
+      <div v-for="category in settings.enabledPlaylistCategories" :key="category" class="button"
+        :class="{ active: category === activeCategory && !showCatOptions }" @click="goToCategory(category)">
         {{ category }}
       </div>
-      <div
-        class="button more"
-        :class="{ active: showCatOptions }"
-        @click="showCatOptions = !showCatOptions"
-      >
+      <div class="button more" :class="{ active: showCatOptions }" @click="showCatOptions = !showCatOptions">
         <svg-icon icon-class="more"></svg-icon>
       </div>
     </div>
@@ -24,174 +15,147 @@
       <div v-for="bigCat in allBigCats" :key="bigCat" class="big-cat">
         <div class="name">{{ bigCat }}</div>
         <div class="cats">
-          <div
-            v-for="cat in getCatsByBigCat(bigCat)"
-            :key="cat.name"
-            class="cat"
-            :class="{
-              active: settings.enabledPlaylistCategories.includes(cat.name),
-            }"
-            @click="toggleCat(cat.name)"
-            ><span>{{ cat.name }}</span></div
-          >
+          <div v-for="cat in getCatsByBigCat(bigCat)" :key="cat.name" class="cat" :class="{
+            active: settings.enabledPlaylistCategories.includes(cat.name),
+          }" @click="toggleCat(cat.name)"><span>{{ cat.name }}</span></div>
         </div>
       </div>
     </div>
 
     <div class="playlists">
-      <CoverRow
-        type="playlist"
-        :items="playlists"
-        :sub-text="subText"
-        :show-play-button="true"
+      <CoverRow type="playlist" :items="playlists" :sub-text="subText" :show-play-button="true"
         :show-play-count="activeCategory !== '排行榜' ? true : false"
-        :image-size="activeCategory !== '排行榜' ? 512 : 1024"
-      />
+        :image-size="activeCategory !== '排行榜' ? 512 : 1024" />
     </div>
-    <div
-      v-show="['推荐歌单', '排行榜'].includes(activeCategory) === false"
-      class="load-more"
-    >
-      <ButtonTwoTone
-        v-show="showLoadMoreButton && hasMore"
-        color="grey"
-        :loading="loadingMore"
-        v-on:click="getPlaylist"
-        >{{ $t('explore.loadMore') }}</ButtonTwoTone
-      >
+    <div v-show="['推荐歌单', '排行榜'].includes(activeCategory) === false" class="load-more">
+      <ButtonTwoTone v-show="showLoadMoreButton && hasMore" color="grey" :loading="loadingMore"
+        v-on:click="getPlaylist">{{ $t('explore.loadMore') }}</ButtonTwoTone>
     </div>
   </div>
 </template>
 
-<script>
-import { mapState, mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+<script setup lang="ts">
+import { useStore } from '@/store/pinia';
 import NProgress from 'nprogress';
 import { topPlaylist, highQualityPlaylist, toplists } from '@/api/playlist';
 import { playlistCategories } from '@/utils/staticData';
-import { getRecommendPlayList } from '@/utils/playList';
-
+import { getRecommendPlayList as getRecommendPlayListApi } from '@/utils/playList';
+import { onBeforeRouteUpdate } from 'vue-router';
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
+import { ref, computed, onActivated } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-export default {
-  name: 'Explore',
-  components: {
-    CoverRow,
-    ButtonTwoTone,
-    SvgIcon,
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.showLoadMoreButton = false;
-    this.hasMore = true;
-    this.playlists = [];
-    this.offset = 1;
-    this.activeCategory = to.query.category;
-    this.getPlaylist();
-    next();
-  },
-  data() {
-    return {
-      show: false,
-      playlists: [],
-      activeCategory: '全部',
-      loadingMore: false,
-      showLoadMoreButton: false,
-      hasMore: true,
-      allBigCats: ['语种', '风格', '场景', '情感', '主题'],
-      showCatOptions: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['settings']),
-    subText() {
-      if (this.activeCategory === '排行榜') return 'updateFrequency';
-      if (this.activeCategory === '推荐歌单') return 'copywriter';
-      return 'none';
-    },
-  },
-  activated() {
-    this.loadData();
-    // TODO scrollbar.restorePosition();
-  },
-  methods: {
-    ...mapActions(useStore, ['togglePlaylistCategory']),
-    loadData() {
-      setTimeout(() => {
-        if (!this.show) NProgress.start();
-      }, 1000);
-      const queryCategory = this.$route.query.category;
-      if (queryCategory === undefined) {
-        this.playlists = [];
-        this.activeCategory = '全部';
-      } else {
-        this.activeCategory = queryCategory;
-      }
-      this.getPlaylist();
-    },
-    goToCategory(Category) {
-      this.showCatOptions = false;
-      this.$router.push({ name: 'explore', query: { category: Category } });
-    },
-    updatePlaylist(playlists) {
-      this.playlists.push(...playlists);
-      this.loadingMore = false;
-      this.showLoadMoreButton = true;
-      NProgress.done();
-      this.show = true;
-    },
-    getPlaylist() {
-      this.loadingMore = true;
-      if (this.activeCategory === '推荐歌单') {
-        return this.getRecommendPlayList();
-      }
-      if (this.activeCategory === '精品歌单') {
-        return this.getHighQualityPlaylist();
-      }
-      if (this.activeCategory === '排行榜') {
-        return this.getTopLists();
-      }
-      return this.getTopPlayList();
-    },
-    getRecommendPlayList() {
-      getRecommendPlayList(100, true).then(list => {
-        this.playlists = [];
-        this.updatePlaylist(list);
-      });
-    },
-    getHighQualityPlaylist() {
-      let playlists = this.playlists;
-      let before =
-        playlists.length !== 0 ? playlists[playlists.length - 1].updateTime : 0;
-      highQualityPlaylist({ limit: 50, before }).then(data => {
-        this.updatePlaylist(data.playlists);
-        this.hasMore = data.more;
-      });
-    },
-    getTopLists() {
-      toplists().then(data => {
-        this.playlists = [];
-        this.updatePlaylist(data.list);
-      });
-    },
-    getTopPlayList() {
-      topPlaylist({
-        cat: this.activeCategory,
-        offset: this.playlists.length,
-      }).then(data => {
-        this.updatePlaylist(data.playlists);
-        this.hasMore = data.more;
-      });
-    },
-    getCatsByBigCat(name) {
-      return playlistCategories.filter(c => c.bigCat === name);
-    },
-    toggleCat(name) {
-      this.togglePlaylistCategory(name);
-    },
-  },
-};
+const { settings, togglePlaylistCategory } = useStore();
+const show = ref(false);
+const playlists = ref([]);
+const activeCategory = ref('全部');
+const loadingMore = ref(false);
+const showLoadMoreButton = ref(false);
+const hasMore = ref(true);
+const allBigCats = ref(['语种', '风格', '场景', '情感', '主题']);
+const showCatOptions = ref(false);
+const route = useRoute();
+const router = useRouter();
+
+onBeforeRouteUpdate((to, _from, next) => {
+  showLoadMoreButton.value = false;
+  hasMore.value = true;
+  playlists.value = [];
+
+  activeCategory.value = to.query.category as string;
+  getPlaylist();
+  next();
+});
+
+
+
+const subText = computed(() => {
+  if (activeCategory.value === '排行榜') return 'updateFrequency';
+  if (activeCategory.value === '推荐歌单') return 'copywriter';
+  return 'none';
+});
+
+onActivated(() => {
+  loadData();
+  // TODO scrollbar.restorePosition();
+});
+
+function loadData() {
+  setTimeout(() => {
+    if (!show.value) NProgress.start();
+  }, 1000);
+  const queryCategory = route.query.category as string;
+  if (queryCategory === undefined) {
+    playlists.value = [];
+    activeCategory.value = '全部';
+  } else {
+    activeCategory.value = queryCategory;
+  }
+  getPlaylist();
+}
+function goToCategory(Category) {
+  showCatOptions.value = false;
+  router.push({ name: 'explore', query: { category: Category } });
+}
+function updatePlaylist(_playlists) {
+  playlists.value.push(..._playlists);
+  loadingMore.value = false;
+  showLoadMoreButton.value = true;
+  NProgress.done();
+  show.value = true;
+}
+function getPlaylist() {
+  loadingMore.value = true;
+  if (activeCategory.value === '推荐歌单') {
+    return getRecommendPlayList();
+  }
+  if (activeCategory.value === '精品歌单') {
+    return getHighQualityPlaylist();
+  }
+  if (activeCategory.value === '排行榜') {
+    return getTopLists();
+  }
+  return getTopPlayList();
+}
+function getRecommendPlayList() {
+  getRecommendPlayListApi(100, true).then(list => {
+    playlists.value = [];
+    updatePlaylist(list);
+  });
+}
+function getHighQualityPlaylist() {
+  let _playlists = playlists.value;
+  let before =
+    _playlists.length !== 0 ? _playlists[_playlists.length - 1].updateTime : 0;
+  highQualityPlaylist({ limit: 50, before }).then(data => {
+    updatePlaylist(data.playlists);
+    hasMore.value = data.more;
+  });
+}
+function getTopLists() {
+  toplists().then(data => {
+    playlists.value = [];
+    updatePlaylist(data.list);
+  });
+}
+function getTopPlayList() {
+  topPlaylist({
+    cat: activeCategory.value,
+    offset: playlists.value.length,
+  }).then(data => {
+    updatePlaylist(data.playlists);
+    hasMore.value = data.more;
+  });
+}
+function getCatsByBigCat(name) {
+  return playlistCategories.filter(c => c.bigCat === name);
+}
+function toggleCat(name) {
+  togglePlaylistCategory(name);
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -199,10 +163,12 @@ h1 {
   color: var(--color-text);
   font-size: 56px;
 }
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
 }
+
 .button {
   user-select: none;
   cursor: pointer;
@@ -223,10 +189,12 @@ h1 {
     color: var(--color-primary);
   }
 }
+
 .button.active {
   background-color: var(--color-primary-bg);
   color: var(--color-primary);
 }
+
 .panel {
   margin-top: 10px;
   background: var(--color-secondary-bg);
@@ -248,11 +216,13 @@ h1 {
     height: 26px;
     margin-top: 8px;
   }
+
   .cats {
     margin-left: 24px;
     display: flex;
     flex-wrap: wrap;
   }
+
   .cat {
     user-select: none;
     margin: 4px 0px 0 0;
@@ -273,6 +243,7 @@ h1 {
       height: 26px;
       border-radius: 10px;
       opacity: 0.88;
+
       &:hover {
         opacity: 1;
         background-color: var(--color-primary-bg);
@@ -280,6 +251,7 @@ h1 {
       }
     }
   }
+
   .cat.active {
     color: var(--color-primary);
   }

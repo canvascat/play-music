@@ -7,11 +7,12 @@ import { getLyric, getMP3, getTrackDetail } from '@/api/track';
 import { pinia, useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { cacheTrackSource, getTrackSource } from '@/utils/db';
-import { isCreateMpris, isCreateTray } from '@/utils/platform';
+import { isCreateMpris } from '@/utils/platform';
 import { Howl, Howler } from 'howler';
 import { shuffle } from 'es-toolkit';
 import { decode as base642Buffer } from '@/utils/base64';
-import { toast } from 'vue-sonner'
+import { toast } from 'vue-sonner';
+import type { Track, RepeatMode, PlaylistSource, PersonalFMResponse } from '@/types';
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -24,81 +25,83 @@ const INDEX_IN_PLAY_NEXT = -1;
 const UNPLAYABLE_CONDITION = {
   PLAY_NEXT_TRACK: 'playNextTrack',
   PLAY_PREV_TRACK: 'playPrevTrack',
-};
+} as const;
 
-const delay = (ms = 0) => new Promise<void>(resolve => setTimeout(resolve, ms));
+type UnplayableCondition = typeof UNPLAYABLE_CONDITION[keyof typeof UNPLAYABLE_CONDITION];
+
+const delay = (ms: number = 0): Promise<void> => new Promise<void>(resolve => setTimeout(resolve, ms));
 const excludeSaveKeys = [
   '_playing',
   '_personalFMLoading',
   '_personalFMNextLoading',
 ];
 
-function setTitle(track) {
+function setTitle(track?: Track): void {
   document.title = track
     ? `${track.name} · ${track.ar[0].name} - YesPlayMusic`
     : 'YesPlayMusic';
-  if (isCreateTray) {
-    window.ipcRenderer?.send('updateTrayTooltip', document.title);
-  }
   useStore().updateTitle(document.title);
 }
 
-function setTrayLikeState(isLiked) {
-  if (isCreateTray) {
-    window.ipcRenderer?.send('updateTrayLikeState', isLiked);
-  }
-}
+ 
 // TODO: 重构 分离播放器和播放列表
 
 export default class Player {
   // 播放器状态
+  /** howler (https://github.com/goldfire/howler.js) */
+  private _howler: Howl | null = null;
   /** 是否正在播放中 */
   private _playing: boolean = false;
   /** 当前播放歌曲的进度 */
   private _progress: number = 0;
-  /** 是否启用Player */
-  private _enabled: boolean = false;
-  /** 循环模式 */
-  private _repeatMode: 'off' | 'on' | 'one' = 'off';
-  /** 是否随机播放 */
-  private _shuffle: boolean = false;
-  /** 是否倒序播放 */
-  private _reversed: boolean = false;
   /** 音量 0-1 */
   private _volume: number = 1;
   /** 静音前的音量 */
   private _volumeBeforeMuted: number = 1;
+  /** The blob records for cleanup. */
+  private createdBlobRecords: string[] = [];
+  
   /** 是否正在私人FM中加载新的track */
   private _personalFMLoading: boolean = false;
   /** 是否正在缓存私人FM的下一首歌曲 */
   private _personalFMNextLoading: boolean = false;
+  /** 是否启用Player */
+  private _enabled: boolean = false;
 
-  // 播放信息
-  /** 播放列表 */
-  private _list: number[] = [];
+  // 播放模式
+
+  /** 循环模式 */
+  private _repeatMode: RepeatMode = 'off';
+  /** 是否随机播放 */
+  private _shuffle: boolean = false;
+  /** 是否倒序播放 */
+  private _reversed: boolean = false;
+
+
   /** 当前播放歌曲在播放列表里的index */
   private _current: number = 0;
-  /** 被随机打乱的播放列表，随机播放模式下会使用此播放列表 */
-  private _shuffledList: number[] = [];
   /** 当前播放歌曲在随机列表里面的index */
   private _shuffledCurrent: number = 0;
-  /** 当前播放列表的信息 */
-  private _playlistSource: { type: string; id: number } = { type: 'album', id: 123 };
   /** 当前播放歌曲的详细信息 */
-  private _currentTrack: { id: number } = { id: 86827685 };
+  private _currentTrack?: Track;
+
+  /** 播放列表 */
+  private _list: number[] = [];
+  /** 被随机打乱的播放列表，随机播放模式下会使用此播放列表 */
+  private _shuffledList: number[] = [];
   /** 当这个list不为空时，会优先播放这个list的歌 */
   private _playNextList: number[] = [];
+
+  /** 当前播放列表的信息 */
+  private _playlistSource: PlaylistSource = { type: 'album', id: 123 };
+
   /** 是否是私人FM模式 */
   private _isPersonalFM: boolean = false;
   /** 私人FM当前歌曲 */
-  private _personalFMTrack: { id: number } = { id: 0 };
+  private _personalFMTrack?: Track;
   /** 私人FM下一首歌曲信息（为了快速加载下一首） */
-  private _personalFMNextTrack: { id: number } = { id: 0 };
+  private _personalFMNextTrack?: Track;
 
-  /** The blob records for cleanup. */
-  private createdBlobRecords: string[] = [];
-  /** howler (https://github.com/goldfire/howler.js) */
-  private _howler: Howl | null = null;
 
   constructor() {
     Object.defineProperty(this, '_howler', {
@@ -113,10 +116,6 @@ export default class Player {
   }
   set repeatMode(mode) {
     if (this._isPersonalFM) return;
-    if (!['off', 'on', 'one'].includes(mode)) {
-      console.warn("repeatMode: invalid args, must be 'on' | 'off' | 'one'");
-      return;
-    }
     this._repeatMode = mode;
   }
   get shuffle() {
@@ -124,10 +123,6 @@ export default class Player {
   }
   set shuffle(shuffle) {
     if (this._isPersonalFM) return;
-    if (shuffle !== true && shuffle !== false) {
-      console.warn('shuffle: invalid args, must be Boolean');
-      return;
-    }
     this._shuffle = shuffle;
     if (shuffle) {
       this._shuffleTheList();
@@ -140,11 +135,6 @@ export default class Player {
   }
   set reversed(reversed) {
     if (this._isPersonalFM) return;
-    if (reversed !== true && reversed !== false) {
-      console.warn('reversed: invalid args, must be Boolean');
-      return;
-    }
-    console.log('changing reversed to:', reversed);
     this._reversed = reversed;
   }
   get volume() {
@@ -195,23 +185,24 @@ export default class Player {
     return this._personalFMTrack;
   }
   get currentTrackDuration() {
-    const trackDuration = this._currentTrack.dt || 1000;
+    const trackDuration = this._currentTrack?.dt || 1000;
     let duration = ~~(trackDuration / 1000);
     return duration > 1 ? duration - 1 : duration;
   }
   get progress() {
     return this._progress;
   }
-  set progress(value) {
-    if (this._howler) {
-      this._howler.seek(value);
-      if (isCreateMpris) {
-        window.ipcRenderer?.send('seeked', this._howler.seek());
-      }
-    }
+  set progress(value) { 
+    this._howler?.seek(value);
   }
   get isCurrentTrackLiked() {
-    return useStore(pinia).liked.songs.includes(this.currentTrack.id);
+    return this.currentTrack && useStore(pinia).liked.songs.includes(this.currentTrack.id);
+  }
+
+  get audioSource() {
+    return this._howler?._src.includes('kuwo.cn')
+      ? '音源来自酷我音乐'
+      : '';
   }
 
   private _init() {
@@ -221,7 +212,7 @@ export default class Player {
     if (this._enabled) {
       // 恢复当前播放歌曲
       this._replaceCurrentTrack(this.currentTrackID, false).then(() => {
-        this._howler?.seek(localStorage.getItem('playerCurrentTrackTime') ?? 0);
+        this._howler?.seek(this._progress || 0);
       }); // update audio source and init howler
       this._initMediaSession();
     }
@@ -230,7 +221,9 @@ export default class Player {
 
     // 初始化私人FM
     if (
+      !this._personalFMTrack ||
       this._personalFMTrack.id === 0 ||
+      !this._personalFMNextTrack ||
       this._personalFMNextTrack.id === 0 ||
       this._personalFMTrack.id === this._personalFMNextTrack.id
     ) {
@@ -243,24 +236,14 @@ export default class Player {
   }
   private _setPlaying(isPlaying: boolean) {
     this._playing = isPlaying;
-    if (isCreateTray) {
-      window.ipcRenderer?.send('updateTrayPlayState', this._playing);
-    }
   }
   private _setIntervals() {
-    // 同步播放进度
-    // TODO: 如果 _progress 在别的地方被改变了，
-    // 这个定时器会覆盖之前改变的值，是bug
     setInterval(() => {
       if (this._howler === null) return;
       this._progress = this._howler.seek();
-      localStorage.setItem('playerCurrentTrackTime', this._progress);
-      if (isCreateMpris) {
-        window.ipcRenderer?.send('playerCurrentTrackTime', this._progress);
-      }
     }, 1000);
   }
-  private _getNextTrack() {
+  private _getNextTrack(): [trackID: number, index: number] {
     const next = this._reversed ? this.current - 1 : this.current + 1;
 
     if (this._playNextList.length > 0) {
@@ -278,11 +261,9 @@ export default class Player {
         return [this.list[0], 0];
       }
     }
-
-    // 返回 [trackID, index]
     return [this.list[next], next];
   }
-  private _getPrevTrack() {
+  private _getPrevTrack(): [trackID: number, index: number] {
     const next = this._reversed ? this.current + 1 : this.current - 1;
 
     // 循环模式开启，则重新播放当前模式下的相对的下一首
@@ -295,18 +276,17 @@ export default class Player {
         return [this.list[this.list.length - 1], this.list.length - 1];
       }
     }
-
-    // 返回 [trackID, index]
+ 
     return [this.list[next], next];
   }
-  private async _shuffleTheList(firstTrackID = this.currentTrackID) {
+  private async _shuffleTheList(firstTrackID: number | 'first' = this.currentTrackID) {
     let list = this._list.filter(tid => tid !== firstTrackID);
     if (firstTrackID === 'first') list = this._list;
     this._shuffledList = shuffle(list);
     if (firstTrackID !== 'first') this._shuffledList.unshift(firstTrackID);
   }
  
-  private _playAudioSource(source, autoplay = true) {
+  private _playAudioSource(source: string, autoplay = true) {
     Howler.unload();
     this._howler = new Howl({
       src: [source],
@@ -342,10 +322,9 @@ export default class Player {
     });
     if (autoplay) {
       this.play();
-      if (this._currentTrack.name) {
+      if (this._currentTrack?.name) {
         setTitle(this._currentTrack);
-      }
-      setTrayLikeState(useStore(pinia).liked.songs.includes(this.currentTrack.id));
+      } 
     }
     this.setOutputDevice();
   }
@@ -470,7 +449,7 @@ export default class Player {
   private _replaceCurrentTrack(
     id,
     autoplay = true,
-    ifUnplayableThen = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
+    ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
   ) {
     return getTrackDetail(id).then(data => {
       const track = data.songs[0];
@@ -491,7 +470,7 @@ export default class Player {
     track,
     autoplay,
     isCacheNextTrack,
-    ifUnplayableThen = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
+    ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
   ) {
     return this._getAudioSource(track).then(source => {
       if (source) {
@@ -528,18 +507,27 @@ export default class Player {
       ? this._personalFMNextTrack?.id ?? 0
       : this._getNextTrack()[0];
     if (!nextTrackID) return;
-    if (this._personalFMTrack.id == nextTrackID) return;
-    getTrackDetail(nextTrackID).then(data => {
-      let track = data.songs[0];
-      this._getAudioSource(track);
+    if (this._personalFMTrack?.id == nextTrackID) return;
+    getTrackDetail(`${nextTrackID}`).then(data => {
+      this._getAudioSource(data.songs[0]);
     });
   }
   private _loadSelfFromLocalStorage() {
-    const player = JSON.parse(localStorage.getItem('player'));
+    const player = JSON.parse(localStorage.getItem('player') || 'null');
     if (!player) return;
     for (const [key, value] of Object.entries(player)) {
       this[key] = value;
     }
+  }
+
+  saveSelfToLocalStorage() {
+    let player = {};
+    for (let [key, value] of Object.entries(this)) {
+      if (excludeSaveKeys.includes(key)) continue;
+      player[key] = value;
+    }
+
+    localStorage.setItem('player', JSON.stringify(player));
   }
   private _initMediaSession() {
     if ('mediaSession' in navigator) {
@@ -572,7 +560,7 @@ export default class Player {
       });
     }
   }
-  private _updateMediaSessionMetaData(track) {
+  private _updateMediaSessionMetaData(track: Track) {
     if ('mediaSession' in navigator === false) {
       return;
     }
@@ -604,7 +592,7 @@ export default class Player {
     }
   }
   // OSDLyrics 会检测 Mpris 状态并寻找对应歌词文件，所以要在更新 Mpris 状态之前保证歌词下载完成
-  private async _updateMprisState(track, metadata) {
+  private async _updateMprisState(track: Track, metadata: MediaMetadata) {
     if (!useStore(pinia).settings.enableOsdlyricsSupport) {
       return window.ipcRenderer?.send('metadata', metadata);
     }
@@ -625,7 +613,7 @@ export default class Player {
     });
   }
   private _updateMediaSessionPositionState() {
-    if ('mediaSession' in navigator === false) {
+    if (!this.currentTrack || 'mediaSession' in navigator === false) {
       return;
     }
     if ('setPositionState' in navigator.mediaSession) {
@@ -665,7 +653,7 @@ export default class Player {
         return [false, this._personalFMNextTrack];
       });
   }
-  private _playDiscordPresence(track, seekTime = 0) {
+  private _playDiscordPresence(track: Track, seekTime = 0) {
     if (
       window.IS_ELECTRON !== true ||
       useStore(pinia).settings.enableDiscordRichPresence === false
@@ -676,7 +664,7 @@ export default class Player {
     copyTrack.dt -= seekTime * 1000;
     window.ipcRenderer?.send('playDiscordPresence', copyTrack);
   }
-  private _pauseDiscordPresence(track) {
+  private _pauseDiscordPresence(track: Track) {
     if (
       window.IS_ELECTRON !== true ||
       useStore(pinia).settings.enableDiscordRichPresence === false
@@ -693,8 +681,8 @@ export default class Player {
     }
   }
 
-  appendTrack(trackID) {
-    this.list.append(trackID);
+  appendTrack(trackID: number) {
+    this.list.push(trackID);
   }
   playNextTrack() {
     // TODO: 切换歌曲时增加加载中的状态
@@ -721,7 +709,7 @@ export default class Player {
     this._isPersonalFM = true;
     if (!this._personalFMNextTrack) {
       this._personalFMLoading = true;
-      let result = null;
+      let result: PersonalFMResponse | null = null;
       let retryCount = 5;
       for (; retryCount >= 0; retryCount--) {
         result = await personalFM().catch(() => null);
@@ -745,14 +733,14 @@ export default class Player {
         return false;
       }
       // 这里只能拿到一条数据
-      this._personalFMTrack = result.data[0];
+      this._personalFMTrack = result?.data[0];
     } else {
-      if (this._personalFMNextTrack.id === this._personalFMTrack.id) {
+      if (this._personalFMTrack &&this._personalFMNextTrack.id === this._personalFMTrack.id) {
         return false;
       }
       this._personalFMTrack = this._personalFMNextTrack;
     }
-    if (this._isPersonalFM) {
+    if (this._isPersonalFM && this._personalFMTrack) {
       this._replaceCurrentTrack(this._personalFMTrack.id);
     }
     this._loadPersonalFMNextTrack();
@@ -769,15 +757,6 @@ export default class Player {
     );
     return true;
   }
-  saveSelfToLocalStorage() {
-    let player = {};
-    for (let [key, value] of Object.entries(this)) {
-      if (excludeSaveKeys.includes(key)) continue;
-      player[key] = value;
-    }
-
-    localStorage.setItem('player', JSON.stringify(player));
-  }
 
   pause() {
     this._howler?.fade(this.volume, 0, PLAY_PAUSE_FADE_DURATION);
@@ -785,8 +764,8 @@ export default class Player {
     this._howler?.once('fade', () => {
       this._howler?.pause();
       this._setPlaying(false);
-      setTitle(null);
-      this._pauseDiscordPresence(this._currentTrack);
+      setTitle();
+      this._pauseDiscordPresence(this._currentTrack!);
     });
   }
   play() {
@@ -800,18 +779,17 @@ export default class Player {
       // 播放时确保开启player.
       // 避免因"忘记设置"导致在播放时播放器不显示的Bug
       this._enabled = true;
-      this._setPlaying(true);
-      if (this._currentTrack.name) {
-        setTitle(this._currentTrack);
-      }
+      this._setPlaying(true); 
+      setTitle(this._currentTrack);
+      if (!this._currentTrack) return;
       this._playDiscordPresence(this._currentTrack, this.seek());
       if (useStore(pinia).lastfm.key !== undefined) {
         trackUpdateNowPlaying({
-          artist: this.currentTrack.ar[0].name,
-          track: this.currentTrack.name,
-          album: this.currentTrack.al.name,
-          trackNumber: this.currentTrack.no,
-          duration: ~~(this.currentTrack.dt / 1000),
+          artist: this._currentTrack.ar[0].name,
+          track: this._currentTrack.name,
+          album: this._currentTrack.al.name,
+          trackNumber: this._currentTrack.no,
+          duration: ~~(this._currentTrack.dt / 1000),
         });
       }
     });
@@ -823,14 +801,12 @@ export default class Player {
       this.play();
     }
   }
-  seek(time = null, sendMpris = true) {
-    if (isCreateMpris && sendMpris && time) {
-      window.ipcRenderer?.send('seeked', time);
-    }
+  seek(time: number | null = null) {
     if (time !== null) {
       this._howler?.seek(time);
-      if (this._playing)
-        this._playDiscordPresence(this._currentTrack, this.seek(null, false));
+      if (this._playing && this._currentTrack) {
+        this._playDiscordPresence(this._currentTrack, this.seek(null));
+      }
     }
     return this._howler === null ? 0 : this._howler.seek();
   }
@@ -843,17 +819,18 @@ export default class Player {
     }
   }
   setOutputDevice() {
-    if (this._howler?._sounds.length <= 0 || !this._howler?._sounds[0]._node) {
-      return;
-    }
-    this._howler?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
+    // TODO: 设置输出设备
+    // if (this._howler?._sounds.length <= 0 || !this._howler?._sounds[0]._node) {
+    //   return;
+    // }
+    // this._howler?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
   }
 
   replacePlaylist(
-    trackIDs,
-    playlistSourceID,
-    playlistSourceType,
-    autoPlayTrackID = 'first'
+    trackIDs: number[],
+    playlistSourceID: number,
+    playlistSourceType: PlaylistSource['type'],
+    autoPlayTrackID: number | 'first' = 'first'
   ) {
     this._isPersonalFM = false;
     this.list = trackIDs;
@@ -870,13 +847,13 @@ export default class Player {
       this._replaceCurrentTrack(autoPlayTrackID);
     }
   }
-  playAlbumByID(id, trackID = 'first') {
+  playAlbumByID(id: number, trackID: number | 'first' = 'first') {
     getAlbum(id).then(data => {
       let trackIDs = data.songs.map(t => t.id);
       this.replacePlaylist(trackIDs, id, 'album', trackID);
     });
   }
-  playPlaylistByID(id, trackID = 'first', noCache = false) {
+  playPlaylistByID(id: number, trackID: number | 'first' = 'first', noCache: boolean = false) {
     console.debug(
       `[debug][Player.js] playPlaylistByID 👉 id:${id} trackID:${trackID} noCache:${noCache}`
     );
@@ -885,19 +862,19 @@ export default class Player {
       this.replacePlaylist(trackIDs, id, 'playlist', trackID);
     });
   }
-  playArtistByID(id, trackID = 'first') {
+  playArtistByID(id: number, trackID: number | 'first' = 'first') {
     getArtist(id).then(data => {
       let trackIDs = data.hotSongs.map(t => t.id);
       this.replacePlaylist(trackIDs, id, 'artist', trackID);
     });
   }
-  playTrackOnListByID(id, listName = 'default') {
+  playTrackOnListByID(id: number, listName: string = 'default') {
     if (listName === 'default') {
       this._current = this._list.findIndex(t => t === id);
     }
     this._replaceCurrentTrack(id);
   }
-  playIntelligenceListById(id, trackID = 'first', noCache = false) {
+  playIntelligenceListById(id: number, trackID: number | 'first' = 'first', noCache: boolean = false) {
     getPlaylistDetail(id, noCache).then(data => {
       const randomId = Math.floor(
         Math.random() * (data.playlist.trackIds.length + 1)
@@ -909,7 +886,7 @@ export default class Player {
       });
     });
   }
-  addTrackToPlayNext(trackID, playNow = false) {
+  addTrackToPlayNext(trackID: number, playNow: boolean = false) {
     this._playNextList.push(trackID);
     if (playNow) {
       this.playNextTrack();
@@ -917,28 +894,19 @@ export default class Player {
   }
   playPersonalFM() {
     this._isPersonalFM = true;
-    if (this.currentTrackID !== this._personalFMTrack.id) {
+    if (this._personalFMTrack && this.currentTrackID !== this._personalFMTrack.id) {
       this._replaceCurrentTrack(this._personalFMTrack.id, true);
     } else {
       this.playOrPause();
     }
   }
   async moveToFMTrash() {
+    if (!this._personalFMTrack) return;
     this._isPersonalFM = true;
     let id = this._personalFMTrack.id;
     if (await this.playNextFMTrack()) {
       fmTrash(id);
     }
-  }
-
-  sendSelfToIpcMain() {
-    if (window.IS_ELECTRON !== true) return false;
-    let liked = useStore(pinia).liked.songs.includes(this.currentTrack.id);
-    window.ipcRenderer?.send('player', {
-      playing: this.playing,
-      likedCurrentTrack: liked,
-    });
-    setTrayLikeState(liked);
   }
 
   switchRepeatMode() {
@@ -949,15 +917,9 @@ export default class Player {
     } else {
       this.repeatMode = 'on';
     }
-    if (isCreateMpris) {
-      window.ipcRenderer?.send('switchRepeatMode', this.repeatMode);
-    }
   }
   switchShuffle() {
     this.shuffle = !this.shuffle;
-    if (isCreateMpris) {
-      window.ipcRenderer?.send('switchShuffle', this.shuffle);
-    }
   }
   switchReversed() {
     this.reversed = !this.reversed;
@@ -966,7 +928,7 @@ export default class Player {
   clearPlayNextList() {
     this._playNextList = [];
   }
-  removeTrackFromQueue(index) {
+  removeTrackFromQueue(index: number) {
     this._playNextList.splice(index, 1);
   }
 }

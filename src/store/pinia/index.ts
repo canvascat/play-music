@@ -33,9 +33,6 @@ export const useStore = defineStore('store', {
   actions: {
     updateLikedXXX({ name, data }) {
       this.liked[name] = data;
-      if (name === 'songs') {
-        this.player.sendSelfToIpcMain();
-      }
     },
     changeLang(lang) {
       this.settings.lang = lang;
@@ -66,9 +63,6 @@ export const useStore = defineStore('store', {
         this.settings.enabledPlaylistCategories.push(name);
       }
     },
-    updateToast(toast) {
-      this.toast = toast;
-    },
     updateModal({ modalName, key, value }) {
       this.modals[modalName][key] = value;
     },
@@ -95,7 +89,7 @@ export const useStore = defineStore('store', {
     updateTitle(title: string) {
       this.title = title;
     },
-    likeATrack(id) {
+    likeATrack(id: number) {
       if (!isAccountLoggedIn()) {
         toast('此操作需要登录网易云账号');
         return;
@@ -126,7 +120,7 @@ export const useStore = defineStore('store', {
     fetchLikedSongs() {
       if (!isLooseLoggedIn()) return;
       if (isAccountLoggedIn()) {
-        return userLikedSongsIDs({ uid: this.data.user.userId }).then(result => {
+        return userLikedSongsIDs( this.data.user.userId  ).then(result => {
           if (result.ids) {
             this.updateLikedXXX({
               name: 'songs',
@@ -158,13 +152,12 @@ export const useStore = defineStore('store', {
         }
       );
     },
-    fetchLikedPlaylist() {
+    async fetchLikedPlaylist() {
       if (!isLooseLoggedIn()) return;
       if (isAccountLoggedIn()) {
         return userPlaylist({
           uid: this.data.user?.userId,
           limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
-          timestamp: new Date().getTime(),
         }).then(result => {
           if (result.playlist) {
             this.updateLikedXXX({
@@ -251,7 +244,7 @@ export const useStore = defineStore('store', {
         }
       });
     },
-    fetchUserProfile() {
+    async fetchUserProfile() {
       if (!isAccountLoggedIn()) return;
       return userAccount().then(result => {
         if (result.code === 200) {

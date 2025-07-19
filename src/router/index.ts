@@ -17,16 +17,6 @@ const routes = [
     component: () => import('@/views/login.vue'),
   },
   {
-    path: '/login/username',
-    name: 'loginUsername',
-    component: () => import('@/views/loginUsername.vue'),
-  },
-  {
-    path: '/login/account',
-    name: 'loginAccount',
-    component: () => import('@/views/loginAccount.vue'),
-  },
-  {
     path: '/playlist/:id',
     name: 'playlist',
     component: () => import('@/views/playlist.vue'),

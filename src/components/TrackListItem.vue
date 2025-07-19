@@ -87,145 +87,158 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
-import { mapState } from 'pinia';
 import { useStore } from '@/store/pinia'; 
 import { isNil } from 'es-toolkit';
 import { formatTime } from '@/utils/filters';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import type { Track, Artist, Album } from '@/types';
 
-export default {
-  name: 'TrackListItem',
-  components: { ArtistsInLine, ExplicitSymbol },
+defineOptions({ name: 'TrackListItem' });
 
-  props: {
-    trackProp: Object,
-    trackNo: Number,
-    highlightPlayingTrack: {
-      type: Boolean,
-      default: true,
-    },
-    type: String,
-    albumArtistName: String,
-  },
+interface Props {
+  trackProp: Track | any;
+  trackNo?: number;
+  highlightPlayingTrack?: boolean;
+  type?: 'album' | 'playlist' | 'tracklist' | 'cloudDisk';
+  albumArtistName?: string;
+}
 
-  data() {
-    return { hover: false, trackStyle: {} };
-  },
+const props = withDefaults(defineProps<Props>(), {
+  highlightPlayingTrack: true,
+  type: 'playlist'
+});
 
-  computed: {
-    ...mapState(useStore, ['settings', 'player']),
-    track() {
-      return this.type === 'cloudDisk'
-        ? this.trackProp.simpleSong
-        : this.trackProp;
-    },
-    playable() {
-      return this.track?.privilege?.pl > 0 || this.track?.playable;
-    },
-    imgUrl() {
-      let image =
-        this.track?.al?.picUrl ??
-        this.track?.album?.picUrl ??
-        'https://p2.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg';
-      return image + '?param=224y224';
-    },
-    artists() {
-      const { ar, artists } = this.track;
-      if (!isNil(ar)) return ar;
-      if (!isNil(artists)) return artists;
-      return [];
-    },
-    album() {
-      return this.track.album || this.track.al || this.track?.simpleSong?.al;
-    },
-    subTitle() {
-      let tn = undefined;
-      if (
-        this.track?.tns?.length > 0 &&
-        this.track.name !== this.track.tns[0]
-      ) {
-        tn = this.track.tns[0];
-      }
+const router = useRouter();
+const store = useStore();
+const { settings, player } = store;
 
-      //优先显示alia
-      if (this.settings.subTitleDefault) {
-        return this.track?.alia?.length > 0 ? this.track.alia[0] : tn;
-      } else {
-        return tn === undefined ? this.track.alia[0] : tn;
-      }
-    },
- 
-    isAlbum() {
-      return this.type === 'album';
-    },
-    isSubTitle() {
-      return (
-        (this.track?.tns?.length > 0 &&
-          this.track.name !== this.track.tns[0]) ||
-        this.track.alia?.length > 0
-      );
-    },
-    isPlaylist() {
-      return this.type === 'playlist';
-    },
-    isLiked() {
-      return false;
-      // return this.$parent.liked.songs.includes(this.track?.id);
-    },
-    isPlaying() {
-      return this.player.currentTrack.id === this.track?.id;
-    },
-    trackClass() {
-      let trackClass = [this.type];
-      if (!this.playable && this.showUnavailableSongInGreyStyle)
-        trackClass.push('disable');
-      if (this.isPlaying && this.highlightPlayingTrack)
-        trackClass.push('playing');
-      if (this.focus) trackClass.push('focus');
-      return trackClass;
-    },
-    // isMenuOpened() {
-    //   return this.$parent.rightClickedTrack.id === this.track.id ? true : false;
-    // },
-    focus() {
-      return (
-        (this.hover)
-      );
-    },
-    showUnavailableSongInGreyStyle() {
-      return window.IS_ELECTRON
-        ? !this.settings.enableUnblockNeteaseMusic
-        : true;
-    },
-    showLikeButton() {
-      return this.type !== 'tracklist' && this.type !== 'cloudDisk';
-    },
-    showOrderNumber() {
-      return this.type === 'album';
-    },
-    showAlbumName() {
-      return this.type !== 'album' && this.type !== 'tracklist';
-    },
-    showTrackTime() {
-      return this.type !== 'tracklist';
-    },
-  },
+const hover = ref(false);
+const trackStyle = ref({});
 
-  methods: {
-    formatTime,
-    goToAlbum() {
-      if (this.track.al.id === 0) return;
-      this.$router.push({ path: '/album/' + this.track.al.id });
-    },
-    playTrack() {
-      // this.$parent.playThisList(this.track.id);
-    },
-    likeThisSong() {
-      // this.$parent.likeATrack(this.track.id);
-    },
-  },
+const track = computed((): Track => {
+  return props.type === 'cloudDisk'
+    ? props.trackProp.simpleSong
+    : props.trackProp;
+});
+const playable = computed((): boolean => {
+  return track.value?.privilege?.pl > 0 || track.value?.playable;
+});
+
+const imgUrl = computed((): string => {
+  let image =
+    track.value?.al?.picUrl ??
+    track.value?.album?.picUrl ??
+    'https://p2.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg';
+  return image + '?param=224y224';
+});
+
+const artists = computed((): Artist[] => {
+  const { ar, artists } = track.value;
+  if (!isNil(ar)) return ar;
+  if (!isNil(artists)) return artists;
+  return [];
+});
+
+const album = computed((): Album => {
+  return track.value.album || track.value.al || track.value?.simpleSong?.al;
+});
+const subTitle = computed((): string | undefined => {
+  let tn = undefined;
+  if (
+    track.value?.tns?.length > 0 &&
+    track.value.name !== track.value.tns[0]
+  ) {
+    tn = track.value.tns[0];
+  }
+
+  //优先显示alia
+  if (settings.subTitleDefault) {
+    return track.value?.alia?.length > 0 ? track.value.alia[0] : tn;
+  } else {
+    return tn === undefined ? track.value.alia[0] : tn;
+  }
+});
+
+const isAlbum = computed((): boolean => {
+  return props.type === 'album';
+});
+
+const isSubTitle = computed((): boolean => {
+  return (
+    (track.value?.tns?.length > 0 &&
+      track.value.name !== track.value.tns[0]) ||
+    track.value.alia?.length > 0
+  );
+});
+
+const isPlaylist = computed((): boolean => {
+  return props.type === 'playlist';
+});
+
+const isLiked = computed((): boolean => {
+  return false;
+  // return this.$parent.liked.songs.includes(this.track?.id);
+});
+
+const isPlaying = computed((): boolean => {
+  return player.currentTrack.id === track.value?.id;
+});
+
+const focus = computed((): boolean => {
+  return hover.value;
+});
+
+const showUnavailableSongInGreyStyle = computed((): boolean => {
+  return window.IS_ELECTRON
+    ? !settings.enableUnblockNeteaseMusic
+    : true;
+});
+
+const trackClass = computed((): string[] => {
+  let classList = [props.type || 'playlist'];
+  if (!playable.value && showUnavailableSongInGreyStyle.value)
+    classList.push('disable');
+  if (isPlaying.value && props.highlightPlayingTrack)
+    classList.push('playing');
+  if (focus.value) classList.push('focus');
+  return classList;
+});
+
+// isMenuOpened() {
+//   return this.$parent.rightClickedTrack.id === this.track.id ? true : false;
+// },
+
+const showLikeButton = computed((): boolean => {
+  return props.type !== 'tracklist' && props.type !== 'cloudDisk';
+});
+
+const showOrderNumber = computed((): boolean => {
+  return props.type === 'album';
+});
+
+const showAlbumName = computed((): boolean => {
+  return props.type !== 'album' && props.type !== 'tracklist';
+});
+
+const showTrackTime = computed((): boolean => {
+  return props.type !== 'tracklist';
+});
+
+const goToAlbum = (): void => {
+  if (track.value.al.id === 0) return;
+  router.push({ path: '/album/' + track.value.al.id });
+};
+
+const playTrack = (): void => {
+  // this.$parent.playThisList(this.track.id);
+};
+
+const likeThisSong = (): void => {
+  // this.$parent.likeATrack(this.track.id);
 };
 </script>
 

@@ -13,7 +13,7 @@
     <div class="navigation-links">
       <router-link to="/" :class="{ active: $route.name === 'home' }">{{
         $t('nav.home')
-      }}</router-link>
+        }}</router-link>
       <router-link to="/explore" :class="{ active: $route.name === 'explore' }">{{ $t('nav.explore') }}</router-link>
       <router-link to="/library" :class="{ active: $route.name === 'library' }">{{ $t('nav.library') }}</router-link>
     </div>
@@ -66,6 +66,7 @@ import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import pkg from '../../package.json';
 
 const inputFocus = ref(false);
 const keywords = ref('');
@@ -127,15 +128,11 @@ const toSettings = () => {
 };
 
 const toGitHub = () => {
-  window.open('https://github.com/qier222/YesPlayMusic');
+  window.open(pkg.repository.url);
 };
 
 const toLogin = () => {
-  if (window.IS_ELECTRON === true) {
-    router.push({ name: 'loginAccount' });
-  } else {
-    router.push({ name: 'login' });
-  }
+  router.push({ name: 'login' });
 };
 </script>
 
@@ -158,7 +155,7 @@ nav {
   backdrop-filter: saturate(180%) blur(20px);
 
   background-color: var(--color-navbar-bg);
- 
+
   -webkit-app-region: drag;
 }
 
