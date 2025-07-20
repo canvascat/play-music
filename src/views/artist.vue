@@ -8,21 +8,14 @@
         <div class="name">{{ artist.name }}</div>
         <div class="artist">{{ $t('artist.artist') }}</div>
         <div class="statistics">
-          <a @click="scrollTo('popularTracks')"
-            >{{ artist.musicSize }} {{ $t('common.songs') }}</a
-          >
+          <a @click="scrollTo('popularTracks')">{{ artist.musicSize }} {{ $t('common.songs') }}</a>
           ·
-          <a @click="scrollTo('seeMore', 'start')"
-            >{{ artist.albumSize }} {{ $t('artist.withAlbums') }}</a
-          >
+          <a @click="scrollTo('seeMore', 'start')">{{ artist.albumSize }} {{ $t('artist.withAlbums') }}</a>
           ·
-          <a @click="scrollTo('mvs')"
-            >{{ artist.mvSize }} {{ $t('artist.videos') }}</a
-          >
+          <a @click="scrollTo('mvs')">{{ artist.mvSize }} {{ $t('artist.videos') }}</a>
         </div>
-        <div class="description" @click="toggleFullDescription">
-          {{ artist.briefDesc }}
-        </div>
+ 
+        <Description :description="artist.briefDesc" :title="$t('artist.artistDesc')" />
         <div class="buttons">
           <ButtonTwoTone icon-class="play" v-on:click="playPopularSongs()">
             {{ $t('common.play') }}
@@ -31,14 +24,20 @@
             <span v-if="artist.followed">{{ $t('artist.following') }}</span>
             <span v-else>{{ $t('artist.follow') }}</span>
           </ButtonTwoTone>
-          <ButtonTwoTone
-            icon-class="more"
-            :icon-button="true"
-            :horizontal-padding="0"
-            color="grey"
-            v-on:click="openMenu"
-          >
-          </ButtonTwoTone>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <ButtonTwoTone icon-class="more" :icon-button="true" :horizontal-padding="0" color="grey">
+              </ButtonTwoTone>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem @click="copyUrl(artist.id)">{{
+                $t('contextMenu.copyUrl')
+                }}</DropdownMenuItem>
+              <DropdownMenuItem @click="openInBrowser(artist.id)">{{
+                $t('contextMenu.openInBrowser')
+                }}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
@@ -46,18 +45,13 @@
       <div class="section-title">{{ $t('artist.latestRelease') }}</div>
       <div class="release">
         <div class="container">
-          <Cover
-            :id="latestRelease.id"
-            :image-url="resizeImage(latestRelease.picUrl)"
-            type="album"
-            :fixed-size="128"
-            :play-button-size="30"
-          />
+          <Cover :id="latestRelease.id" :image-url="resizeImage(latestRelease.picUrl)" type="album" :fixed-size="128"
+            :play-button-size="30" />
           <div class="info">
             <div class="name">
               <router-link :to="`/album/${latestRelease.id}`">{{
                 latestRelease.name
-              }}</router-link>
+                }}</router-link>
             </div>
             <div class="date">
               {{ formatDate(latestRelease.publishTime) }}
@@ -69,28 +63,19 @@
           </div>
         </div>
         <div v-show="latestMV.id" class="container latest-mv">
-          <div
-            class="cover"
-            @mouseover="mvHover = true"
-            @mouseleave="mvHover = false"
-            @click="goToMv(latestMV.id)"
-          >
+          <div class="cover" @mouseover="mvHover = true" @mouseleave="mvHover = false" @click="goToMv(latestMV.id)">
             <img :src="latestMV.coverUrl" loading="lazy" />
             <transition name="fade">
-              <div
-                v-show="mvHover"
-                class="shadow"
-                :style="{
-                  background: 'url(' + latestMV.coverUrl + ')',
-                }"
-              ></div>
+              <div v-show="mvHover" class="shadow" :style="{
+                background: 'url(' + latestMV.coverUrl + ')',
+              }"></div>
             </transition>
           </div>
           <div class="info">
             <div class="name">
               <router-link :to="'/mv/' + latestMV.id">{{
                 latestMV.name
-              }}</router-link>
+                }}</router-link>
             </div>
             <div class="date">
               {{ formatDate(latestMV.publishTime) }}
@@ -103,10 +88,7 @@
     </div>
     <div id="popularTracks" class="popular-tracks">
       <div class="section-title">{{ $t('artist.popularSongs') }}</div>
-      <TrackList
-        :tracks="popularTracks.slice(0, showMorePopTracks ? 24 : 12)"
-        :type="'tracklist'"
-      />
+      <TrackList :tracks="popularTracks.slice(0, showMorePopTracks ? 24 : 12)" :type="'tracklist'" />
 
       <div id="seeMore" class="show-more">
         <button @click="showMorePopTracks = !showMorePopTracks">
@@ -117,253 +99,193 @@
     </div>
     <div v-if="albums.length !== 0" id="albums" class="albums">
       <div class="section-title">{{ $t('artist.albums') }}</div>
-      <CoverRow
-        :type="'album'"
-        :items="albums"
-        :sub-text="'releaseYear'"
-        :show-play-button="true"
-      />
+      <CoverRow :type="'album'" :items="albums" :sub-text="'releaseYear'" :show-play-button="true" />
     </div>
     <div v-if="mvs.length !== 0" id="mvs" class="mvs">
-      <div class="section-title"
-        >MVs
+      <div class="section-title">MVs
         <router-link v-show="hasMoreMV" :to="`/artist/${artist.id}/mv`">{{
           $t('home.seeMore')
-        }}</router-link>
+          }}</router-link>
       </div>
       <MvRow :mvs="mvs" subtitle="publishTime" :playing="player?.playing" />
     </div>
     <div v-if="eps.length !== 0" class="eps">
       <div class="section-title">{{ $t('artist.EPsSingles') }}</div>
-      <CoverRow
-        :type="'album'"
-        :items="eps"
-        :sub-text="'albumType+releaseYear'"
-        :show-play-button="true"
-      />
+      <CoverRow :type="'album'" :items="eps" :sub-text="'albumType+releaseYear'" :show-play-button="true" />
     </div>
 
     <div v-if="similarArtists.length !== 0" class="similar-artists">
       <div class="section-title">{{ $t('artist.similarArtists') }}</div>
-      <CoverRow
-        type="artist"
-        :column-number="6"
-        gap="36px 28px"
-        :items="similarArtists.slice(0, 12)"
-      />
+      <CoverRow type="artist" :column-number="6" gap="36px 28px" :items="similarArtists.slice(0, 12)" />
     </div>
 
-    <Modal
-      :show="showFullDescription"
-      :close="toggleFullDescription"
-      :show-footer="false"
-      :click-outside-hide="true"
-      :title="$t('artist.artistDesc')"
-    >
-      <p class="description-fulltext">
-        {{ artist.briefDesc }}
-      </p>
-    </Modal>
 
-    <ContextMenu ref="artistMenu">
-      <div class="item" @click="copyUrl(artist.id)">{{
-        $t('contextMenu.copyUrl')
-      }}</div>
-      <div class="item" @click="openInBrowser(artist.id)">{{
-        $t('contextMenu.openInBrowser')
-      }}</div>
-    </ContextMenu>
+
+
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia';
-import { useStore } from '@/store/pinia'; 
-import {
-  getArtist,
-  getArtistAlbum,
-  artistMv,
-  followAArtist,
-  similarArtists,
-} from '@/api/artist';
-import { getTrackDetail } from '@/api/track';
+<script setup lang="ts">
+
+import { useStore } from '@/store/pinia';
+
+import * as api from '@/api';
 import { isAccountLoggedIn } from '@/utils/auth';
 import NProgress from 'nprogress';
 import { resizeImage, formatDate, formatAlbumType } from '@/utils/filters';
-
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
-import ContextMenu from '@/components/ContextMenu.vue';
 import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
 import MvRow from '@/components/MvRow.vue';
-import Modal from '@/components/Modal.vue';
+import Description from '@/components/Description.tsx';
 import { copyText } from '@/utils/copy';
 import { toast } from 'vue-sonner'
+import { ref, computed, onActivated } from 'vue';
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
-export default {
-  name: 'Artist',
-  components: {
-    Cover,
-    ButtonTwoTone,
-    TrackList,
-    CoverRow,
-    MvRow,
-    Modal,
-    ContextMenu,
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.artist.img1v1Url =
-      'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg';
-    this.loadData(to.params.id, next);
-  },
-  data() {
-    return {
-      show: false,
-      artist: {
-        img1v1Url:
-          'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg',
-      },
-      popularTracks: [],
-      albumsData: [],
-      latestRelease: {
-        picUrl: '',
-        publishTime: 0,
-        id: 0,
-        name: '',
-        type: '',
-        size: '',
-      },
-      showMorePopTracks: false,
-      showFullDescription: false,
-      mvs: [],
-      hasMoreMV: false,
-      similarArtists: [],
-      mvHover: false,
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['player']),
-    albums() {
-      return this.albumsData.filter(
-        a => a.type === '专辑' || a.type === '精选集'
-      );
-    },
-    eps() {
-      return this.albumsData.filter(a =>
-        ['EP/Single', 'EP', 'Single'].includes(a.type)
-      );
-    },
-    latestMV() {
-      const mv = this.mvs[0] || {};
-      return {
-        id: mv.id || mv.vid,
-        name: mv.name || mv.title,
-        coverUrl: `${mv.imgurl16v9 || mv.cover || mv.coverUrl}?param=464y260`,
-        publishTime: mv.publishTime,
-      };
-    },
-  },
-  activated() {
-    if (this.artist?.id?.toString() !== this.$route.params.id) {
-      this.loadData(this.$route.params.id);
-    } else {
-      // TODO scrollbar.restorePosition();
-    }
-  },
-  methods: {
-    resizeImage, formatDate, formatAlbumType,
-    ...mapActions(useStore, ['playFirstTrackOnList', 'playTrackOnListByID']),
-    loadData(id, next = undefined) {
-      setTimeout(() => {
-        if (!this.show) NProgress.start();
-      }, 1000);
-      this.show = false;
-      // TODO scrollTo({ top: 0 });
-      getArtist(id).then(data => {
-        this.artist = data.artist;
-        this.setPopularTracks(data.hotSongs);
-        if (next !== undefined) next();
-        NProgress.done();
-        this.show = true;
-      });
-      getArtistAlbum({ id: id, limit: 200 }).then(data => {
-        this.albumsData = data.hotAlbums;
-        this.latestRelease = data.hotAlbums[0];
-      });
-      artistMv({ id }).then(data => {
-        this.mvs = data.mvs;
-        this.hasMoreMV = data.hasMore;
-      });
-      if (isAccountLoggedIn()) {
-        similarArtists(id).then(data => {
-          this.similarArtists = data.artists;
-        });
-      }
-    },
-    setPopularTracks(hotSongs) {
-      const trackIDs = hotSongs.map(t => t.id);
-      getTrackDetail(trackIDs.join(',')).then(data => {
-        this.popularTracks = data.songs;
-      });
-    },
-    goToAlbum(id) {
-      this.$router.push({
-        name: 'album',
-        params: { id },
-      });
-    },
-    goToMv(id) {
-      this.$router.push({ path: '/mv/' + id });
-    },
-    playPopularSongs(trackID = 'first') {
-      let trackIDs = this.popularTracks.map(t => t.id);
-      this.player.replacePlaylist(
-        trackIDs,
-        this.artist.id,
-        'artist',
-        trackID
-      );
-    },
-    followArtist() {
-      if (!isAccountLoggedIn()) {
-        toast(this.$t('toast.needToLogin'));
-        return;
-      }
-      followAArtist({
-        id: this.artist.id,
-        t: this.artist.followed ? 0 : 1,
-      }).then(data => {
-        if (data.code === 200) this.artist.followed = !this.artist.followed;
-      });
-    },
-    scrollTo(div, block = 'center') {
-      document.getElementById(div).scrollIntoView({
-        behavior: 'smooth',
-        block,
-      });
-    },
-    toggleFullDescription() {
-      this.showFullDescription = !this.showFullDescription;
-    },
-    openMenu(e) {
-      this.$refs.artistMenu.openMenu(e);
-    },
-    copyUrl(id) {
-       copyText(`https://music.163.com/#/artist?id=${id}`)
-        .then(function () {
-          toast(this.$t('toast.copied'));
-        })
-        .catch(error => {
-          toast(`${this.$t('toast.copyFailed')}${error}`);
-        });
-    },
-    openInBrowser(id) {
-      const url = `https://music.163.com/#/artist?id=${id}`;
-      window.open(url);
-    },
-  },
-};
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
+const { player } = useStore();
+const show = ref(false);
+const artist = ref({
+  img1v1Url:
+    'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg',
+});
+const popularTracks = ref([]);
+const albumsData = ref([]);
+const latestRelease = ref({
+  picUrl: '',
+  publishTime: 0,
+  id: 0,
+  name: '',
+  type: '',
+  size: '',
+});
+const showMorePopTracks = ref(false);
+
+const mvs = ref([]);
+const hasMoreMV = ref(false);
+const similarArtists = ref([]);
+const mvHover = ref(false);
+
+onBeforeRouteUpdate((to, _from, next) => {
+  artist.value.img1v1Url =
+    'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg';
+  loadData(to.params.id as string, next);
+});
+
+const albums = computed(() => {
+  return albumsData.value.filter(
+    a => a.type === '专辑' || a.type === '精选集'
+  );
+});
+const eps = computed(() => {
+  return albumsData.value.filter(a =>
+    ['EP/Single', 'EP', 'Single'].includes(a.type)
+  );
+});
+const latestMV = computed(() => {
+  const mv = mvs.value[0] || {};
+  return {
+    id: mv.id || mv.vid,
+    name: mv.name || mv.title,
+    coverUrl: `${mv.imgurl16v9 || mv.cover || mv.coverUrl}?param=464y260`,
+    publishTime: mv.publishTime,
+  };
+});
+
+onActivated(() => {
+  if (artist.value?.id?.toString() !== route.params.id) {
+    loadData(route.params.id);
+  } else {
+    // TODO scrollbar.restorePosition();
+  }
+})
+
+
+function loadData(id: string, next?: () => void) {
+  setTimeout(() => {
+    if (!show.value) NProgress.start();
+  }, 1000);
+  show.value = false;
+  // TODO scrollTo({ top: 0 });
+  api.artist.getArtist(id).then(data => {
+    artist.value = data.artist;
+    setPopularTracks(data.hotSongs);
+    if (next !== undefined) next();
+    NProgress.done();
+    show.value = true;
+  });
+  api.artist.getArtistAlbum({ id: id, limit: 200 }).then(data => {
+    albumsData.value = data.hotAlbums;
+    latestRelease.value = data.hotAlbums[0];
+  });
+  api.artist.artistMv({ id }).then(data => {
+    mvs.value = data.mvs;
+    hasMoreMV.value = data.hasMore;
+  });
+  if (isAccountLoggedIn()) {
+    api.artist.similarArtists(id).then(data => {
+      similarArtists.value = data.artists;
+    });
+  }
+}
+function setPopularTracks(hotSongs) {
+  const trackIDs = hotSongs.map(t => t.id);
+  api.track.getTrackDetail(trackIDs.join(',')).then(data => {
+    popularTracks.value = data.songs;
+  });
+}
+
+function goToMv(id: string) {
+  router.push({ path: '/mv/' + id });
+}
+function playPopularSongs(trackID = 'first') {
+  let trackIDs = popularTracks.value.map(t => t.id);
+  player.replacePlaylist(
+    trackIDs,
+    artist.value.id,
+    'artist',
+    trackID
+  );
+}
+function followArtist() {
+  if (!isAccountLoggedIn()) {
+    toast(t('toast.needToLogin'));
+    return;
+  }
+  api.artist.followAArtist({
+    id: artist.value.id,
+    t: artist.value.followed ? 0 : 1,
+  }).then(data => {
+    if (data.code === 200) artist.value.followed = !artist.value.followed;
+  });
+}
+function scrollTo(div: string, block: ScrollLogicalPosition = 'center') {
+  document.getElementById(div).scrollIntoView({
+    behavior: 'smooth',
+    block,
+  });
+}
+
+
+function copyUrl(id: string) {
+  copyText(`https://music.163.com/#/artist?id=${id}`)
+    .then(function () {
+      toast(t('toast.copied'));
+    })
+    .catch(error => {
+      toast(`${t('toast.copyFailed')}${error}`);
+    });
+}
+function openInBrowser(id: string) {
+  const url = `https://music.163.com/#/artist?id=${id}`;
+  window.open(url);
+} 
 </script>
 
 <style lang="scss" scoped>
@@ -376,6 +298,7 @@ export default {
   align-items: center;
   margin-bottom: 26px;
   color: var(--color-text);
+
   img {
     height: 248px;
     width: 248px;
@@ -383,6 +306,7 @@ export default {
     margin-right: 56px;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 16px -8px;
   }
+
   .name {
     font-size: 56px;
     font-weight: 700;
@@ -403,28 +327,13 @@ export default {
   .buttons {
     margin-top: 26px;
     display: flex;
+
     .shuffle {
       padding: 8px 11px;
+
       .svg-icon {
         margin: 0;
       }
-    }
-  }
-
-  .description {
-    user-select: none;
-    font-size: 14px;
-    opacity: 0.68;
-    margin-top: 24px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
-    cursor: pointer;
-    white-space: pre-line;
-    &:hover {
-      transition: opacity 0.3s;
-      opacity: 0.88;
     }
   }
 }
@@ -440,6 +349,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+
   a {
     font-size: 13px;
     font-weight: 600;
@@ -449,31 +359,38 @@ export default {
 
 .latest-release {
   color: var(--color-text);
+
   .release {
     display: flex;
   }
+
   .container {
     display: flex;
     flex: 1;
     align-items: center;
     border-radius: 12px;
   }
+
   img {
     height: 96px;
     border-radius: 8px;
   }
+
   .info {
     margin-left: 24px;
   }
+
   .name {
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 8px;
   }
+
   .date {
     font-size: 14px;
     opacity: 0.78;
   }
+
   .type {
     margin-top: 2px;
     font-size: 12px;
@@ -493,6 +410,7 @@ export default {
       opacity: 0.78;
       color: var(--color-secondary);
       font-weight: 600;
+
       &:hover {
         opacity: 1;
       }
@@ -510,10 +428,12 @@ export default {
   .cover {
     position: relative;
     transition: transform 0.3s;
+
     &:hover {
       cursor: pointer;
     }
   }
+
   img {
     border-radius: 0.75em;
     height: 128px;
@@ -537,17 +457,13 @@ export default {
   .fade-leave-active {
     transition: opacity 0.3s;
   }
-  .fade-enter-from, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+
+  .fade-enter-from,
+  .fade-leave-to
+
+  /* .fade-leave-active below version 2.1.8 */
+    {
     opacity: 0;
   }
-}
-
-.description-fulltext {
-  font-size: 16px;
-  margin-top: 24px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: pre-line;
 }
 </style>

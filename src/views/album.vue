@@ -27,26 +27,7 @@
           {{ formatTime(albumTime, 'Human') }}
         </div>
 
-        <Dialog>
-          <DialogTrigger>
-            <!-- TODO: 放在DialogTrigger里会不显示？？ -->
-            <div class="description line-clamp-3">
-              {{ album.description }}
-            </div>
-          </DialogTrigger>
-          <DialogContent class="bg-white/78 backdrop-blur-sm" overlayClass="bg-white/58">
-            <DialogHeader>
-              <DialogTitle>
-                {{ $t('album.albumDesc') }}
-              </DialogTitle>
-            </DialogHeader>
-            <DialogDescription>
-              <p class="description-fulltext">
-                {{ album.description }}
-              </p>
-            </DialogDescription>
-          </DialogContent>
-        </Dialog>
+        <Description :description="album.description" :title="$t('album.albumDesc')" />
 
         <div class="buttons" style="margin-top: 32px">
           <ButtonTwoTone icon-class="play" @click="playAlbumByID(album.id)">
@@ -128,16 +109,17 @@ import { toPairs } from 'es-toolkit/compat';
 import { resizeImage, formatDate, formatTime, formatAlbumType } from '@/utils/filters';
 import { useI18n } from 'vue-i18n';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
 import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import Cover from '@/components/Cover.vue';
+import Description from '@/components/Description.tsx';
 import { copyText } from '@/utils/copy.ts';
 import { toast } from 'vue-sonner'
 import { computed, ref } from 'vue';
 import { onBeforeRouteUpdate, useRouter } from 'vue-router';
+
 const { t } = useI18n();
 
 
@@ -179,7 +161,7 @@ const album = ref<Album>({
   mark: 0,
   publishTime: 0,
   size: 0,
-  description: '',
+  description: 'default description',
   company: '',
 });
 
