@@ -125,8 +125,7 @@ const routes = [
 const router = createRouter({
   history:  createWebHistory() ,
   routes,
-  scrollBehavior(_to, _from, savedPosition) {
-    console.log(savedPosition?.top, _to);
+  scrollBehavior(_to, _from, savedPosition) {   
     return {
       el: document.querySelector('main > [data-reka-scroll-area-viewport]'), 
       top: savedPosition?.top,
@@ -139,24 +138,20 @@ const router = createRouter({
 //   return originalPush.call(this, location).catch(err => err);
 // };
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   // 需要登录的逻辑
   if (to.meta.requireAccountLogin) {
     if (isAccountLoggedIn()) {
       next();
     } else {
-      next({ path: '/login/account' });
+      next({ path: '/login' });
     }
   }
   if (to.meta.requireLogin) {
     if (isLooseLoggedIn()) {
       next();
     } else {
-      if (window.IS_ELECTRON === true) {
-        next({ path: '/login/account' });
-      } else {
-        next({ path: '/login' });
-      }
+      next({ path: '/login' });
     }
   } else {
     next();
