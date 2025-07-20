@@ -115,7 +115,7 @@ import Cover from '@/components/Cover.vue';
 import Description from '@/components/Description.tsx';
 import { copyText } from '@/utils/copy.ts';
 import { toast } from 'vue-sonner'
-import { computed, ref } from 'vue';
+import { computed, ref, toValue, shallowRef } from 'vue';
 import { onBeforeRouteUpdate, useRouter } from 'vue-router';
 
 const { t } = useI18n();
@@ -124,6 +124,7 @@ const { t } = useI18n();
 interface Track {
   id: number;
   dt: number;
+  cd: number;
 }
 
 interface AlbumDynamicDetail {
@@ -163,7 +164,7 @@ const album = ref<Album>({
   company: '',
 });
 
-const tracks = ref<Track[]>([]);
+const tracks = shallowRef<Track[]>([]);
 const moreAlbums = ref<Album[]>([]);
 const dynamicDetail = ref<AlbumDynamicDetail>({ isSub: false });
 const subtitle = ref('');
@@ -195,7 +196,8 @@ const filteredMoreAlbums = computed(() => {
 const tracksByDisc = computed(() => {
 
   if (tracks.value.length <= 1) return [];
-  const pairs = toPairs(groupBy(tracks.value, 'cd'));
+
+  const pairs = toPairs(groupBy(toValue(tracks), item => item.cd));
   return sortBy(pairs, p => p[0]).map(items => ({
     disc: items[0],
     tracks: items[1],

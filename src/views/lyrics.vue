@@ -7,7 +7,7 @@
     >
       <div
         v-if="
-          (settings.lyricsBackground === 'blur') |
+          (settings.lyricsBackground === 'blur') ||
             (settings.lyricsBackground === 'dynamic')
         "
         class="lyrics-background"
@@ -298,379 +298,436 @@
   </transition>
 </template>
 
-<script>
+<script setup lang="ts">
 // The lyrics page of Apple Music is so gorgeous, so I copy the design.
 // Some of the codes are from https://github.com/sl1673495/vue-netease-music
 
-import { mapState, mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useStore } from '@/store/pinia';
 import VueSlider from 'vue-slider-component';
 import ContextMenu from '@/components/ContextMenu.vue';
 import { formatTrackTime } from '@/utils/common';
 import * as api from '@/api';
-import { lyricParser, copyLyric } from '@/utils/lyrics';
+import { lyricParser, copyLyric as copyLyricUtil } from '@/utils/lyrics';
 import ButtonIcon from '@/components/ButtonIcon.vue';
 import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { hasListSource, getListSourcePath } from '@/utils/playList';
-import { toast } from 'vue-sonner'
+import { toast } from 'vue-sonner';
+import { useRafFn } from '@vueuse/core';
 
-export default {
-  name: 'Lyrics',
-  components: {
-    VueSlider,
-    ButtonIcon,
-    ContextMenu,
+// 定义接口
+interface LyricLine {
+  rawTime: string;
+  time: number;
+  content: string;
+}
+
+interface LyricItem {
+  time: number;
+  content: string;
+  contents: string[];
+}
+
+interface RightClickLyric extends LyricItem {
+  idx: number;
+}
+const store = useStore();
+const { 
+  player, 
+  settings,  
+  toggleLyrics, 
+  updateModal, 
+  likeATrack, 
+  fetchLikedPlaylist 
+} = store;
+
+// 响应式数据
+let lyricsInterval: number
+const lyric = ref<LyricLine[]>([]);
+const tlyric = ref<LyricLine[]>([]);
+const romalyric = ref<LyricLine[]>([]);
+const lyricType = ref<'translation' | 'romaPronunciation'>('translation');
+const highlightLyricIndex = ref(-1);
+const background = ref('');
+const date = ref(formatTime(new Date()));
+const isFullscreen = ref(!!document.fullscreenElement);
+const rightClickLyric = ref<RightClickLyric | null>(null);
+const timer = ref<number | null>(null);
+const lyricsContainer = ref<HTMLElement>();
+const lyricMenu = ref<InstanceType<typeof ContextMenu>>();
+
+// const progress = ref(player.progress);
+// useRafFn(() => {
+//   progress.value = player.progress;
+// })
+
+// const setProgress = (value: number) => {
+//   player.progress = value;
+//   progress.value = value;
+// }
+
+// 计算属性
+const currentTrack = computed(() => player.currentTrack);
+
+const volume = computed({
+  get() {
+    return player.volume;
   },
-  data() {
-    return {
-      lyricsInterval: null,
-      lyric: [],
-      tlyric: [],
-      romalyric: [],
-      lyricType: 'translation', // or 'romaPronunciation'
-      highlightLyricIndex: -1,
-      minimize: true,
-      background: '',
-      date: this.formatTime(new Date()),
-      isFullscreen: !!document.fullscreenElement,
-      rightClickLyric: null,
-    };
+  set(value: number) {
+    player.volume = value;
   },
-  computed: {
-    ...mapState(useStore, ['player', 'settings', 'showLyrics']),
-    currentTrack() {
-      return this.player.currentTrack;
-    },
-    volume: {
-      get() {
-        return this.player.volume;
-      },
-      set(value) {
-        this.player.volume = value;
-      },
-    },
-    imageUrl() {
-      return this.player.currentTrack?.al?.picUrl + '?param=1024y1024';
-    },
-    bgImageUrl() {
-      return this.player.currentTrack?.al?.picUrl + '?param=512y512';
-    },
-    isShowLyricTypeSwitch() {
-      return this.romalyric.length > 0 && this.tlyric.length > 0;
-    },
-    lyricToShow() {
-      return this.lyricType === 'translation'
-        ? this.lyricWithTranslation
-        : this.lyricWithRomaPronunciation;
-    },
-    lyricWithTranslation() {
-      let ret = [];
-      // 空内容的去除
-      const lyricFiltered = this.lyric.filter(({ content }) =>
-        Boolean(content)
+});
+
+const imageUrl = computed(() => {
+  return player.currentTrack?.al?.picUrl + '?param=1024y1024';
+});
+
+const bgImageUrl = computed(() => {
+  return player.currentTrack?.al?.picUrl + '?param=512y512';
+});
+
+const isShowLyricTypeSwitch = computed(() => {
+  return romalyric.value.length > 0 && tlyric.value.length > 0;
+});
+
+const lyricToShow = computed(() => {
+  return lyricType.value === 'translation'
+    ? lyricWithTranslation.value
+    : lyricWithRomaPronunciation.value;
+});
+
+const lyricWithTranslation = computed((): LyricItem[] => {
+  let ret: LyricItem[] = [];
+  // 空内容的去除
+  const lyricFiltered = lyric.value.filter(({ content }) =>
+    Boolean(content)
+  );
+  // content统一转换数组形式
+  if (lyricFiltered.length) {
+    lyricFiltered.forEach(l => {
+      const { rawTime, time, content } = l;
+      const lyricItem: LyricItem = { time, content, contents: [content] };
+      const sameTimeTLyric = tlyric.value.find(
+        ({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime
       );
-      // content统一转换数组形式
-      if (lyricFiltered.length) {
-        lyricFiltered.forEach(l => {
-          const { rawTime, time, content } = l;
-          const lyricItem = { time, content, contents: [content] };
-          const sameTimeTLyric = this.tlyric.find(
-            ({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime
-          );
-          if (sameTimeTLyric) {
-            const { content: tLyricContent } = sameTimeTLyric;
-            if (content) {
-              lyricItem.contents.push(tLyricContent);
-            }
-          }
-          ret.push(lyricItem);
-        });
-      } else {
-        ret = lyricFiltered.map(({ time, content }) => ({
-          time,
-          content,
-          contents: [content],
-        }));
-      }
-      return ret;
-    },
-    lyricWithRomaPronunciation() {
-      let ret = [];
-      // 空内容的去除
-      const lyricFiltered = this.lyric.filter(({ content }) =>
-        Boolean(content)
-      );
-      // content统一转换数组形式
-      if (lyricFiltered.length) {
-        lyricFiltered.forEach(l => {
-          const { rawTime, time, content } = l;
-          const lyricItem = { time, content, contents: [content] };
-          const sameTimeRomaLyric = this.romalyric.find(
-            ({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime
-          );
-          if (sameTimeRomaLyric) {
-            const { content: romaLyricContent } = sameTimeRomaLyric;
-            if (content) {
-              lyricItem.contents.push(romaLyricContent);
-            }
-          }
-          ret.push(lyricItem);
-        });
-      } else {
-        ret = lyricFiltered.map(({ time, content }) => ({
-          time,
-          content,
-          contents: [content],
-        }));
-      }
-      return ret;
-    },
-    lyricFontSize() {
-      return {
-        fontSize: `${this.settings.lyricFontSize || 28}px`,
-      };
-    },
-    noLyric() {
-      return this.lyric.length == 0;
-    },
-    artist() {
-      return this.currentTrack?.ar
-        ? this.currentTrack.ar[0]
-        : { id: 0, name: 'unknown' };
-    },
-    album() {
-      return this.currentTrack?.al || { id: 0, name: 'unknown' };
-    },
-    theme() {
-      return this.settings.lyricsBackground === true ? 'dark' : 'auto';
-    },
-  },
-  watch: {
-    currentTrack() {
-      this.getLyric();
-      this.getCoverColor();
-    },
-    showLyrics(show) {
-      if (show) this.setLyricsInterval();
-      else clearInterval(this.lyricsInterval);
-    },
-  },
-  created() {
-    this.getLyric();
-    this.getCoverColor();
-    this.initDate();
-    document.addEventListener('keydown', e => {
-      if (e.key === 'F11') {
-        e.preventDefault();
-        this.fullscreen();
-      }
-    });
-    document.addEventListener('fullscreenchange', () => {
-      this.isFullscreen = !!document.fullscreenElement;
-    });
-  },
-  beforeMount: function () {
-    if (this.timer) {
-      clearInterval(this.timer);
-    }
-  },
-  destroyed() {
-    clearInterval(this.lyricsInterval);
-  },
-  methods: {
-    ...mapActions(useStore, ['toggleLyrics', 'updateModal', 'likeATrack',  'fetchLikedPlaylist']),
-    initDate() {
-      var _this = this;
-      clearInterval(this.timer);
-      this.timer = setInterval(function () {
-        _this.date = _this.formatTime(new Date());
-      }, 1000);
-    },
-    formatTime(value) {
-      let hour = value.getHours().toString();
-      let minute = value.getMinutes().toString();
-      let second = value.getSeconds().toString();
-      return (
-        hour.padStart(2, '0') +
-        ':' +
-        minute.padStart(2, '0') +
-        ':' +
-        second.padStart(2, '0')
-      );
-    },
-    fullscreen() {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        document.documentElement.requestFullscreen();
-      }
-    },
-    addToPlaylist() {
-      if (!isAccountLoggedIn()) {
-        toast(this.$t('toast.needToLogin'));
-        return;
-      }
-      this.fetchLikedPlaylist();
-      this.updateModal({
-        modalName: 'addTrackToPlaylistModal',
-        key: 'show',
-        value: true,
-      });
-      this.updateModal({
-        modalName: 'addTrackToPlaylistModal',
-        key: 'selectedTrackID',
-        value: this.currentTrack?.id,
-      });
-    },
-    playPrevTrack() {
-      this.player.playPrevTrack();
-    },
-    playOrPause() {
-      this.player.playOrPause();
-    },
-    playNextTrack() {
-      if (this.player.isPersonalFM) {
-        this.player.playNextFMTrack();
-      } else {
-        this.player.playNextTrack();
-      }
-    },
-    getLyric() {
-      if (!this.currentTrack.id) return;
-      return api.track.getLyric(this.currentTrack.id).then(data => {
-        if (!data?.lrc?.lyric) {
-          this.lyric = [];
-          this.tlyric = [];
-          this.romalyric = [];
-          return false;
-        } else {
-          let { lyric, tlyric, romalyric } = lyricParser(data);
-          lyric = lyric.filter(
-            l => !/^作(词|曲)\s*(:|：)\s*无$/.exec(l.content)
-          );
-          let includeAM =
-            lyric.length <= 10 &&
-            lyric.map(l => l.content).includes('纯音乐，请欣赏');
-          if (includeAM) {
-            let reg = /^作(词|曲)\s*(:|：)\s*/;
-            let author = this.currentTrack?.ar[0]?.name;
-            lyric = lyric.filter(l => {
-              let regExpArr = l.content.match(reg);
-              return (
-                !regExpArr || l.content.replace(regExpArr[0], '') !== author
-              );
-            });
-          }
-          if (lyric.length === 1 && includeAM) {
-            this.lyric = [];
-            this.tlyric = [];
-            this.romalyric = [];
-            return false;
-          } else {
-            this.lyric = lyric;
-            this.tlyric = tlyric;
-            this.romalyric = romalyric;
-            if (tlyric.length * romalyric.length > 0) {
-              this.lyricType = 'translation';
-            } else {
-              this.lyricType =
-                lyric.length > 0 ? 'translation' : 'romaPronunciation';
-            }
-            return true;
-          }
+      if (sameTimeTLyric) {
+        const { content: tLyricContent } = sameTimeTLyric;
+        if (content) {
+          lyricItem.contents.push(tLyricContent);
         }
-      });
-    },
-    switchLyricType() {
-      this.lyricType =
-        this.lyricType === 'translation' ? 'romaPronunciation' : 'translation';
-    },
-    formatTrackTime(value) {
-      return formatTrackTime(value);
-    },
-    clickLyricLine(value, startPlay = false) {
-      // TODO: 双击选择还会选中文字，考虑搞个右键菜单复制歌词
-      let jumpFlag = false;
-      this.lyric.filter(function (item) {
-        if (item.content == '纯音乐，请欣赏') {
-          jumpFlag = true;
+      }
+      ret.push(lyricItem);
+    });
+  } else {
+    ret = lyricFiltered.map(({ time, content }) => ({
+      time,
+      content,
+      contents: [content],
+    }));
+  }
+  return ret;
+});
+
+const lyricWithRomaPronunciation = computed((): LyricItem[] => {
+  let ret: LyricItem[] = [];
+  // 空内容的去除
+  const lyricFiltered = lyric.value.filter(({ content }) =>
+    Boolean(content)
+  );
+  // content统一转换数组形式
+  if (lyricFiltered.length) {
+    lyricFiltered.forEach(l => {
+      const { rawTime, time, content } = l;
+      const lyricItem: LyricItem = { time, content, contents: [content] };
+      const sameTimeRomaLyric = romalyric.value.find(
+        ({ rawTime: tLyricRawTime }) => tLyricRawTime === rawTime
+      );
+      if (sameTimeRomaLyric) {
+        const { content: romaLyricContent } = sameTimeRomaLyric;
+        if (content) {
+          lyricItem.contents.push(romaLyricContent);
         }
-      });
-      if (window.getSelection().toString().length === 0 && !jumpFlag) {
-        this.player.seek(value);
       }
-      if (startPlay === true) {
-        this.player.play();
-      }
-    },
-    openLyricMenu(e, lyric, idx) {
-      this.rightClickLyric = { ...lyric, idx };
-      this.$refs.lyricMenu.openMenu(e);
+      ret.push(lyricItem);
+    });
+  } else {
+    ret = lyricFiltered.map(({ time, content }) => ({
+      time,
+      content,
+      contents: [content],
+    }));
+  }
+  return ret;
+});
+
+const lyricFontSize = computed(() => {
+  return {
+    fontSize: `${settings.lyricFontSize || 28}px`,
+  };
+});
+
+const noLyric = computed(() => {
+  return lyric.value.length === 0;
+});
+
+const artist = computed(() => {
+  return currentTrack.value?.ar
+    ? currentTrack.value.ar[0]
+    : { id: 0, name: 'unknown' };
+});
+
+const album = computed(() => {
+  return currentTrack.value?.al || { id: 0, name: 'unknown' };
+});
+
+const theme = computed(() => {
+  return settings.lyricsBackground === true ? 'dark' : 'auto';
+});
+
+// 监听器
+watch(currentTrack, () => {
+  getLyric();
+  getCoverColor();
+});
+
+watch(() => store.showLyrics, (show) => {
+  if (show) setLyricsInterval();
+  else if (lyricsInterval) clearInterval(lyricsInterval);
+});
+
+// 生命周期
+onMounted(() => {
+  getLyric();
+  getCoverColor();
+  initDate();
+  document.addEventListener('keydown', e => {
+    if (e.key === 'F11') {
       e.preventDefault();
-    },
-    copyLyric(withTranslation) {
-      if (this.rightClickLyric) {
-        const idx = this.rightClickLyric.idx;
-        if (!withTranslation) {
-          copyLyric(this.rightClickLyric.contents[idx]);
-        } else {
-          copyLyric(this.rightClickLyric.contents.join(' '));
-        }
-      }
-    },
-    setLyricsInterval() {
-      this.lyricsInterval = setInterval(() => {
-        const progress = this.player.seek(null, false) ?? 0;
-        let oldHighlightLyricIndex = this.highlightLyricIndex;
-        this.highlightLyricIndex = this.lyric.findIndex((l, index) => {
-          const nextLyric = this.lyric[index + 1];
+      fullscreen();
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    isFullscreen.value = !!document.fullscreenElement;
+  });
+});
+
+onBeforeUnmount(() => {
+  if (timer.value) {
+    clearInterval(timer.value);
+  }
+  if (lyricsInterval) {
+    clearInterval(lyricsInterval);
+  }
+});
+
+// 方法
+function formatTime(value: Date): string {
+  let hour = value.getHours().toString();
+  let minute = value.getMinutes().toString();
+  let second = value.getSeconds().toString();
+  return (
+    hour.padStart(2, '0') +
+    ':' +
+    minute.padStart(2, '0') +
+    ':' +
+    second.padStart(2, '0')
+  );
+}
+
+const initDate = () => {
+  if (timer.value) {
+    clearInterval(timer.value);
+  }
+  timer.value = setInterval(() => {
+    date.value = formatTime(new Date());
+  }, 1000);
+};
+
+const fullscreen = () => {
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    document.documentElement.requestFullscreen();
+  }
+};
+
+const addToPlaylist = () => {
+  if (!isAccountLoggedIn()) {
+    toast(t('toast.needToLogin'));
+    return;
+  }
+  fetchLikedPlaylist();
+  updateModal({
+    modalName: 'addTrackToPlaylistModal',
+    key: 'show',
+    value: true,
+  });
+  updateModal({
+    modalName: 'addTrackToPlaylistModal',
+    key: 'selectedTrackID',
+    value: currentTrack.value?.id,
+  });
+};
+
+const playPrevTrack = () => {
+  player.playPrevTrack();
+};
+
+const playOrPause = () => {
+  player.playOrPause();
+};
+
+const playNextTrack = () => {
+  if (player.isPersonalFM) {
+    player.playNextFMTrack();
+  } else {
+    player.playNextTrack();
+  }
+};
+
+const getLyric = () => {
+  if (!currentTrack.value.id) return;
+  return api.track.getLyric(currentTrack.value.id).then(data => {
+    if (!data?.lrc?.lyric) {
+      lyric.value = [];
+      tlyric.value = [];
+      romalyric.value = [];
+      return false;
+    } else {
+      let { lyric: parsedLyric, tlyric: parsedTLyric, romalyric: parsedRomaLyric } = lyricParser(data);
+      parsedLyric = parsedLyric.filter(
+        l => !/^作(词|曲)\s*(:|：)\s*无$/.exec(l.content)
+      );
+      let includeAM =
+        parsedLyric.length <= 10 &&
+        parsedLyric.map(l => l.content).includes('纯音乐，请欣赏');
+      if (includeAM) {
+        let reg = /^作(词|曲)\s*(:|：)\s*/;
+        let author = currentTrack.value?.ar[0]?.name;
+        parsedLyric = parsedLyric.filter(l => {
+          let regExpArr = l.content.match(reg);
           return (
-            progress >= l.time && (nextLyric ? progress < nextLyric.time : true)
+            !regExpArr || l.content.replace(regExpArr[0], '') !== author
           );
         });
-        if (oldHighlightLyricIndex !== this.highlightLyricIndex) {
-          const el = document.getElementById(`line${this.highlightLyricIndex}`);
-          if (el)
-            el.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            });
+      }
+      if (parsedLyric.length === 1 && includeAM) {
+        lyric.value = [];
+        tlyric.value = [];
+        romalyric.value = [];
+        return false;
+      } else {
+        lyric.value = parsedLyric;
+        tlyric.value = parsedTLyric;
+        romalyric.value = parsedRomaLyric;
+        if (parsedTLyric.length * parsedRomaLyric.length > 0) {
+          lyricType.value = 'translation';
+        } else {
+          lyricType.value =
+            parsedLyric.length > 0 ? 'translation' : 'romaPronunciation';
         }
-      }, 50);
-    },
-    moveToFMTrash() {
-      this.player.moveToFMTrash();
-    },
-    switchRepeatMode() {
-      this.player.switchRepeatMode();
-    },
-    switchShuffle() {
-      this.player.switchShuffle();
-    },
-    getCoverColor() {
-      if (this.settings.lyricsBackground !== true) return;
-      const cover = this.currentTrack.al?.picUrl + '?param=256y256';
-      Vibrant.from(cover, { colorCount: 1 })
-        .getPalette()
-        .then(palette => {
-          const originColor = Color.rgb(palette.DarkMuted._rgb);
-          const color = originColor.darken(0.1).rgb().string();
-          const color2 = originColor.lighten(0.28).rotate(-30).rgb().string();
-          this.background = `linear-gradient(to top left, ${color}, ${color2})`;
+        return true;
+      }
+    }
+  });
+};
+
+const switchLyricType = () => {
+  lyricType.value =
+    lyricType.value === 'translation' ? 'romaPronunciation' : 'translation';
+};
+
+const clickLyricLine = (value: number, startPlay = false) => {
+  // TODO: 双击选择还会选中文字，考虑搞个右键菜单复制歌词
+  let jumpFlag = false;
+  lyric.value.filter(function (item) {
+    if (item.content == '纯音乐，请欣赏') {
+      jumpFlag = true;
+    }
+  });
+  if (window.getSelection()?.toString().length === 0 && !jumpFlag) {
+    player.seek(value);
+  }
+  if (startPlay === true) {
+    player.play();
+  }
+};
+
+const openLyricMenu = (e: MouseEvent, lyricItem: LyricItem, idx: number) => {
+  rightClickLyric.value = { ...lyricItem, idx };
+  lyricMenu.value?.openMenu(e);
+  e.preventDefault();
+};
+
+const copyLyric = (withTranslation: boolean) => {
+  if (rightClickLyric.value) {
+    const idx = rightClickLyric.value.idx;
+    if (!withTranslation) {
+      copyLyricUtil(rightClickLyric.value.contents[idx]);
+    } else {
+      copyLyricUtil(rightClickLyric.value.contents.join(' '));
+    }
+  }
+};
+
+const setLyricsInterval = () => {
+  lyricsInterval = setInterval(() => {
+    const progress = player.seek(null) ?? 0;
+    let oldHighlightLyricIndex = highlightLyricIndex.value;
+    highlightLyricIndex.value = lyric.value.findIndex((l, index) => {
+      const nextLyric = lyric.value[index + 1];
+      return (
+        progress >= l.time && (nextLyric ? progress < nextLyric.time : true)
+      );
+    });
+    if (oldHighlightLyricIndex !== highlightLyricIndex.value) {
+      const el = document.getElementById(`line${highlightLyricIndex.value}`);
+      if (el)
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
         });
-    },
-    hasList() {
-      return hasListSource();
-    },
-    getListPath() {
-      return getListSourcePath();
-    },
-    mute() {
-      this.player.mute();
-    },
-  },
+    }
+  }, 50);
+};
+
+const moveToFMTrash = () => {
+  player.moveToFMTrash();
+};
+
+const switchRepeatMode = () => {
+  player.switchRepeatMode();
+};
+
+const switchShuffle = () => {
+  player.switchShuffle();
+};
+
+const getCoverColor = () => {
+  if (settings.lyricsBackground !== true) return;
+  const cover = currentTrack.value.al?.picUrl + '?param=256y256';
+  Vibrant.from(cover, { colorCount: 1 })
+    .getPalette()
+    .then(palette => {
+      const originColor = Color.rgb(palette.DarkMuted._rgb);
+      const color = originColor.darken(0.1).rgb().string();
+      const color2 = originColor.lighten(0.28).rotate(-30).rgb().string();
+      background.value = `linear-gradient(to top left, ${color}, ${color2})`;
+    });
+};
+
+const hasList = () => {
+  return hasListSource();
+};
+
+const getListPath = () => {
+  return getListSourcePath();
+};
+
+const mute = () => {
+  player.mute();
 };
 </script>
 

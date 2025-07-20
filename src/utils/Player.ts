@@ -222,7 +222,7 @@ export default class Player {
       this._personalFMNextTrack.id === 0 ||
       this._personalFMTrack.id === this._personalFMNextTrack.id
     ) {
-      personalFM().then(result => {
+      api.others.personalFM().then(result => {
         this._personalFMTrack = result.data[0];
         this._personalFMNextTrack = result.data[1];
         return this._personalFMTrack;
@@ -843,7 +843,7 @@ export default class Player {
     }
   }
   playAlbumByID(id: number, trackID: number | 'first' = 'first') {
-    getAlbum(id).then(data => {
+    api.album.getAlbum(id).then(data => {
       let trackIDs = data.songs.map(t => t.id);
       this.replacePlaylist(trackIDs, id, 'album', trackID);
     });
@@ -852,13 +852,13 @@ export default class Player {
     console.debug(
       `[debug][Player.js] playPlaylistByID 👉 id:${id} trackID:${trackID} noCache:${noCache}`
     );
-    getPlaylistDetail(id, noCache).then(data => {
+    api.playlist.getPlaylistDetail(id, noCache).then(data => {
       let trackIDs = data.playlist.trackIds.map(t => t.id);
       this.replacePlaylist(trackIDs, id, 'playlist', trackID);
     });
   }
   playArtistByID(id: number, trackID: number | 'first' = 'first') {
-    getArtist(id).then(data => {
+    api.artist.getArtist(id).then(data => {
       let trackIDs = data.hotSongs.map(t => t.id);
       this.replacePlaylist(trackIDs, id, 'artist', trackID);
     });
@@ -870,12 +870,12 @@ export default class Player {
     this._replaceCurrentTrack(id);
   }
   playIntelligenceListById(id: number, trackID: number | 'first' = 'first', noCache: boolean = false) {
-    getPlaylistDetail(id, noCache).then(data => {
+    api.playlist.getPlaylistDetail(id, noCache).then(data => {
       const randomId = Math.floor(
         Math.random() * (data.playlist.trackIds.length + 1)
       );
       const songId = data.playlist.trackIds[randomId].id;
-      intelligencePlaylist({ id: songId, pid: id }).then(result => {
+      api.playlist.intelligencePlaylist({ id: songId, pid: id }).then(result => {
         let trackIDs = result.data.map(t => t.id);
         this.replacePlaylist(trackIDs, id, 'playlist', trackID);
       });
@@ -900,7 +900,7 @@ export default class Player {
     this._isPersonalFM = true;
     let id = this._personalFMTrack.id;
     if (await this.playNextFMTrack()) {
-      fmTrash(id);
+      api.others.fmTrash(id);
     }
   }
 
