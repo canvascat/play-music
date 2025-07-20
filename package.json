@@ -58,6 +58,7 @@
     "@types/howler": "^2.2.12",
     "@types/node": "^24.0.13",
     "@vitejs/plugin-vue": "^6.0.0",
+    "@vitejs/plugin-vue-jsx": "^5.0.1",
     "@vue/tsconfig": "^0.7.0",
     "glob": "^11.0.3",
     "sass": "^1.26.11",

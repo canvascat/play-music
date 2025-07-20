@@ -19,7 +19,11 @@
     "allowJs": true,
     "checkJs": false,
     "noImplicitAny": false, 
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    
+    /* JSX Support */
+    "jsx": "preserve",
+    "jsxImportSource": "vue"
   },
   "include": [
     "src/**/*.ts",
