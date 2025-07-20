@@ -3,8 +3,8 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   artists: any[];
-  exclude: string;
-  prefix: string;
+  exclude?: string;
+  prefix?: string;
 }>();
 
 const filteredArtists = computed(() => {

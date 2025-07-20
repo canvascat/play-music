@@ -1,22 +1,15 @@
 <template>
   <div v-show="show" ref="library">
     <h1>
-      <img
-        class="avatar"
-        :src="resizeImage(data.user.avatarUrl)"
-        loading="lazy"
-      />{{ data.user.nickname }}{{ $t('library.sLibrary') }}
+      <img class="avatar" :src="resizeImage(data.user.avatarUrl)" loading="lazy" />{{ data.user.nickname }}{{
+        $t('library.sLibrary') }}
     </h1>
     <div class="section-one">
       <div class="liked-songs" @click="goToLikedSongsList">
         <div class="top">
           <p>
-            <span
-              v-for="(line, index) in pickedLyric"
-              v-show="line !== ''"
-              :key="`${line}${index}`"
-              >{{ line }}<br
-            /></span>
+            <span v-for="(line, index) in pickedLyric" v-show="line !== ''" :key="`${line}${index}`">{{ line
+              }}<br /></span>
           </p>
         </div>
         <div class="bottom">
@@ -26,30 +19,36 @@
               {{ liked.songs.length }} {{ $t('common.songs') }}
             </div>
           </div>
-          <button @click.stop="openPlayModeTabMenu">
-            <svg-icon icon-class="play" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger @click.stop as-child>
+              <button>
+                <svg-icon icon-class="play" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem @click="playLikedSongs">{{ $t('library.likedSongs') }}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem @click="playIntelligenceList">{{
+                $t('contextMenu.cardiacMode')
+                }}</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <div class="songs">
-        <TrackList
-          :id="liked.playlists.length > 0 ? liked.playlists[0].id : 0"
-          :tracks="liked.songsWithDetails"
-          :column-number="3"
-          type="tracklist"
-          dbclick-track-func="playPlaylistByID"
-        />
+        <TrackList :id="liked.playlists.length > 0 ? liked.playlists[0].id : 0" :tracks="liked.songsWithDetails"
+          :column-number="3" type="tracklist" dbclick-track-func="playPlaylistByID"
+          :album-object="{ artist: { name: '' } }" :extra-context-menu-item="[]" :highlight-playing-track="true"
+          item-key="id" />
       </div>
     </div>
 
     <div class="section-two">
       <div class="tabs-row">
         <div class="tabs">
-          <div
-            class="tab dropdown"
-            :class="{ active: currentTab === 'playlists' }"
-            @click="updateCurrentTab('playlists')"
-          >
+          <div class="tab dropdown" :class="{ active: currentTab === 'playlists' }"
+            @click="updateCurrentTab('playlists')">
             <span class="text">{{
               {
                 all: $t('contextMenu.allPlaylists'),
@@ -57,86 +56,62 @@
                 liked: $t('contextMenu.likedPlaylists'),
               }[playlistFilter]
             }}</span>
-            <span class="icon" @click.stop="openPlaylistTabMenu"
-              ><svg-icon icon-class="dropdown"
-            /></span>
+            <DropdownMenu>
+              <DropdownMenuTrigger @click.stop as-child>
+                <span class="icon"><svg-icon icon-class="dropdown" /></span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem @click="changePlaylistFilter('all')">{{
+                  $t('contextMenu.allPlaylists')
+                  }}</DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem @click="changePlaylistFilter('mine')">{{
+                  $t('contextMenu.minePlaylists')
+                  }}</DropdownMenuItem>
+                <DropdownMenuItem @click="changePlaylistFilter('liked')">{{
+                  $t('contextMenu.likedPlaylists')
+                  }}</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
           </div>
-          <div
-            class="tab"
-            :class="{ active: currentTab === 'albums' }"
-            @click="updateCurrentTab('albums')"
-          >
+          <div class="tab" :class="{ active: currentTab === 'albums' }" @click="updateCurrentTab('albums')">
             {{ $t('library.albums') }}
           </div>
-          <div
-            class="tab"
-            :class="{ active: currentTab === 'artists' }"
-            @click="updateCurrentTab('artists')"
-          >
+          <div class="tab" :class="{ active: currentTab === 'artists' }" @click="updateCurrentTab('artists')">
             {{ $t('library.artists') }}
           </div>
-          <div
-            class="tab"
-            :class="{ active: currentTab === 'mvs' }"
-            @click="updateCurrentTab('mvs')"
-          >
+          <div class="tab" :class="{ active: currentTab === 'mvs' }" @click="updateCurrentTab('mvs')">
             {{ $t('library.mvs') }}
           </div>
-          <div
-            class="tab"
-            :class="{ active: currentTab === 'cloudDisk' }"
-            @click="updateCurrentTab('cloudDisk')"
-          >
+          <div class="tab" :class="{ active: currentTab === 'cloudDisk' }" @click="updateCurrentTab('cloudDisk')">
             {{ $t('library.cloudDisk') }}
           </div>
-          <div
-            class="tab"
-            :class="{ active: currentTab === 'playHistory' }"
-            @click="updateCurrentTab('playHistory')"
-          >
+          <div class="tab" :class="{ active: currentTab === 'playHistory' }" @click="updateCurrentTab('playHistory')">
             {{ $t('library.playHistory.title') }}
           </div>
         </div>
-        <button
-          v-show="currentTab === 'playlists'"
-          class="tab-button"
-          @click="openAddPlaylistModal"
-          ><svg-icon icon-class="plus" />{{ $t('library.newPlayList') }}
+        <button v-show="currentTab === 'playlists'" class="tab-button" @click="openAddPlaylistModal"><svg-icon
+            icon-class="plus" />{{ $t('library.newPlayList') }}
         </button>
-        <button
-          v-show="currentTab === 'cloudDisk'"
-          class="tab-button"
-          @click="selectUploadFiles"
-          ><svg-icon icon-class="arrow-up-alt" />{{ $t('library.uploadSongs') }}
+        <button v-show="currentTab === 'cloudDisk'" class="tab-button" @click="selectUploadFiles"><svg-icon
+            icon-class="arrow-up-alt" />{{ $t('library.uploadSongs') }}
         </button>
       </div>
 
       <div v-show="currentTab === 'playlists'">
         <div v-if="liked.playlists.length > 1">
-          <CoverRow
-            :items="filterPlaylists"
-            type="playlist"
-            sub-text="creator"
-            :show-play-button="true"
-          />
+          <CoverRow :items="filterPlaylists" type="playlist" sub-text="creator" :show-play-button="true" />
         </div>
       </div>
 
       <div v-show="currentTab === 'albums'">
-        <CoverRow
-          :items="liked.albums"
-          type="album"
-          sub-text="artist"
-          :show-play-button="true"
-        />
+        <CoverRow :items="liked.albums" type="album" sub-text="artist" :show-play-button="true" />
       </div>
 
       <div v-show="currentTab === 'artists'">
-        <CoverRow
-          :items="liked.artists"
-          type="artist"
-          :show-play-button="true"
-        />
+        <CoverRow :items="liked.artists" type="artist" :show-play-button="true" />
       </div>
 
       <div v-show="currentTab === 'mvs'">
@@ -144,90 +119,66 @@
       </div>
 
       <div v-show="currentTab === 'cloudDisk'">
-        <TrackList
-          :id="-8"
-          :tracks="liked.cloudDisk"
-          :column-number="3"
-          type="cloudDisk"
-          dbclick-track-func="playCloudDisk"
-          :extra-context-menu-item="['removeTrackFromCloudDisk']"
-        />
+        <TrackList :id="-8" :tracks="liked.cloudDisk" :column-number="3" type="cloudDisk"
+          dbclick-track-func="playCloudDisk" :extra-context-menu-item="['removeTrackFromCloudDisk']"
+          :album-object="{ artist: { name: '' } }" :highlight-playing-track="true" item-key="id" />
       </div>
 
       <div v-show="currentTab === 'playHistory'">
-        <button
-          :class="{
-            'playHistory-button': true,
-            'playHistory-button--selected': playHistoryMode === 'week',
-          }"
-          @click="playHistoryMode = 'week'"
-        >
+        <button :class="{
+          'playHistory-button': true,
+          'playHistory-button--selected': playHistoryMode === 'week',
+        }" @click="playHistoryMode = 'week'">
           {{ $t('library.playHistory.week') }}
         </button>
-        <button
-          :class="{
-            'playHistory-button': true,
-            'playHistory-button--selected': playHistoryMode === 'all',
-          }"
-          @click="playHistoryMode = 'all'"
-        >
+        <button :class="{
+          'playHistory-button': true,
+          'playHistory-button--selected': playHistoryMode === 'all',
+        }" @click="playHistoryMode = 'all'">
           {{ $t('library.playHistory.all') }}
         </button>
-        <TrackList
-          :tracks="playHistoryList"
-          :column-number="1"
-          type="tracklist"
-        />
+        <TrackList :tracks="playHistoryList" :column-number="1" type="tracklist" :id="0" dbclick-track-func="default"
+          :album-object="{ artist: { name: '' } }" :extra-context-menu-item="[]" :highlight-playing-track="true"
+          item-key="id" />
       </div>
     </div>
 
-    <input
-      ref="cloudDiskUploadInput"
-      type="file"
-      style="display: none"
-      @change="uploadSongToCloudDisk"
-    />
-
-    <ContextMenu ref="playlistTabMenu">
-      <div class="item" @click="changePlaylistFilter('all')">{{
-        $t('contextMenu.allPlaylists')
-      }}</div>
-      <hr />
-      <div class="item" @click="changePlaylistFilter('mine')">{{
-        $t('contextMenu.minePlaylists')
-      }}</div>
-      <div class="item" @click="changePlaylistFilter('liked')">{{
-        $t('contextMenu.likedPlaylists')
-      }}</div>
-    </ContextMenu>
-
-    <ContextMenu ref="playModeTabMenu">
-      <div class="item" @click="playLikedSongs">{{
-        $t('library.likedSongs')
-      }}</div>
-      <hr />
-      <div class="item" @click="playIntelligenceList">{{
-        $t('contextMenu.cardiacMode')
-      }}</div>
-    </ContextMenu>
+    <input ref="cloudDiskUploadInput" type="file" style="display: none" @change="uploadSongToCloudDisk" />
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'pinia';
+<script setup lang="ts">
+import { ref, computed, onMounted, onActivated } from 'vue';
+import { useRouter } from 'vue-router';
 import { useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import * as api from '@/api';
 import NProgress from 'nprogress';
 import { resizeImage } from '@/utils/filters';
-import { toast } from 'vue-sonner'
+import { toast } from 'vue-sonner';
+import { randomInt } from 'es-toolkit';
+import { useI18n } from 'vue-i18n';
 
-import ContextMenu from '@/components/ContextMenu.vue';
 import TrackList from '@/components/TrackList.vue';
 import CoverRow from '@/components/CoverRow.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
 import MvRow from '@/components/MvRow.vue';
-import { randomInt } from 'es-toolkit';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+
+// 定义接口
+interface Playlist {
+  id: number;
+  creator: {
+    userId: number;
+  };
+  [key: string]: any;
+}
+
+interface CloudDiskItem {
+  songId: number;
+  songName: string;
+  [key: string]: any;
+}
 
 /**
  * Pick the lyric part from a string formed in `[timecode] lyric`.
@@ -235,185 +186,205 @@ import { randomInt } from 'es-toolkit';
  * @param {string} rawLyric The raw lyric string formed in `[timecode] lyric`
  * @returns {string} The lyric part
  */
-function extractLyricPart(rawLyric) {
-  return rawLyric.split(']').pop().trim();
+function extractLyricPart(rawLyric: string): string {
+  return rawLyric.split(']').pop()?.trim() || '';
 }
 
-export default {
-  name: 'Library',
-  components: { SvgIcon, CoverRow, TrackList, MvRow, ContextMenu },
-  data() {
-    return {
-      show: false,
-      likedSongs: [],
-      lyric: undefined,
-      currentTab: 'playlists',
-      playHistoryMode: 'week',
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['data', 'liked']),
-    /**
-     * @returns {string[]}
-     */
-    pickedLyric() {
-      /** @type {string?} */
-      const lyric = this.lyric;
+const router = useRouter();
+const { t } = useI18n();
+const {
+  data,
+  liked,
+  player,
+  updateModal,
+  updateData,
+  fetchLikedSongsWithDetails,
+  fetchLikedSongs,
+  fetchLikedPlaylist,
+  fetchLikedAlbums,
+  fetchLikedArtists,
+  fetchLikedMVs,
+  fetchCloudDisk,
+  fetchPlayHistory,
+  updateLikedXXX
+} = useStore();
 
-      // Returns [] if we got no lyrics.
-      if (!lyric) return [];
+// 响应式数据
+const show = ref(false);
 
-      const lyricLine = lyric
+const lyric = ref<string>();
+const currentTab = ref('playlists');
+const playHistoryMode = ref<'week' | 'all'>('week');
+const library = ref<HTMLElement>();
+const cloudDiskUploadInput = ref<HTMLInputElement>();
+
+// 计算属性
+const pickedLyric = computed((): string[] => {
+  // Returns [] if we got no lyrics.
+  if (!lyric.value) return [];
+
+  const lyricLine = lyric.value
+    .split('\n')
+    .filter(line => !line.includes('作词') && !line.includes('作曲'));
+
+  // Pick 3 or fewer lyrics based on the lyric lines.
+  const lyricsToPick = Math.min(lyricLine.length, 3);
+
+  // The upperBound of the lyric line to pick
+  const randomUpperBound = lyricLine.length - lyricsToPick;
+  const startLyricLineIndex = randomInt(0, randomUpperBound - 1);
+
+  // Pick lyric lines to render.
+  return lyricLine
+    .slice(startLyricLineIndex, startLyricLineIndex + lyricsToPick)
+    .map(extractLyricPart);
+});
+
+const playlistFilter = computed(() => {
+  return data.libraryPlaylistFilter || 'all';
+});
+
+const filterPlaylists = computed((): Playlist[] => {
+  const playlists = liked.playlists.slice(1);
+  const userId = data.user.userId;
+  if (playlistFilter.value === 'mine') {
+    return playlists.filter(p => p.creator.userId === userId);
+  } else if (playlistFilter.value === 'liked') {
+    return playlists.filter(p => p.creator.userId !== userId);
+  }
+  return playlists;
+});
+
+const playHistoryList = computed(() => {
+  if (show.value && playHistoryMode.value === 'week') {
+    return liked.playHistory.weekData;
+  }
+  if (show.value && playHistoryMode.value === 'all') {
+    return liked.playHistory.allData;
+  }
+  return [];
+});
+
+// 生命周期
+onMounted(() => {
+  setTimeout(() => {
+    if (!show.value) NProgress.start();
+  }, 1000);
+  loadData();
+});
+
+onActivated(() => {
+  // this.$parent.$refs.scrollbar.restorePosition();
+  loadData();
+});
+
+// 方法
+const loadData = () => {
+  if (liked.songsWithDetails.length > 0) {
+    NProgress.done();
+    show.value = true;
+    fetchLikedSongsWithDetails();
+    getRandomLyric();
+  } else {
+    fetchLikedSongsWithDetails().then(() => {
+      NProgress.done();
+      show.value = true;
+      getRandomLyric();
+    });
+  }
+  fetchLikedSongs();
+  fetchLikedPlaylist();
+  fetchLikedAlbums();
+  fetchLikedArtists();
+  fetchLikedMVs();
+  fetchCloudDisk();
+  fetchPlayHistory();
+};
+
+const playLikedSongs = () => {
+  player.playPlaylistByID(
+    liked.playlists[0].id,
+    'first',
+    true
+  );
+};
+
+const playIntelligenceList = () => {
+  player.playIntelligenceListById(
+    liked.playlists[0].id,
+    'first',
+    true
+  );
+};
+
+const updateCurrentTab = (tab: string) => {
+  if (!isAccountLoggedIn() && tab !== 'playlists') {
+    toast(t('toast.needToLogin'));
+    return;
+  }
+  currentTab.value = tab;
+  // TODO scrollTo({ top: 375, behavior: 'smooth' });
+};
+
+const goToLikedSongsList = () => {
+  router.push({ path: '/library/liked-songs' });
+};
+
+const getRandomLyric = () => {
+  if (liked.songs.length === 0) return;
+  api.track.getLyric(
+    liked.songs[randomInt(0, liked.songs.length - 1)]
+  ).then(data => {
+    if (data.lrc !== undefined) {
+      const isInstrumental = data.lrc.lyric
         .split('\n')
-        .filter(line => !line.includes('作词') && !line.includes('作曲'));
+        .filter(l => l.includes('纯音乐，请欣赏'));
+      if (isInstrumental.length === 0) {
+        lyric.value = data.lrc.lyric;
+      }
+    }
+  });
+};
 
-      // Pick 3 or fewer lyrics based on the lyric lines.
-      const lyricsToPick = Math.min(lyricLine.length, 3);
+const openAddPlaylistModal = () => {
+  if (!isAccountLoggedIn()) {
+    toast(t('toast.needToLogin'));
+    return;
+  }
+  updateModal({
+    modalName: 'newPlaylistModal',
+    key: 'show',
+    value: true,
+  });
+};
 
-      // The upperBound of the lyric line to pick
-      const randomUpperBound = lyricLine.length - lyricsToPick;
-      const startLyricLineIndex = randomInt(0, randomUpperBound - 1);
 
-      // Pick lyric lines to render.
-      return lyricLine
-        .slice(startLyricLineIndex, startLyricLineIndex + lyricsToPick)
-        .map(extractLyricPart);
-    },
-    playlistFilter() {
-      return this.data.libraryPlaylistFilter || 'all';
-    },
-    filterPlaylists() {
-      const playlists = this.liked.playlists.slice(1);
-      const userId = this.data.user.userId;
-      if (this.playlistFilter === 'mine') {
-        return playlists.filter(p => p.creator.userId === userId);
-      } else if (this.playlistFilter === 'liked') {
-        return playlists.filter(p => p.creator.userId !== userId);
-      }
-      return playlists;
-    },
-    playHistoryList() {
-      if (this.show && this.playHistoryMode === 'week') {
-        return this.liked.playHistory.weekData;
-      }
-      if (this.show && this.playHistoryMode === 'all') {
-        return this.liked.playHistory.allData;
-      }
-      return [];
-    },
-  },
-  created() {
-    setTimeout(() => {
-      if (!this.show) NProgress.start();
-    }, 1000);
-    this.loadData();
-  },
-  activated() {
-    // this.$parent.$refs.scrollbar.restorePosition();
-    this.loadData();
-  },
-  methods: {
-    resizeImage,
-    ...mapActions(useStore, ['updateModal', 'updateData', 'fetchLikedSongsWithDetails', 'fetchLikedSongs', 'fetchLikedPlaylist', 'fetchLikedAlbums', 'fetchLikedArtists', 'fetchLikedMVs', 'fetchCloudDisk', 'fetchPlayHistory', 'updateLikedXXX'  ]),
-    loadData() {
-      if (this.liked.songsWithDetails.length > 0) {
-        NProgress.done();
-        this.show = true;
-        this.fetchLikedSongsWithDetails();
-        this.getRandomLyric();
-      } else {
-        this.fetchLikedSongsWithDetails().then(() => {
-          NProgress.done();
-          this.show = true;
-          this.getRandomLyric();
-        });
-      }
-      this.fetchLikedSongs();
-      this.fetchLikedPlaylist();
-      this.fetchLikedAlbums();
-      this.fetchLikedArtists();
-      this.fetchLikedMVs();
-      this.fetchCloudDisk();
-      this.fetchPlayHistory();
-    },
-    playLikedSongs() {
-      this.player.playPlaylistByID(
-        this.liked.playlists[0].id,
-        'first',
-        true
-      );
-    },
-    playIntelligenceList() {
-      this.player.playIntelligenceListById(
-        this.liked.playlists[0].id,
-        'first',
-        true
-      );
-    },
-    updateCurrentTab(tab) {
-      if (!isAccountLoggedIn() && tab !== 'playlists') {
-        toast(this.$t('toast.needToLogin'));
-        return;
-      }
-      this.currentTab = tab;
-      // TODO scrollTo({ top: 375, behavior: 'smooth' });
-    },
-    goToLikedSongsList() {
-      this.$router.push({ path: '/library/liked-songs' });
-    },
-    getRandomLyric() {
-      if (this.liked.songs.length === 0) return;
-      api.track.getLyric(
-        this.liked.songs[randomInt(0, this.liked.songs.length - 1)]
-      ).then(data => {
-        if (data.lrc !== undefined) {
-          const isInstrumental = data.lrc.lyric
-            .split('\n')
-            .filter(l => l.includes('纯音乐，请欣赏'));
-          if (isInstrumental.length === 0) {
-            this.lyric = data.lrc.lyric;
-          }
-        }
+
+
+const changePlaylistFilter = (type: string) => {
+  updateData({ key: 'libraryPlaylistFilter', value: type });
+  window.scrollTo({ top: 375, behavior: 'smooth' });
+};
+
+const selectUploadFiles = () => {
+  cloudDiskUploadInput.value?.click();
+};
+
+const uploadSongToCloudDisk = (e: Event) => {
+  const target = e.target as HTMLInputElement;
+  const files = target.files;
+  if (!files || files.length === 0) return;
+
+  api.user.uploadSong(files[0]).then(result => {
+    if (result.code === 200) {
+      let newCloudDisk = liked.cloudDisk;
+      newCloudDisk.unshift(result.privateCloud);
+      updateLikedXXX({
+        name: 'cloudDisk',
+        data: newCloudDisk,
       });
-    },
-    openAddPlaylistModal() {
-      if (!isAccountLoggedIn()) {
-        toast(this.$t('toast.needToLogin'));
-        return;
-      }
-      this.updateModal({
-        modalName: 'newPlaylistModal',
-        key: 'show',
-        value: true,
-      });
-    },
-    openPlaylistTabMenu(e) {
-      this.$refs.playlistTabMenu.openMenu(e);
-    },
-    openPlayModeTabMenu(e) {
-      this.$refs.playModeTabMenu.openMenu(e);
-    },
-    changePlaylistFilter(type) {
-      this.updateData({ key: 'libraryPlaylistFilter', value: type });
-      window.scrollTo({ top: 375, behavior: 'smooth' });
-    },
-    selectUploadFiles() {
-      this.$refs.cloudDiskUploadInput.click();
-    },
-    uploadSongToCloudDisk(e) {
-      const files = e.target.files;
-      api.user.uploadSong(files[0]).then(result => {
-        if (result.code === 200) {
-          let newCloudDisk = this.liked.cloudDisk;
-          newCloudDisk.unshift(result.privateCloud);
-          this.updateLikedXXX({
-            name: 'cloudDisk',
-            data: newCloudDisk,
-          });
-        }
-      });
-    },
-  },
+    }
+  });
 };
 </script>
 
@@ -423,6 +394,7 @@ h1 {
   color: var(--color-text);
   display: flex;
   align-items: center;
+
   .avatar {
     height: 44px;
     margin-right: 12px;
@@ -435,6 +407,7 @@ h1 {
 .section-one {
   display: flex;
   margin-top: 24px;
+
   .songs {
     flex: 7;
     margin-top: 8px;
@@ -466,6 +439,7 @@ h1 {
       font-size: 24px;
       font-weight: 700;
     }
+
     .sub-title {
       font-size: 15px;
       margin-top: 2px;
@@ -490,10 +464,12 @@ h1 {
         height: 16px;
         width: 16px;
       }
+
       &:hover {
         transform: scale(1.06);
         box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.4);
       }
+
       &:active {
         transform: scale(0.94);
       }
@@ -507,6 +483,7 @@ h1 {
     font-size: 14px;
     opacity: 0.88;
     color: var(--color-primary);
+
     p {
       margin-top: 2px;
     }
@@ -529,6 +506,7 @@ h1 {
   flex-wrap: wrap;
   font-size: 18px;
   color: var(--color-text);
+
   .tab {
     font-weight: 600;
     padding: 8px 14px;
@@ -538,28 +516,34 @@ h1 {
     user-select: none;
     transition: 0.2s;
     opacity: 0.68;
+
     &:hover {
       opacity: 0.88;
       background-color: var(--color-secondary-bg);
     }
   }
+
   .tab.active {
     opacity: 0.88;
     background-color: var(--color-secondary-bg);
   }
+
   .tab.dropdown {
     display: flex;
     align-items: center;
     padding: 0;
     overflow: hidden;
+
     .text {
       padding: 8px 3px 8px 14px;
     }
+
     .icon {
       height: 100%;
       display: flex;
       align-items: center;
       padding: 0 8px 0 3px;
+
       .svg-icon {
         height: 16px;
         width: 16px;
@@ -578,15 +562,18 @@ button.tab-button {
   transition: 0.2s;
   opacity: 0.68;
   font-weight: 500;
+
   .svg-icon {
     width: 14px;
     height: 14px;
     margin-right: 8px;
   }
+
   &:hover {
     opacity: 1;
     background: var(--color-secondary-bg);
   }
+
   &:active {
     opacity: 1;
     transform: scale(0.92);
@@ -603,10 +590,12 @@ button.playHistory-button {
   opacity: 0.68;
   font-weight: 500;
   cursor: pointer;
+
   &:hover {
     opacity: 1;
     background: var(--color-secondary-bg);
   }
+
   &:active {
     transform: scale(0.95);
   }
@@ -617,6 +606,7 @@ button.playHistory-button--selected {
   background: var(--color-secondary-bg);
   opacity: 1;
   font-weight: 700;
+
   &:active {
     transform: none;
   }

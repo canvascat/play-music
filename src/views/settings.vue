@@ -613,6 +613,7 @@ import { toast } from 'vue-sonner'
 import { ref, computed, onActivated } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { isLinux } from '@/utils/platform';
 
 const i18n = useI18n();
 const validShortcutCodes = ['=', '-', '~', '[', ']', ';', "'", ',', '.', '/'];
@@ -641,7 +642,7 @@ const recordedShortcut = ref<KeyboardEvent[]>([]);
 const { player, settings, data, lastfm } = useStore()
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
-const isLinux = process.platform === 'linux';
+ 
 const version = pkg.version;
 
 const {
