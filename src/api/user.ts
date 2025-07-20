@@ -1,5 +1,6 @@
 import request, { noCacheParams } from '@/utils/request';
 import * as NCMAPI from './NCMAPI';
+import type { UserAccountResponse } from '@/types';
 
 /**
  * 获取用户详情
@@ -18,7 +19,7 @@ export function userDetail(uid: NCMAPI.user_detail[0]['uid']) {
  * 获取账号详情
  * 说明 : 登录后调用此接口 ,可获取用户账号信息
  */
-export function userAccount() {
+export function userAccount(): Promise<UserAccountResponse> {
   return request({
     url: '/user/account',
     method: 'get',

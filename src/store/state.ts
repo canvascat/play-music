@@ -3,6 +3,7 @@ import pkg from '../../package.json';
 import updateApp from '@/utils/updateApp';
 
 import Player from '@/utils/Player';
+import type { DataStore } from './type';
 
 if (localStorage.getItem('appVersion') === null) {
   localStorage.setItem('settings', JSON.stringify(initLocalStorage.settings));
@@ -13,24 +14,25 @@ if (localStorage.getItem('appVersion') === null) {
 updateApp();
 
 
-const player = new Proxy(new Player(), {
-  set(target, prop, val) {
-    // console.log({ prop, val });
-    target[prop] = val;
-    if (prop === '_howler') return true;
-    target.saveSelfToLocalStorage();
-    target.sendSelfToIpcMain();
-    return true;
-  },
-});
+const player = new Player()
+// new Proxy(new Player(), {
+//   set(target, prop, val) {
+//     // console.log({ prop, val });
+//     target[prop] = val;
+//     if (prop === '_howler') return true;
+//     target.saveSelfToLocalStorage();
+//     target.sendSelfToIpcMain();
+//     return true;
+//   },
+// });
 
-Object.assign(player, JSON.parse(localStorage.getItem('player')));
+// Object.assign(player, JSON.parse(localStorage.getItem('player')));
 
 export default {
   showLyrics: false,
   title: 'YesPlayMusic',
   liked: {
-    songs: [],
+    songs: [] as number[],
     songsWithDetails: [], // 只有前12首
     playlists: [],
     albums: [],
@@ -41,10 +43,6 @@ export default {
       weekData: [],
       allData: [],
     },
-  },
-  contextMenu: {
-    clickObjectID: 0,
-    showMenu: false,
   },
   modals: {
     addTrackToPlaylistModal: {
@@ -60,5 +58,5 @@ export default {
   lastfm: JSON.parse(localStorage.getItem('lastfm')) || {},
   player,
   settings: JSON.parse(localStorage.getItem('settings')),
-  data: JSON.parse(localStorage.getItem('data')),
+  data: JSON.parse(localStorage.getItem('data')!) as DataStore,
 };
