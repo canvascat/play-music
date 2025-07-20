@@ -2,32 +2,14 @@ import { createPinia, defineStore } from 'pinia'
 import _state from '../state';
 import shortcuts from '@/utils/shortcuts';
 import { cloneDeep } from 'es-toolkit';
-import { getSendSettingsPlugin, localStoragePiniaPlugin } from './plugins';
 
 import { isAccountLoggedIn, isLooseLoggedIn } from '@/utils/auth';
-import { likeATrack } from '@/api/track';
-import { getPlaylistDetail } from '@/api/playlist';
-import { getTrackDetail } from '@/api/track';
-import {
-  userPlaylist,
-  userPlayHistory,
-  userLikedSongsIDs,
-  likedAlbums,
-  likedArtists,
-  likedMVs,
-  cloudDisk,
-  userAccount,
-} from '@/api/user';
+import * as api from '@/api';
 import { changeAppearance } from '@/utils/common';
 import { toast } from 'vue-sonner'
 
 export const pinia = createPinia()
-// 将该插件交给 Pinia
-pinia.use(localStoragePiniaPlugin)
-if (window.IS_ELECTRON === true) {
-  pinia.use(getSendSettingsPlugin);
-}
-
+ 
 export const useStore = defineStore('store', {
   state: () => _state,
   actions: {
@@ -35,7 +17,7 @@ export const useStore = defineStore('store', {
       this.liked[name] = data;
     },
     changeLang(lang) {
-      this.settings.lang = lang;
+      this.settings.lang = lang; 
     },
     changeMusicQuality(value) {
       this.settings.musicQuality = value;
@@ -96,7 +78,7 @@ export const useStore = defineStore('store', {
       }
       let like = true;
       if (this.liked.songs.includes(id)) like = false;
-      likeATrack({ id, like })
+      api.track.likeATrack({ id, like })
         .then(() => {
           if (like === false) {
             this.updateLikedXXX({
@@ -120,7 +102,7 @@ export const useStore = defineStore('store', {
     fetchLikedSongs() {
       if (!isLooseLoggedIn()) return;
       if (isAccountLoggedIn()) {
-        return userLikedSongsIDs( this.data.user.userId  ).then(result => {
+        return api.user.userLikedSongsIDs( this.data.user.userId  ).then(result => {
           if (result.ids) {
             this.updateLikedXXX({
               name: 'songs',
@@ -133,12 +115,12 @@ export const useStore = defineStore('store', {
       }
     },
     fetchLikedSongsWithDetails() {
-      return getPlaylistDetail(this.data.likedSongPlaylistID, true).then(
+      return api.playlist.getPlaylistDetail(this.data.likedSongPlaylistID, true).then(
         result => {
           if (result.playlist?.trackIds?.length === 0) {
             return Promise.resolve();
           }
-          return getTrackDetail(
+          return api.track.getTrackDetail(
             result.playlist.trackIds
               .slice(0, 12)
               .map(t => t.id)
@@ -155,7 +137,7 @@ export const useStore = defineStore('store', {
     async fetchLikedPlaylist() {
       if (!isLooseLoggedIn()) return;
       if (isAccountLoggedIn()) {
-        return userPlaylist({
+        return api.user.userPlaylist({
           uid: this.data.user?.userId,
           limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
         }).then(result => {
@@ -177,7 +159,7 @@ export const useStore = defineStore('store', {
     },
     fetchLikedAlbums() {
       if (!isAccountLoggedIn()) return;
-      return likedAlbums({ limit: 2000 }).then(result => {
+      return api.user.likedAlbums({ limit: 2000 }).then(result => {
         if (result.data) {
           this.updateLikedXXX({
             name: 'albums',
@@ -188,7 +170,7 @@ export const useStore = defineStore('store', {
     },
     fetchLikedArtists() {
       if (!isAccountLoggedIn()) return;
-      return likedArtists({ limit: 2000 }).then(result => {
+      return api.user.likedArtists({ limit: 2000 }).then(result => {
         if (result.data) {
           this.updateLikedXXX({
             name: 'artists',
@@ -199,7 +181,7 @@ export const useStore = defineStore('store', {
     },
     fetchLikedMVs() {
       if (!isAccountLoggedIn()) return;
-      return likedMVs({ limit: 1000 }).then(result => {
+      return api.user.likedMVs({ limit: 1000 }).then(result => {
         if (result.data) {
           this.updateLikedXXX({
             name: 'mvs',
@@ -211,7 +193,7 @@ export const useStore = defineStore('store', {
     fetchCloudDisk() {
       if (!isAccountLoggedIn()) return;
       // FIXME: #1242
-      return cloudDisk({ limit: 1000 }).then(result => {
+      return api.user.cloudDisk({ limit: 1000 }).then(result => {
         if (result.data) {
           this.updateLikedXXX({
             name: 'cloudDisk',
@@ -223,8 +205,8 @@ export const useStore = defineStore('store', {
     fetchPlayHistory() {
       if (!isAccountLoggedIn()) return;
       return Promise.all([
-        userPlayHistory({ uid: this.data.user?.userId, type: 0 }),
-        userPlayHistory({ uid: this.data.user?.userId, type: 1 }),
+        api.user.userPlayHistory({ uid: this.data.user?.userId, type: 0 }),
+        api.user.userPlayHistory({ uid: this.data.user?.userId, type: 1 }),
       ]).then(result => {
         const data = {};
         const dataType = { 0: 'allData', 1: 'weekData' };
@@ -246,7 +228,7 @@ export const useStore = defineStore('store', {
     },
     async fetchUserProfile() {
       if (!isAccountLoggedIn()) return;
-      return userAccount().then(result => {
+      return api.user.userAccount().then(result => {
         if (result.code === 200) {
           this.updateData({ key: 'user', value: result.profile });
         }
@@ -276,7 +258,6 @@ if ([undefined, null].includes(store.settings.lang)) {
 }
 
 changeAppearance(store.settings.appearance);
-
 
 window
   .matchMedia('(prefers-color-scheme: dark)')

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import locale from '@/locale';
+import { useI18n } from 'vue-i18n';
 
 export function formatTime(Milliseconds: number, format = 'HH:MM:SS') {
   if (!Milliseconds) return '';
@@ -19,7 +19,7 @@ export function formatTime(Milliseconds: number, format = 'HH:MM:SS') {
       : `${mins}:${seconds}`;
   } else if (format === 'Human') {
     let hoursUnit: string, minitesUnit: string;
-    switch (locale.global.locale) {
+    switch (useI18n().locale.value) {
       case 'zh-CN':
         hoursUnit = '小时';
         minitesUnit = '分钟';
@@ -41,8 +41,9 @@ export function formatTime(Milliseconds: number, format = 'HH:MM:SS') {
 
 export function formatDate(timestamp: number, format = 'MMM D, YYYY') {
   if (!timestamp) return '';
-  if (locale.global.locale === 'zh-CN') format = 'YYYY年MM月DD日';
-  else if (locale.global.locale === 'zh-TW') format = 'YYYY年MM月DD日';
+  const locale = useI18n().locale.value;
+  if (locale === 'zh-CN') format = 'YYYY年MM月DD日';
+  else if (locale === 'zh-TW') format = 'YYYY年MM月DD日';
   return dayjs(timestamp).format(format);
 }
 
