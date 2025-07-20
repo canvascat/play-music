@@ -4,7 +4,7 @@
       nyancat: settings.nyancatStyle,
       'nyancat-stop': settings.nyancatStyle && !player.playing,
     }" @click.stop>
-      <VueSlider v-model="player.progress" :min="0" :max="player.currentTrackDuration" :interval="1"
+      <VueSlider :model-value="progress" @update:model-value="updateProgress" :min="0" :max="player.currentTrackDuration" :interval="1"
         :drag-on-click="true" :duration="0" :dot-size="12" :height="2" :tooltip-formatter="formatTrackTime" :lazy="true"
         :silent="true"></VueSlider>
     </div>
@@ -14,7 +14,7 @@
           <img :src="resizeImage(currentTrack.al && currentTrack.al.picUrl, 224)" loading="lazy" @click="goToAlbum" />
           <div class="track-info" :title="audioSource">
             <div :class="['name', { 'has-list': hasList() }]" @click="hasList() && goToList()">
-              {{ currentTrack.name }} {{ player.progress }}
+              {{ currentTrack.name }}
             </div>
             <div class="artist">
               <span v-for="(ar, index) in currentTrack.ar" :key="ar.id" @click="ar.id && goToArtist(ar.id)">
@@ -101,8 +101,9 @@ import VueSlider from 'vue-slider-component';
 import { goToListSource, hasListSource } from '@/utils/playList';
 import { formatTrackTime } from '@/utils/common';
 import { resizeImage } from '@/utils/filters';
-import { computed, onMounted, onBeforeMount } from 'vue';
+import { computed, onMounted, onBeforeMount, ref, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useRafFn } from '@vueuse/core';
 
 const { player, settings, toggleLyrics, likeATrack } = useStore();
 
@@ -120,6 +121,15 @@ const audioSource = computed(() => player.audioSource);
 const route = useRoute();
 const router = useRouter();
 
+// TODO
+const progress = ref(player.progress);
+useRafFn(() => {
+  progress.value = player.progress;
+})
+function updateProgress(value: number) {
+  player.progress = value;
+  progress.value = value;
+}
 
 
 onMounted(() => {

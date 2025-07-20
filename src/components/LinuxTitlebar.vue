@@ -64,7 +64,6 @@ const windowClose = () => {
   .title {
     padding: 8px;
     font-size: 12px;
-    font-family: 'Segoe UI', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
     justify-self: center;
     margin: 0 auto;
   }
