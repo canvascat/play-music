@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { useStore } from '@/store/pinia';
-import { dailyRecommendTracks } from '@/api/playlist';
+import * as api from '@/api';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { noop, sample } from 'es-toolkit';
 import { toast } from 'vue-sonner'
@@ -46,7 +46,7 @@ const coverUrl = computed(() => {
 
 function loadDailyTracks() {
   if (!isAccountLoggedIn()) return;
-  dailyRecommendTracks()
+      api.playlist.dailyRecommendTracks()
     .then(result => {
       updateDailyTracks(result.data.dailySongs);
     })

@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import Modal from '@/components/Modal.vue';
 import { useStore } from '@/store/pinia';
-import { createPlaylist, addOrRemoveTrackFromPlaylist } from '@/api/playlist';
+import * as api from '@/api';
 import { toast } from 'vue-sonner'
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -46,10 +46,10 @@ function close() {
 }
 
 function _createPlaylist() {
-  createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 }).then(data => {
+  api.playlist.createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 }).then(data => {
     if (data.code === 200) {
       if (modals.newPlaylistModal.afterCreateAddTrackID !== 0) {
-        addOrRemoveTrackFromPlaylist({
+        api.playlist.addOrRemoveTrackFromPlaylist({
           op: 'add',
           pid: data.id,
           tracks: modals.newPlaylistModal.afterCreateAddTrackID,

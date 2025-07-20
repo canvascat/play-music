@@ -17,7 +17,7 @@
 import { mapActions, mapState } from 'pinia';
 import { useStore } from '@/store/pinia'; 
 import NProgress from 'nprogress';
-import { dailyRecommendTracks } from '@/api/playlist';
+import * as api from '@/api';
 
 import TrackList from '@/components/TrackList.vue';
 
@@ -48,7 +48,7 @@ export default {
   methods: {
     ...mapActions(useStore, ['updateDailyTracks']),
     loadDailyTracks() {
-      dailyRecommendTracks().then(result => {
+      api.playlist.dailyRecommendTracks().then(result => {
         this.updateDailyTracks(result.data.dailySongs);
         NProgress.done();
         this.show = true;

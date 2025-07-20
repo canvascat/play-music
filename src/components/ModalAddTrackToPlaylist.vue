@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { useStore } from '@/store/pinia';
 import Modal from '@/components/Modal.vue';
-import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
+import * as api from '@/api';
 import { resizeImage } from '@/utils/filters';
 import { toast } from 'vue-sonner'
 import { computed } from 'vue';
@@ -48,7 +48,7 @@ function close() {
 }
 
 function addTrackToPlaylist(playlistID: string) {
-  addOrRemoveTrackFromPlaylist({
+        api.playlist.addOrRemoveTrackFromPlaylist({
     op: 'add',
     pid: playlistID,
     tracks: modals.addTrackToPlaylistModal.selectedTrackID,

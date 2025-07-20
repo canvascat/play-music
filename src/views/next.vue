@@ -32,7 +32,7 @@
 <script>
 import { mapState, mapActions } from 'pinia';
 import { useStore } from '@/store/pinia'; 
-import { getTrackDetail } from '@/api/track';
+import * as api from '@/api';
 import TrackList from '@/components/TrackList.vue';
 
 export default {
@@ -102,7 +102,7 @@ export default {
       let loadedTrackIDs = this.tracks.map(t => t.id);
 
       if (trackIDs.length > 0) {
-        getTrackDetail(trackIDs.join(',')).then(data => {
+        api.track.getTrackDetail(trackIDs.join(',')).then(data => {
           let newTracks = data.songs.filter(
             t => !loadedTrackIDs.includes(t.id)
           );

@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { useStore } from '@/store/pinia';
 import NProgress from 'nprogress';
-import { topPlaylist, highQualityPlaylist, toplists } from '@/api/playlist';
+import * as api from '@/api';
 import { playlistCategories } from '@/utils/staticData';
 import { getRecommendPlayList as getRecommendPlayListApi } from '@/utils/playList';
 import { onBeforeRouteUpdate } from 'vue-router';
@@ -129,19 +129,19 @@ function getHighQualityPlaylist() {
   let _playlists = playlists.value;
   let before =
     _playlists.length !== 0 ? _playlists[_playlists.length - 1].updateTime : 0;
-  highQualityPlaylist({ limit: 50, before }).then(data => {
+      api.playlist.highQualityPlaylist({ limit: 50, before }).then(data => {
     updatePlaylist(data.playlists);
     hasMore.value = data.more;
   });
 }
 function getTopLists() {
-  toplists().then(data => {
+  api.playlist.toplists().then(data => {
     playlists.value = [];
     updatePlaylist(data.list);
   });
 }
 function getTopPlayList() {
-  topPlaylist({
+      api.playlist.topPlaylist({
     cat: activeCategory.value,
     offset: playlists.value.length,
   }).then(data => {

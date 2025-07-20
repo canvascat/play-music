@@ -1,19 +1,18 @@
 
 
 <script setup lang="ts">
-import { newAlbums } from '@/api/album';
+import * as api from '@/api';
 import NProgress from 'nprogress';
 import { ref, onMounted } from 'vue';
 
 import CoverRow from '@/components/CoverRow.vue';
 import type { Album } from '@/types';
-import { AlbumListArea } from '@/api/NCMAPI';
 
 const albums = ref<Album[]>([]);
 
 onMounted(() => {
-  newAlbums({
-    area: AlbumListArea.ea,
+  api.album.newAlbums({
+    area: api.NCMAPI.AlbumListArea.ea,
     limit: 100,
   }).then(data => {
     albums.value = data.albums;

@@ -98,9 +98,7 @@
 
 <script setup lang="ts">
 import { useStore } from '@/store/pinia';
-import { getArtistAlbum } from '@/api/artist';
-import { getTrackDetail } from '@/api/track';
-import { getAlbum, albumDynamicDetail, likeAAlbum } from '@/api/album';
+import * as api from '@/api';
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
 import NProgress from 'nprogress';
 import { isAccountLoggedIn } from '@/utils/auth';
@@ -217,7 +215,7 @@ function likeAlbum(showToast = false) {
     toast(t('toast.needToLogin'));
     return;
   }
-  likeAAlbum({
+  api.album.likeAAlbum({
     id: album.value.id,
     t: dynamicDetail.value.isSub ? 0 : 1,
   })
@@ -251,7 +249,7 @@ function loadData(id: string) {
   setTimeout(() => {
     if (!show.value) NProgress.start();
   }, 1000);
-  getAlbum(id).then(data => {
+  api.album.getAlbum(id).then(data => {
     console.debug(cloneDeep(data))
     album.value = data.album;
     tracks.value = data.songs;
@@ -261,16 +259,16 @@ function loadData(id: string) {
 
     // to get explicit mark
     let trackIDs = tracks.value.map(t => t.id);
-    getTrackDetail(trackIDs.join(',')).then(data => {
+    api.track.getTrackDetail(trackIDs.join(',')).then(data => {
       tracks.value = data.songs;
     });
 
     // get more album by this artist
-    getArtistAlbum({ id: album.value.artist.id, limit: 100 }).then(data => {
+    api.artist.getArtistAlbum({ id: album.value.artist.id, limit: 100 }).then(data => {
       moreAlbums.value = data.hotAlbums;
     });
   });
-  albumDynamicDetail(id).then(data => {
+  api.album.albumDynamicDetail(id).then(data => {
     dynamicDetail.value = data;
   });
 }

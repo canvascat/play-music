@@ -70,9 +70,7 @@
 
 <script>
 import { toast } from 'vue-sonner'
-import { toplists } from '@/api/playlist';
-import { toplistOfArtists } from '@/api/artist';
-import { newAlbums } from '@/api/album';
+import * as api from '@/api';
 import { byAppleMusic } from '@/utils/staticData';
 import { getRecommendPlayList } from '@/utils/playList';
 import NProgress from 'nprogress';
@@ -121,7 +119,7 @@ export default {
         NProgress.done();
         this.show = true;
       });
-      newAlbums({
+      api.album.newAlbums({
         area: this.settings.musicLanguage ?? 'ALL',
         limit: 10,
       }).then(data => {
@@ -135,7 +133,7 @@ export default {
         jp: 4,
         kr: 3,
       };
-      toplistOfArtists(
+      api.artist.toplistOfArtists(
         toplistOfArtistsAreaTable[this.settings.musicLanguage ?? 'all']
       ).then(data => {
         let indexs = [];
@@ -148,7 +146,7 @@ export default {
           indexs.includes(index)
         );
       });
-      toplists().then(data => {
+      api.playlist.toplists().then(data => {
         this.topList.items = data.list.filter(l =>
           this.topList.ids.includes(l.id)
         );

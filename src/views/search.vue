@@ -54,8 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTrackDetail } from '@/api/track';
-import * as others from '@/api/others';
+import * as api from '@/api';
 import NProgress from 'nprogress';
 import { toast } from 'vue-sonner'
 
@@ -105,7 +104,7 @@ function search(type = 'all') {
     artists: 100,
     playlists: 1000,
   };
-  return others.search({
+      return api.others.search({
     keywords: keywords.value,
     type: typeTable[type],
     limit: 16,
@@ -171,7 +170,7 @@ function getData() {
 function getTracksDetail() {
   const trackIDs = tracks.value.map(t => t.id);
   if (trackIDs.length === 0) return;
-  getTrackDetail(trackIDs.join(',')).then(result => {
+        api.track.getTrackDetail(trackIDs.join(',')).then(result => {
     tracks.value = result.songs;
   });
 }

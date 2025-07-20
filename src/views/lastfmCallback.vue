@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authGetSession } from '@/api/lastfm';
+import * as api from '@/api';
 import { useStore } from '@/store/pinia';
 import { ref, onMounted } from 'vue';
 
@@ -14,7 +14,7 @@ onMounted(() => {
     done.value = true;
     return;
   }
-  authGetSession(token).then(result => {
+      api.lastfm.authGetSession(token).then(result => {
     if (!result.data.session) {
       message.value = '连接失败，请重试或联系开发者（无Session）';
       done.value = true;

@@ -50,8 +50,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useStore } from '@/store/pinia';
-import { addOrRemoveTrackFromPlaylist } from '@/api/playlist';
-import { cloudDiskTrackDelete } from '@/api/user';
+import * as api from '@/api';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { resizeImage } from '@/utils/filters';
 import { toast } from 'vue-sonner'
@@ -175,7 +174,7 @@ function removeTrackFromPlaylist(track: any) {
   }
   if (confirm(`确定要从歌单删除 ${track.name}？`)) {
     let trackID = track.id;
-    addOrRemoveTrackFromPlaylist({
+    api.playlist.addOrRemoveTrackFromPlaylist({
       op: 'del',
       pid: props.id,
       tracks: trackID,
@@ -209,7 +208,7 @@ function removeTrackFromCloudDisk(track: any) {
   if (confirm(`确定要从云盘删除 ${track.songName}？`)) {
     // ?? 这里track.songId 和 track.id 不一样
     let trackID = track.songId;
-    cloudDiskTrackDelete(trackID).then(data => {
+    api.user.cloudDiskTrackDelete(trackID).then(data => {
       toast(
         data.code === 200 ? '已将此歌曲从云盘删除' : data.message
       );
