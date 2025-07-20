@@ -1,6 +1,5 @@
 import { isAccountLoggedIn } from './auth';
-import { refreshCookie } from '@/api/auth';
-import { dailySignin } from '@/api/user';
+import * as api from '@/api';
 import dayjs from 'dayjs';
 import { useStore } from '@/store/pinia';
 
@@ -66,17 +65,17 @@ export function dailyTask() {
     (lastDate === undefined || lastDate !== dayjs().date())
   ) {
     console.debug('[debug][common.js] execute dailyTask');
-    refreshCookie().then(() => {
+    api.auth.refreshCookie().then(() => {
       console.debug('[debug][common.js] 刷新cookie');
       store.updateData({
         key: 'lastRefreshCookieDate',
         value: dayjs().date(),
       });
     });
-    dailySignin(0).catch(() => {
+    api.user.dailySignin(0).catch(() => {
       console.debug('[debug][common.js] 手机端重复签到');
     });
-    dailySignin(1).catch(() => {
+    api.user.dailySignin(1).catch(() => {
       console.debug('[debug][common.js] PC端重复签到');
     });
   }

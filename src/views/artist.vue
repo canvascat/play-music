@@ -99,7 +99,7 @@
     </div>
     <div v-if="albums.length !== 0" id="albums" class="albums">
       <div class="section-title">{{ $t('artist.albums') }}</div>
-      <CoverRow :type="'album'" :items="albums" :sub-text="'releaseYear'" :show-play-button="true" />
+      <CoverRow type="album" :items="albums" :sub-text="'releaseYear'" :show-play-button="true" />
     </div>
     <div v-if="mvs.length !== 0" id="mvs" class="mvs">
       <div class="section-title">MVs
@@ -111,7 +111,7 @@
     </div>
     <div v-if="eps.length !== 0" class="eps">
       <div class="section-title">{{ $t('artist.EPsSingles') }}</div>
-      <CoverRow :type="'album'" :items="eps" :sub-text="'albumType+releaseYear'" :show-play-button="true" />
+      <CoverRow type="album" :items="eps" :sub-text="'albumType+releaseYear'" :show-play-button="true" />
     </div>
 
     <div v-if="similarArtists.length !== 0" class="similar-artists">

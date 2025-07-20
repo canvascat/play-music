@@ -217,8 +217,7 @@
 import { mapActions, mapState } from 'pinia';
 import { useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
-import { uploadSong } from '@/api/user';
-import { getLyric } from '@/api/track';
+import * as api from '@/api';
 import NProgress from 'nprogress';
 import { resizeImage } from '@/utils/filters';
 import { toast } from 'vue-sonner'
@@ -364,7 +363,7 @@ export default {
     },
     getRandomLyric() {
       if (this.liked.songs.length === 0) return;
-      getLyric(
+      api.track.getLyric(
         this.liked.songs[randomInt(0, this.liked.songs.length - 1)]
       ).then(data => {
         if (data.lrc !== undefined) {
@@ -403,7 +402,7 @@ export default {
     },
     uploadSongToCloudDisk(e) {
       const files = e.target.files;
-      uploadSong(files[0]).then(result => {
+      api.user.uploadSong(files[0]).then(result => {
         if (result.code === 200) {
           let newCloudDisk = this.liked.cloudDisk;
           newCloudDisk.unshift(result.privateCloud);

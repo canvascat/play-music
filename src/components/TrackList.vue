@@ -63,15 +63,15 @@ const { t } = useI18n();
 
 const emits = defineEmits(['removeTrack']);
 interface Props {
-  tracks: any[];
-  type: 'tracklist' | 'album' | 'playlist' | 'cloudDisk';
-  id: number;
-  dbclickTrackFunc: string;
-  albumObject: any;
-  extraContextMenuItem: string[];
-  columnNumber: number;
-  highlightPlayingTrack: boolean;
-  itemKey: string;
+  tracks?: any[];
+  type?: 'tracklist' | 'album' | 'playlist' | 'cloudDisk';
+  id?: number;
+  dbclickTrackFunc?: string;
+  albumObject?: any;
+  extraContextMenuItem?: string[];
+  columnNumber?: number;
+  highlightPlayingTrack?: boolean;
+  itemKey?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {

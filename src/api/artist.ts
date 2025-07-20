@@ -1,7 +1,7 @@
 import request, { noCacheParams } from '@/utils/request';
 import { mapTrackPlayableStatus } from '@/utils/common';
 import { isAccountLoggedIn } from '@/utils/auth';
-import { getTrackDetail } from '@/api/track';
+import { getTrackDetail } from './track';
 import * as NCMAPI from './NCMAPI';
 
 /**

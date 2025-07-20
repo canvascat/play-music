@@ -1,14 +1,14 @@
 <template>
   <div v-show="show">
-    <h1>
+    <h1 class="text-4xl mt-9 mb-4.5 flex items-center">
       <img
-        class="avatar"
+        class="h-11 w-11 rounded-full mr-3"
         :src="resizeImage(artist.img1v1Url, 1024)"
         loading="lazy"
       />{{ artist.name }}'s Music Videos
     </h1>
     <MvRow :mvs="mvs" subtitle="publishTime" />
-    <div class="load-more">
+    <div class="flex justify-center">
       <ButtonTwoTone v-show="hasMore" color="grey" v-on:click="loadMVs">{{
         $t('explore.loadMore')
       }}</ButtonTwoTone>
@@ -16,87 +16,93 @@
   </div>
 </template>
 
-<script>
-import { artistMv, getArtist } from '@/api/artist';
+<script setup lang="ts">
+import { ref, onMounted, onActivated } from 'vue';
+import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+import * as api from '@/api';
 import NProgress from 'nprogress';
-
 import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
 import MvRow from '@/components/MvRow.vue';
 import { resizeImage } from '@/utils/filters';
 
-export default {
-  name: 'ArtistMV',
-  components: {
-    MvRow,
-    ButtonTwoTone,
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.id = to.params.id;
-    this.loadData();
-    next();
-  },
-  data() {
-    return {
+// 定义接口
+interface Artist {
+  id: number;
+  name: string;
+  img1v1Url: string;
+  [key: string]: any;
+}
+
+interface MvItem {
+  id: number;
+  name: string;
+  imgurl16v9?: string;
+  cover?: string;
+  coverUrl?: string;
+  publishTime?: string;
+  [key: string]: any;
+}
+
+const route = useRoute();
+
+// 响应式数据
+const id = ref(0);
+const show = ref(false);
+const hasMore = ref(true);
+const artist = ref<Artist>({
+  id: 0,
+  name: '',
+  img1v1Url: '',
+});
+const mvs = ref<MvItem[]>([]);
+
+// 路由更新处理
+onBeforeRouteUpdate((to, _from, next) => {
+  id.value = Number(to.params.id);
+  loadData();
+  next();
+});
+
+// 生命周期
+onMounted(() => {
+  id.value = Number(route.params.id);
+  loadData();
+});
+
+onActivated(() => {
+  if (Number(route.params.id) !== id.value) {
+    id.value = Number(route.params.id);
+    mvs.value = [];
+    artist.value = {
       id: 0,
-      show: false,
-      hasMore: true,
-      artist: {},
-      mvs: [],
+      name: '',
+      img1v1Url: '',
     };
-  },
-  created() {
-    this.id = this.$route.params.id;
-    this.loadData();
-  },
-  activated() {
-    if (this.$route.params.id !== this.id) {
-      this.id = this.$route.params.id;
-      this.mvs = [];
-      this.artist = {};
-      this.show = false;
-      this.hasMore = true;
-      this.loadData();
+    show.value = false;
+    hasMore.value = true;
+    loadData();
+  }
+});
+
+// 方法
+const loadData = () => {
+  setTimeout(() => {
+    if (!show.value) NProgress.start();
+  }, 1000);
+  api.artist.getArtist(id.value).then(data => {
+    artist.value = data.artist;
+  });
+  loadMVs();
+};
+
+const loadMVs = () => {
+  api.artist.artistMv({ id: id.value, limit: 100, offset: mvs.value.length }).then(
+    data => {
+      mvs.value.push(...data.mvs);
+      hasMore.value = data.hasMore;
+      NProgress.done();
+      show.value = true;
     }
-  },
-  methods: {
-    resizeImage,
-    loadData() {
-      setTimeout(() => {
-        if (!this.show) NProgress.start();
-      }, 1000);
-      getArtist(this.id).then(data => {
-        this.artist = data.artist;
-      });
-      this.loadMVs();
-    },
-    loadMVs() {
-      artistMv({ id: this.id, limit: 100, offset: this.mvs.length }).then(
-        data => {
-          this.mvs.push(...data.mvs);
-          this.hasMore = data.hasMore;
-          NProgress.done();
-          this.show = true;
-        }
-      );
-    },
-  },
+  );
 };
 </script>
-
-<style lang="scss" scoped>
-h1 {
-  font-size: 42px;
-  color: var(--color-text);
-  .avatar {
-    height: 44px;
-    margin-right: 12px;
-    vertical-align: -7px;
-    border-radius: 50%;
-    border: rgba(0, 0, 0, 0.2);
-  }
-}
-.load-more {
-  display: flex;
-  justify-content: center;
-}
-</style>

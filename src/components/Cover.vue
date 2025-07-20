@@ -34,7 +34,7 @@ interface Props {
   imageUrl: string;
   fixedSize?: number;
   playButtonSize?: number;
-  coverHover: boolean;
+  coverHover?: boolean;
   alwaysShowPlayButton?: boolean;
   alwaysShowShadow?: boolean;
   clickCoverToPlay?: boolean;

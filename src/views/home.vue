@@ -6,7 +6,7 @@
     >
       <div class="title" @click="toast('Hello')"> by Apple Music </div>
       <CoverRow
-        :type="'playlist'"
+        type="playlist"
         :items="byAppleMusic"
         sub-text="appleMusic"
         :image-size="1024"
@@ -20,7 +20,7 @@
         }}</router-link>
       </div>
       <CoverRow
-        :type="'playlist'"
+        type="playlist"
         :items="recommendPlaylist.items"
         sub-text="copywriter"
       />

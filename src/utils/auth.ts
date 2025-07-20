@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import { logout } from '@/api/auth';
+import * as api from '@/api';
 import { useStore } from '@/store/pinia';
 
 export function setCookies(string: string) {
@@ -44,7 +44,7 @@ export function isLooseLoggedIn() {
 }
 
 export function doLogout() {
-  logout();
+  api.auth.logout();
   removeCookie('MUSIC_U');
   removeCookie('__csrf');
   const store = useStore();

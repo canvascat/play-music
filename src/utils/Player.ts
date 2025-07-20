@@ -1,9 +1,4 @@
-import { getAlbum } from '@/api/album';
-import { getArtist } from '@/api/artist';
-import { trackUpdateNowPlaying } from '@/api/lastfm';
-import { fmTrash, personalFM } from '@/api/others';
-import { getPlaylistDetail, intelligencePlaylist } from '@/api/playlist';
-import { getLyric, getMP3, getTrackDetail } from '@/api/track';
+import * as api from '@/api';
 import { pinia, useStore } from '@/store/pinia';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { cacheTrackSource, getTrackSource } from '@/utils/db';
@@ -353,7 +348,7 @@ export default class Player {
   }
   private _getAudioSourceFromNetease(track) {
     if (isAccountLoggedIn()) {
-      return getMP3(track.id).then(result => {
+      return api.track.getMP3(track.id).then(result => {
         if (!result.data[0]) return null;
         if (!result.data[0].url) return null;
         if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
@@ -451,7 +446,7 @@ export default class Player {
     autoplay = true,
     ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK
   ) {
-    return getTrackDetail(id).then(data => {
+    return api.track.getTrackDetail(id).then(data => {
       const track = data.songs[0];
       this._currentTrack = track;
       this._updateMediaSessionMetaData(track);
@@ -508,7 +503,7 @@ export default class Player {
       : this._getNextTrack()[0];
     if (!nextTrackID) return;
     if (this._personalFMTrack?.id == nextTrackID) return;
-    getTrackDetail(`${nextTrackID}`).then(data => {
+    api.track.getTrackDetail(`${nextTrackID}`).then(data => {
       this._getAudioSource(data.songs[0]);
     });
   }
@@ -597,7 +592,7 @@ export default class Player {
       return window.ipcRenderer?.send('metadata', metadata);
     }
 
-    let lyricContent = await getLyric(track.id);
+    let lyricContent = await api.track.getLyric(track.id);
 
     if (!lyricContent.lrc || !lyricContent.lrc.lyric) {
       return window.ipcRenderer?.send('metadata', metadata);
@@ -636,7 +631,7 @@ export default class Player {
       return [false, undefined];
     }
     this._personalFMNextLoading = true;
-    return personalFM()
+    return api.others.personalFM()
       .then(result => {
         if (!result || !result.data) {
           this._personalFMNextTrack = undefined;
@@ -712,7 +707,7 @@ export default class Player {
       let result: PersonalFMResponse | null = null;
       let retryCount = 5;
       for (; retryCount >= 0; retryCount--) {
-        result = await personalFM().catch(() => null);
+        result = await api.others.personalFM().catch(() => null);
         if (!result) {
           this._personalFMLoading = false;
           toast('personal fm timeout');
@@ -784,7 +779,7 @@ export default class Player {
       if (!this._currentTrack) return;
       this._playDiscordPresence(this._currentTrack, this.seek());
       if (useStore(pinia).lastfm.key !== undefined) {
-        trackUpdateNowPlaying({
+        api.lastfm.trackUpdateNowPlaying({
           artist: this._currentTrack.ar[0].name,
           track: this._currentTrack.name,
           album: this._currentTrack.al.name,

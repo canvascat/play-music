@@ -81,16 +81,10 @@
 import QRCode from 'qrcode';
 import md5 from 'crypto-js/md5';
 import NProgress from 'nprogress';
-import { mapActions } from 'pinia';
 import { useStore } from '@/store/pinia';
 import { setCookies } from '@/utils/auth';
 import nativeAlert from '@/utils/nativeAlert';
-import {
-  loginWithPhone,
-  loginWithEmail,
-  loginQrCodeKey,
-  loginQrCodeCheck,
-} from '@/api/auth';
+import * as api from '@/api';
 import { onBeforeUnmount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -153,7 +147,7 @@ function login() {
   if (mode.value === 'phone') {
     processing.value = validatePhone();
     if (!processing.value) return;
-    loginWithPhone({
+    api.auth.loginWithPhone({
       countrycode: countryCode.value.replace('+', '').replace(/\s/g, ''),
       phone: phoneNumber.value.replace(/\s/g, ''),
       password: 'fakePassword',
@@ -167,7 +161,7 @@ function login() {
   } else {
     processing.value = validateEmail();
     if (!processing.value) return;
-    loginWithEmail({
+    api.auth.loginWithEmail({
       email: email.value.replace(/\s/g, ''),
       password: 'fakePassword',
       md5_password: md5(password.value).toString(),
@@ -198,7 +192,7 @@ function handleLoginResponse(data) {
   }
 }
 function getQrCodeKey() {
-  return loginQrCodeKey().then(result => {
+  return api.auth.loginQrCodeKey().then(result => {
     if (result.code === 200) {
       qrCodeKey.value = result.data.unikey;
       QRCode.toString(
@@ -233,7 +227,7 @@ function checkQrCodeLogin() {
   clearInterval(qrCodeCheckInterval);
   qrCodeCheckInterval = setInterval(() => {
     if (qrCodeKey.value === '') return;
-    loginQrCodeCheck(qrCodeKey.value).then(result => {
+    api.auth.loginQrCodeCheck(qrCodeKey.value).then(result => {
       if (result.code === 800) {
         getQrCodeKey(); // 重新生成QrCode
         qrCodeInformation.value = '二维码已失效，请重新扫码';

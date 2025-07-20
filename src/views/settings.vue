@@ -605,7 +605,7 @@
 <script setup lang="ts">
 import { useStore } from '@/store/pinia';
 import { isLooseLoggedIn, doLogout } from '@/utils/auth';
-import { auth as lastfmAuth } from '@/api/lastfm';
+import * as api from '@/api';
 import { changeAppearance, bytesToSize } from '@/utils/common';
 import { countDBSize as countDBSizeApi, clearDB } from '@/utils/db';
 import pkg from '../../package.json';
@@ -1166,7 +1166,7 @@ function clearCache() {
   });
 }
 function lastfmConnect() {
-  lastfmAuth();
+  api.lastfm.auth();
   let lastfmChecker = setInterval(() => {
     const session = localStorage.getItem('lastfm');
     if (session) {

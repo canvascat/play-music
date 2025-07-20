@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import { mvDetail, mvUrl, simiMv, likeAMV } from '@/api/mv.ts';
+import * as api from '@/api';
 import { isAccountLoggedIn } from '@/utils/auth';
 import NProgress from 'nprogress';
 import '@/assets/css/plyr.css';
@@ -110,9 +110,9 @@ onMounted(() => {
 });
 
 function getData(id: string) {
-  mvDetail(id).then(data => {
+  api.mv.mvDetail(id).then(data => {
     mv.value = data;
-    Promise.all(data.data.brs.map(br => mvUrl({ id, r: br.br }))).then(results => {
+    Promise.all(data.data.brs.map(br => api.mv.mvUrl({ id, r: br.br }))).then(results => {
       let sources = results.map(result => {
         return {
           src: result.data.url.replace(/^http:/, 'https:'),
@@ -129,7 +129,7 @@ function getData(id: string) {
       NProgress.done();
     });
   });
-  simiMv(id).then(data => {
+  api.mv.simiMv(id).then(data => {
     simiMvs.value = data.mvs;
   });
 }
@@ -138,7 +138,7 @@ function likeMV() {
     toast(t('toast.needToLogin'));
     return;
   }
-  likeAMV({
+  api.mv.likeAMV({
     mvid: mv.value.data.id,
     t: mv.value.subed ? 0 : 1,
   }).then(data => {

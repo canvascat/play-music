@@ -1,10 +1,6 @@
 import router from '../router';
 import state from '../store/state';
-import {
-  recommendPlaylist,
-  dailyRecommendPlaylist,
-  getPlaylistDetail,
-} from '@/api/playlist';
+import * as api from '@/api';
 import { isAccountLoggedIn } from '@/utils/auth';
 
 export function hasListSource() {
@@ -30,8 +26,8 @@ export function getListSourcePath() {
 export async function getRecommendPlayList(limit, removePrivateRecommand) {
   if (isAccountLoggedIn()) {
     const playlists = await Promise.all([
-      dailyRecommendPlaylist(),
-      recommendPlaylist({ limit }),
+      api.playlist.dailyRecommendPlaylist(),
+      api.playlist.recommendPlaylist({ limit }),
     ]);
     let recommend = playlists[0].recommend ?? [];
     if (recommend.length) {
@@ -40,7 +36,7 @@ export async function getRecommendPlayList(limit, removePrivateRecommand) {
     }
     return recommend.concat(playlists[1].result).slice(0, limit);
   } else {
-    const response = await recommendPlaylist({ limit });
+    const response = await api.playlist.recommendPlaylist({ limit });
     return response.result;
   }
 }
@@ -48,7 +44,7 @@ export async function getRecommendPlayList(limit, removePrivateRecommand) {
 async function replaceRecommendResult(recommend) {
   for (let r of recommend) {
     if (specialPlaylist.indexOf(r.id) > -1) {
-      const data = await getPlaylistDetail(r.id, true);
+      const data = await api.playlist.getPlaylistDetail(r.id, true);
       const playlist = data.playlist;
       if (playlist) {
         r.name = playlist.name;

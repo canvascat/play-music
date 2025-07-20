@@ -31,8 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { getTrackDetail } from '@/api/track';
-import { search } from '@/api/others';
+import * as api from '@/api';
 import { camelCase } from 'es-toolkit';
 import NProgress from 'nprogress';
 import { useI18n } from 'vue-i18n';
@@ -78,7 +77,7 @@ function fetchData() {
     artists: 100,
     playlists: 1000,
   };
-  return search({
+  return api.others.search({
     keywords: keywords.value,
     type: typeTable[type.value],
     offset: result.value.length,
@@ -116,7 +115,7 @@ function fetchData() {
 function getTracksDetail() {
   const trackIDs = result.value.map(t => t.id);
   if (trackIDs.length === 0) return;
-  getTrackDetail(trackIDs.join(',')).then(result => {
+  api.track.getTrackDetail(trackIDs.join(',')).then(result => {
     result.value = result.songs;
   });
 } 

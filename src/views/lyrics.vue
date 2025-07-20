@@ -307,7 +307,7 @@ import { useStore } from '@/store/pinia';
 import VueSlider from 'vue-slider-component';
 import ContextMenu from '@/components/ContextMenu.vue';
 import { formatTrackTime } from '@/utils/common';
-import { getLyric } from '@/api/track';
+import * as api from '@/api';
 import { lyricParser, copyLyric } from '@/utils/lyrics';
 import ButtonIcon from '@/components/ButtonIcon.vue';
 import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
@@ -539,7 +539,7 @@ export default {
     },
     getLyric() {
       if (!this.currentTrack.id) return;
-      return getLyric(this.currentTrack.id).then(data => {
+      return api.track.getLyric(this.currentTrack.id).then(data => {
         if (!data?.lrc?.lyric) {
           this.lyric = [];
           this.tlyric = [];
