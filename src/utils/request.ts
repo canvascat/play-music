@@ -76,12 +76,9 @@ service.interceptors.response.use(
       // 登出帳戶
       doLogout();
 
-      // 導向登入頁面
-      if (window.IS_ELECTRON === true) {
-        router.push({ name: 'loginAccount' });
-      } else {
+ 
         router.push({ name: 'login' });
-      }
+ 
     }
   }
 );
