@@ -2,228 +2,179 @@
   <div v-show="show" class="search-page">
     <div v-show="artists.length > 0 || albums.length > 0" class="row">
       <div v-show="artists.length > 0" class="artists">
-        <div v-show="artists.length > 0" class="section-title"
-          >{{ $t('search.artist')
-          }}<router-link :to="`/search/${keywords}/artists`">{{
+        <div v-show="artists.length > 0" class="section-title">{{ $t('search.artist')
+        }}<router-link :to="`/search/${keywords}/artists`">{{
             $t('home.seeMore')
-          }}</router-link></div
-        >
-        <CoverRow
-          type="artist"
-          :column-number="3"
-          :items="artists.slice(0, 3)"
-          gap="34px 24px"
-        />
+            }}</router-link></div>
+        <CoverRow type="artist" :column-number="3" :items="artists.slice(0, 3)" gap="34px 24px" />
       </div>
 
       <div class="albums">
-        <div v-show="albums.length > 0" class="section-title"
-          >{{ $t('search.album')
-          }}<router-link :to="`/search/${keywords}/albums`">{{
+        <div v-show="albums.length > 0" class="section-title">{{ $t('search.album')
+        }}<router-link :to="`/search/${keywords}/albums`">{{
             $t('home.seeMore')
-          }}</router-link></div
-        >
-        <CoverRow
-          type="album"
-          :items="albums.slice(0, 3)"
-          sub-text="artist"
-          :column-number="3"
-          sub-text-font-size="14px"
-          gap="34px 24px"
-          :play-button-size="26"
-        />
+            }}</router-link></div>
+        <CoverRow type="album" :items="albums.slice(0, 3)" sub-text="artist" :column-number="3"
+          sub-text-font-size="14px" gap="34px 24px" :play-button-size="26" />
       </div>
     </div>
 
     <div v-show="tracks.length > 0" class="tracks">
-      <div class="section-title"
-        >{{ $t('search.song')
-        }}<router-link :to="`/search/${keywords}/tracks`">{{
+      <div class="section-title">{{ $t('search.song')
+      }}<router-link :to="`/search/${keywords}/tracks`">{{
           $t('home.seeMore')
-        }}</router-link></div
-      >
+          }}</router-link></div>
       <TrackList :tracks="tracks" type="tracklist" />
     </div>
 
     <div v-show="musicVideos.length > 0" class="music-videos">
-      <div class="section-title"
-        >{{ $t('search.mv')
-        }}<router-link :to="`/search/${keywords}/music-videos`">{{
+      <div class="section-title">{{ $t('search.mv')
+      }}<router-link :to="`/search/${keywords}/music-videos`">{{
           $t('home.seeMore')
-        }}</router-link></div
-      >
+          }}</router-link></div>
       <MvRow :mvs="musicVideos.slice(0, 5)" />
     </div>
 
     <div v-show="playlists.length > 0" class="playlists">
-      <div class="section-title"
-        >{{ $t('search.playlist')
-        }}<router-link :to="`/search/${keywords}/playlists`">{{
+      <div class="section-title">{{ $t('search.playlist')
+      }}<router-link :to="`/search/${keywords}/playlists`">{{
           $t('home.seeMore')
-        }}</router-link></div
-      >
-      <CoverRow
-        type="playlist"
-        :items="playlists.slice(0, 12)"
-        sub-text="title"
-        :column-number="6"
-        sub-text-font-size="14px"
-        gap="34px 24px"
-        :play-button-size="26"
-      />
+          }}</router-link></div>
+      <CoverRow type="playlist" :items="playlists.slice(0, 12)" sub-text="title" :column-number="6"
+        sub-text-font-size="14px" gap="34px 24px" :play-button-size="26" />
     </div>
 
     <div v-show="!haveResult" class="no-results">
-      <div
-        ><svg-icon icon-class="search" />
+      <div><svg-icon icon-class="search" />
         {{
           keywords.length === 0 ? '输入关键字搜索' : $t('search.noResult')
-        }}</div
-      >
+        }}</div>
     </div>
   </div>
 </template>
 
-<script>
-import { mapState, mapActions } from 'pinia';
-import { useStore } from '@/store/pinia'; 
+<script setup lang="ts">
 import { getTrackDetail } from '@/api/track';
-import { search } from '@/api/others';
+import * as others from '@/api/others';
 import NProgress from 'nprogress';
 import { toast } from 'vue-sonner'
 
 import TrackList from '@/components/TrackList.vue';
 import MvRow from '@/components/MvRow.vue';
 import CoverRow from '@/components/CoverRow.vue';
+import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
-export default {
-  name: 'Search',
-  components: {
-    TrackList,
-    MvRow,
-    CoverRow,
-  },
-  data() {
-    return {
-      show: false,
-      tracks: [],
-      artists: [],
-      albums: [],
-      playlists: [],
-      musicVideos: [],
-    };
-  },
-  computed: {
-    ...mapState(useStore, ['player']),
-    keywords() {
-      return this.$route.params.keywords ?? '';
-    },
-    haveResult() {
-      return (
-        this.tracks.length +
-          this.artists.length +
-          this.albums.length +
-          this.playlists.length +
-          this.musicVideos.length >
-        0
-      );
-    },
-  },
-  watch: {
-    keywords: function (newKeywords) {
-      if (newKeywords.length === 0) return;
-      this.getData();
-    },
-  },
-  created() {
-    this.getData();
-  },
-  methods: { 
-    playTrackInSearchResult(id) {
-      let track = this.tracks.find(t => t.id === id);
-      this.player.appendTrackToPlayerList(track, true);
-    },
-    search(type = 'all') {
-      const typeTable = {
-        all: 1018,
-        musicVideos: 1004,
-        tracks: 1,
-        albums: 10,
-        artists: 100,
-        playlists: 1000,
-      };
-      return search({
-        keywords: this.keywords,
-        type: typeTable[type],
-        limit: 16,
-      })
-        .then(result => {
-          return { result: result.result, type };
-        })
-        .catch(err => {
-          toast(err.response.data.msg || err.response.data.message);
-        });
-    },
-    getData() {
-      setTimeout(() => {
-        if (!this.show) NProgress.start();
-      }, 1000);
-      this.show = false;
+const route = useRoute();
 
-      const requestAll = requests => {
-        const keywords = this.keywords;
-        Promise.all(requests).then(results => {
-          if (keywords != this.keywords) return;
-          results.map(result => {
-            const searchType = result.type;
-            if (result.result === undefined) return;
-            result = result.result;
-            switch (searchType) {
-              case 'all':
-                this.result = result;
-                break;
-              case 'musicVideos':
-                this.musicVideos = result.mvs ?? [];
-                break;
-              case 'artists':
-                this.artists = result.artists ?? [];
-                break;
-              case 'albums':
-                this.albums = result.albums ?? [];
-                break;
-              case 'tracks':
-                this.tracks = result.songs ?? [];
-                this.getTracksDetail();
-                break;
-              case 'playlists':
-                this.playlists = result.playlists ?? [];
-                break;
-            }
-          });
-          NProgress.done();
-          this.show = true;
-        });
-      };
 
-      const requests = [
-        this.search('artists'),
-        this.search('albums'),
-        this.search('tracks'),
-      ];
-      const requests2 = [this.search('musicVideos'), this.search('playlists')];
+const show = ref(false);
+const tracks = ref([]);
+const artists = ref([]);
+const albums = ref([]);
+const playlists = ref([]);
+const musicVideos = ref([]);
 
-      requestAll(requests);
-      requestAll(requests2);
-    },
-    getTracksDetail() {
-      const trackIDs = this.tracks.map(t => t.id);
-      if (trackIDs.length === 0) return;
-      getTrackDetail(trackIDs.join(',')).then(result => {
-        this.tracks = result.songs;
+
+const keywords = computed(() => route.params.keywords as string ?? '');
+const haveResult = computed(() => {
+  return (
+    tracks.value.length +
+    artists.value.length +
+    albums.value.length +
+    playlists.value.length +
+    musicVideos.value.length >
+    0
+  );
+})
+
+watch(() => keywords.value, (newKeywords) => {
+  if (newKeywords.length === 0) return;
+  getData();
+})
+
+getData()
+
+
+function search(type = 'all') {
+  const typeTable = {
+    all: 1018,
+    musicVideos: 1004,
+    tracks: 1,
+    albums: 10,
+    artists: 100,
+    playlists: 1000,
+  };
+  return others.search({
+    keywords: keywords.value,
+    type: typeTable[type],
+    limit: 16,
+  })
+    .then(result => {
+      return { result: result.result, type };
+    })
+    .catch(err => {
+      toast(err.response.data.msg || err.response.data.message);
+    });
+}
+function getData() {
+  setTimeout(() => {
+    if (!show.value) NProgress.start();
+  }, 1000);
+  show.value = false;
+
+  const requestAll = requests => {
+    const currentKeywords = keywords.value;
+    Promise.all(requests).then(results => {
+      if (currentKeywords != keywords.value) return;
+      results.map(result => {
+        const searchType = result.type;
+        if (result.result === undefined) return;
+        result = result.result;
+        switch (searchType) {
+          case 'all':
+            // this.result = result;
+            break;
+          case 'musicVideos':
+            musicVideos.value = result.mvs ?? [];
+            break;
+          case 'artists':
+            artists.value = result.artists ?? [];
+            break;
+          case 'albums':
+            albums.value = result.albums ?? [];
+            break;
+          case 'tracks':
+            tracks.value = result.songs ?? [];
+            getTracksDetail();
+            break;
+          case 'playlists':
+            playlists.value = result.playlists ?? [];
+            break;
+        }
       });
-    },
-  },
-};
+      NProgress.done();
+      show.value = true;
+    });
+  };
+
+  const requests = [
+    search('artists'),
+    search('albums'),
+    search('tracks'),
+  ];
+  const requests2 = [search('musicVideos'), search('playlists')];
+
+  requestAll(requests);
+  requestAll(requests2);
+}
+function getTracksDetail() {
+  const trackIDs = tracks.value.map(t => t.id);
+  if (trackIDs.length === 0) return;
+  getTrackDetail(trackIDs.join(',')).then(result => {
+    tracks.value = result.songs;
+  });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -237,6 +188,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   a {
     font-size: 13px;
     font-weight: 600;
@@ -253,6 +205,7 @@ export default {
     flex: 1;
     margin-right: 8rem;
   }
+
   .albums {
     flex: 1;
   }
@@ -276,10 +229,12 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+
   div {
     display: flex;
     align-items: center;
   }
+
   .svg-icon {
     height: 24px;
     width: 24px;
