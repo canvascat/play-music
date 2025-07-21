@@ -314,8 +314,14 @@ import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
 import Color from 'color';
 import { isAccountLoggedIn } from '@/utils/auth';
 import { hasListSource, getListSourcePath } from '@/utils/playList';
-import { toast } from 'vue-sonner';
-import { useRafFn } from '@vueuse/core';
+import { toast } from 'vue-sonner'; 
+import { useModalStore } from '@/store/modal';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
+
+const modalStore = useModalStore()
+
 
 // 定义接口
 interface LyricLine {
@@ -337,8 +343,7 @@ const store = useStore();
 const { 
   player, 
   settings,  
-  toggleLyrics, 
-  updateModal, 
+  toggleLyrics,
   likeATrack, 
   fetchLikedPlaylist 
 } = store;
@@ -559,16 +564,7 @@ const addToPlaylist = () => {
     return;
   }
   fetchLikedPlaylist();
-  updateModal({
-    modalName: 'addTrackToPlaylistModal',
-    key: 'show',
-    value: true,
-  });
-  updateModal({
-    modalName: 'addTrackToPlaylistModal',
-    key: 'selectedTrackID',
-    value: currentTrack.value?.id,
-  });
+  modalStore.showAddTrackToPlaylist(currentTrack.value!.id)
 };
 
 const playPrevTrack = () => {

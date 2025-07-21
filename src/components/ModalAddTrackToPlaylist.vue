@@ -1,14 +1,15 @@
 <template>
-  <Modal class="add-track-to-playlist-modal" :show="show" :close="close" :show-footer="false" title="添加到歌单"
+  <Modal class="add-track-to-playlist-modal" :show="show" :close="modalStore.closeAddTrackToPlaylist" :show-footer="false" title="添加到歌单"
     width="25vw">
     <template v-slot:default>
       <div class="new-playlist-button" @click="newPlaylist"><svg-icon icon-class="plus" />新建歌单</div>
-      <div v-for="playlist in ownPlaylists" :key="playlist.id" class="playlist"
-        @click="addTrackToPlaylist(playlist.id)">
-        <img :src="resizeImage(playlist.coverImgUrl, 224)" loading="lazy" />
-        <div class="info">
-          <div class="title">{{ playlist.name }}</div>
-          <div class="track-count">{{ playlist.trackCount }} 首</div>
+      <div v-for="playlist in ownPlaylists" :key="playlist.id"
+        class="flex p-2 rounded-xl cursor-pointer hover:bg-gray-100" @click="addTrackToPlaylist(playlist.id)">
+        <img class="rounded-lg h-11 w-11 mr-3 border border-gray-200" :src="resizeImage(playlist.coverImgUrl, 224)"
+          loading="lazy" />
+        <div>
+          <div class="line-clamp-1 break-all pr-4 text-base font-medium">{{ playlist.name }}</div>
+          <div class="text-sm opacity-68">{{ playlist.trackCount }} 首</div>
         </div>
       </div>
     </template>
@@ -22,39 +23,31 @@ import * as api from '@/api';
 import { resizeImage } from '@/utils/filters';
 import { toast } from 'vue-sonner'
 import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'; 
+import { useModalStore } from '@/store/modal';
+
+const modalStore = useModalStore()
 
 const { t } = useI18n();
 
-const { modals, updateModal, liked, data } = useStore()
+const { liked, data } = useStore()
 
 
-const show = computed({
-  get() {
-    return modals.addTrackToPlaylistModal.show
-  },
-  set(value) {
-    updateModal({ modalName: 'addTrackToPlaylistModal', key: 'show', value })
-  }
-})
+const show = computed(() => modalStore.show.addTrackToPlaylist)
 
 const ownPlaylists = computed(() => {
   return liked.playlists.filter(p => p.creator.userId === data.user.userId && p.id !== data.likedSongPlaylistID)
 })
 
 
-function close() {
-  show.value = false
-}
-
 function addTrackToPlaylist(playlistID: string) {
-        api.playlist.addOrRemoveTrackFromPlaylist({
+  api.playlist.addOrRemoveTrackFromPlaylist({
     op: 'add',
     pid: playlistID,
-    tracks: modals.addTrackToPlaylistModal.selectedTrackID,
+    tracks: `${modalStore.selectedTrackID}`,
   }).then(data => {
     if (data.body.code === 200) {
-      show.value = false;
+      modalStore.closeAddTrackToPlaylist()
       toast(t('toast.savedToPlaylist'));
     } else {
       toast(data.body.message);
@@ -63,17 +56,8 @@ function addTrackToPlaylist(playlistID: string) {
 }
 
 function newPlaylist() {
-  updateModal({
-    modalName: 'newPlaylistModal',
-    key: 'afterCreateAddTrackID',
-    value: modals.addTrackToPlaylistModal.selectedTrackID,
-  });
-  close();
-  updateModal({
-    modalName: 'newPlaylistModal',
-    key: 'show',
-    value: true,
-  });
+  modalStore.showNewPlaylist(modalStore.selectedTrackID)
+  modalStore.closeAddTrackToPlaylist()
 }
 
 </script>
@@ -104,50 +88,6 @@ function newPlaylist() {
   &:hover {
     color: var(--color-primary);
     background: var(--color-primary-bg-for-transparent);
-  }
-}
-
-.playlist {
-  display: flex;
-  padding: 6px;
-  border-radius: 8px;
-  cursor: pointer;
-
-  &:hover {
-    background: var(--color-secondary-bg-for-transparent);
-  }
-
-  img {
-    border-radius: 8px;
-    height: 42px;
-    width: 42px;
-    margin-right: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-  }
-
-  .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .title {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--color-text);
-    padding-right: 16px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
-    overflow: hidden;
-    word-break: break-all;
-  }
-
-  .track-count {
-    margin-top: 2px;
-    font-size: 13px;
-    opacity: 0.68;
-    color: var(--color-text);
   }
 }
 </style>

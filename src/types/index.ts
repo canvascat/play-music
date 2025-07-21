@@ -324,16 +324,6 @@ export interface GlobalState {
     clickObjectID: number;
     showMenu: boolean;
   };
-  modals: {
-    addTrackToPlaylistModal: {
-      show: boolean;
-      selectedTrackID: number;
-    };
-    newPlaylistModal: {
-      show: boolean;
-      afterCreateAddTrackID: number;
-    };
-  };
   dailyTracks: Track[];
   lastfm: Record<string, any>;
   player: PlayerState;

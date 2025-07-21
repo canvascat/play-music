@@ -20,62 +20,48 @@ import * as api from '@/api';
 import { toast } from 'vue-sonner'
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useModalStore } from '@/store/modal';
 
 const { t } = useI18n();
-
+const modalStore = useModalStore()
 const title = ref('')
 const privatePlaylist = ref(false)
-const { modals, updateModal, updateData, fetchLikedPlaylist } = useStore()
+const { updateData, fetchLikedPlaylist } = useStore()
 
-const show = computed({
-  get() {
-    return modals.newPlaylistModal.show
-  },
-  set(value) {
-    updateModal({ modalName: 'newPlaylistModal', key: 'show', value })
-  }
-})
+const show = computed(() => modalStore.show.newPlaylist)
 
 
 
 function close() {
-  show.value = false
+  modalStore.closeNewPlaylist()
   title.value = ''
-  privatePlaylist.value = false
-  resetAfterCreateAddTrackID()
+  privatePlaylist.value = false 
 }
 
 function _createPlaylist() {
   api.playlist.createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 }).then(data => {
     if (data.code === 200) {
-      if (modals.newPlaylistModal.afterCreateAddTrackID !== 0) {
+      if (modalStore.afterCreateAddTrackID !== 0) {
         api.playlist.addOrRemoveTrackFromPlaylist({
           op: 'add',
           pid: data.id,
-          tracks: modals.newPlaylistModal.afterCreateAddTrackID,
+          tracks: `${modalStore.afterCreateAddTrackID}`,
         }).then(data => {
           if (data.body.code === 200) {
             toast(t('toast.savedToPlaylist'));
           } else {
             toast(data.body.message);
-          }
-          resetAfterCreateAddTrackID();
+          } 
         });
       }
-      close();
+      close()
       toast('成功创建歌单');
       updateData({ key: 'libraryPlaylistFilter', value: 'mine' });
       fetchLikedPlaylist();
     }
   });
 }
-function resetAfterCreateAddTrackID() {
-  updateModal({
-    modalName: 'newPlaylistModal',
-    key: 'afterCreateAddTrackID',
-    value: 0,
-  });
-}
+ 
 
 </script>
 

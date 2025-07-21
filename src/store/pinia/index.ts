@@ -45,9 +45,6 @@ export const useStore = defineStore('store', {
         this.settings.enabledPlaylistCategories.push(name);
       }
     },
-    updateModal({ modalName, key, value }) {
-      this.modals[modalName][key] = value;
-    },
     toggleLyrics() {
       this.showLyrics = !this.showLyrics;
     },

@@ -164,7 +164,7 @@ import CoverRow from '@/components/CoverRow.vue';
 import SvgIcon from '@/components/SvgIcon.vue';
 import MvRow from '@/components/MvRow.vue';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-
+import { useModalStore } from '@/store/modal';
 // 定义接口
 interface Playlist {
   id: number;
@@ -192,11 +192,11 @@ function extractLyricPart(rawLyric: string): string {
 
 const router = useRouter();
 const { t } = useI18n();
+const modalStore = useModalStore()
 const {
   data,
   liked,
   player,
-  updateModal,
   updateData,
   fetchLikedSongsWithDetails,
   fetchLikedSongs,
@@ -351,11 +351,7 @@ const openAddPlaylistModal = () => {
     toast(t('toast.needToLogin'));
     return;
   }
-  updateModal({
-    modalName: 'newPlaylistModal',
-    key: 'show',
-    value: true,
-  });
+  modalStore.showNewPlaylist()
 };
 
 

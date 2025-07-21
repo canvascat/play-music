@@ -58,9 +58,11 @@ import { useI18n } from 'vue-i18n';
 import TrackListItem from '@/components/TrackListItem.vue'; 
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '@/components/ui/context-menu'
 import { copyText } from '@/utils/copy';
+import { useModalStore } from '@/store/modal';
+
 
 const { t } = useI18n();
-
+const modalStore = useModalStore()
 const emits = defineEmits(['removeTrack']);
 interface Props {
   tracks?: any[];
@@ -89,10 +91,7 @@ const props = withDefaults(defineProps<Props>(), {
   highlightPlayingTrack: true,
   itemKey: 'id',
 })
-const { liked, player, updateModal, likeATrack, updateLikedXXX } = useStore()
-
- 
-
+const { liked, player, likeATrack, updateLikedXXX } = useStore()
 
 const listStyles = ref({
   // display: 'grid',
@@ -156,16 +155,7 @@ function addTrackToPlaylist(trackID: string) {
     toast(t('toast.needToLogin'));
     return;
   }
-  updateModal({
-    modalName: 'addTrackToPlaylistModal',
-    key: 'show',
-    value: true,
-  });
-  updateModal({
-    modalName: 'addTrackToPlaylistModal',
-    key: 'selectedTrackID',
-    value: trackID,
-  });
+  modalStore.showAddTrackToPlaylist(trackID)
 }
 function removeTrackFromPlaylist(track: any) {
   if (!isAccountLoggedIn()) {
