@@ -1,13 +1,16 @@
 import request, { noCacheParams } from '@/utils/request';
 import * as NCMAPI from './NCMAPI';
-import type { UserAccountResponse } from '@/types';
+import type { UserAccountResponse, UserDetailResponse, UserPlaylistResponse } from '@/types';
+import type { CloudDiskResponse, UserPlayHistoryResponse } from '@/types/api';
+import type {  LikedAlbumsResponse, LikedMVsResponse, LikedSongsResponse } from '@/types/api';
+import type { LikedArtistsResponse } from '@/types/api';
 
 /**
  * 获取用户详情
  * 说明 : 登录后调用此接口 , 传入用户 id, 可以获取用户详情
  * - uid : 用户 id 
  */
-export function userDetail(uid: NCMAPI.user_detail[0]['uid']) {
+export function userDetail(uid: NCMAPI.user_detail[0]['uid']): Promise<UserDetailResponse> {
   return request({
     url: '/user/detail',
     method: 'get',
@@ -34,7 +37,7 @@ export function userAccount(): Promise<UserAccountResponse> {
  * - limit : 返回数量 , 默认为 30
  * - offset : 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0 
  */
-export function userPlaylist(params: NCMAPI.user_playlist[0]) {
+export function userPlaylist(params: NCMAPI.user_playlist[0]): Promise<UserPlaylistResponse> {
   return request({
     url: '/user/playlist',
     method: 'get',
@@ -48,7 +51,7 @@ export function userPlaylist(params: NCMAPI.user_playlist[0]) {
  * - uid : 用户 id
  * - type : type=1 时只返回 weekData, type=0 时返回 allData 
  */
-export function userPlayHistory(params: NCMAPI.user_record[0]) {
+export function userPlayHistory(params: NCMAPI.user_record[0]): Promise<UserPlayHistoryResponse> {
   return request({
     url: '/user/record',
     method: 'get',
@@ -62,7 +65,7 @@ export function userPlayHistory(params: NCMAPI.user_record[0]) {
  * - uid: 用户 id
  * @param {number} uid
  */
-export function userLikedSongsIDs(uid: NCMAPI.likelist[0]['uid']) {
+export function userLikedSongsIDs(uid: NCMAPI.likelist[0]['uid']): Promise<LikedSongsResponse> {
   return request({
     url: '/likelist',
     method: 'get',
@@ -90,7 +93,7 @@ export function dailySignin(type: NCMAPI.daily_signin[0]['type'] = 0) {
  * - limit : 返回数量 , 默认为 25
  * - offset : 偏移数量，用于分页 , 如 :( 页数 -1)*25, 其中 25 为 limit 的值 , 默认为 0
  */
-export function likedAlbums(params: NCMAPI.album_sublist[0]) {
+export function likedAlbums(params: NCMAPI.album_sublist[0]): Promise<LikedAlbumsResponse> {
   return request({
     url: '/album/sublist',
     method: 'get',
@@ -102,7 +105,7 @@ export function likedAlbums(params: NCMAPI.album_sublist[0]) {
  * 获取收藏的歌手（需要登录）
  * 说明 : 调用此接口可获取到用户收藏的歌手
  */
-export function likedArtists(params: NCMAPI.artist_sublist[0]) {
+export function likedArtists(params: NCMAPI.artist_sublist[0]): Promise<LikedArtistsResponse> {
   return request({
     url: '/artist/sublist',
     method: 'get',
@@ -114,7 +117,7 @@ export function likedArtists(params: NCMAPI.artist_sublist[0]) {
  * 获取收藏的MV（需要登录）
  * 说明 : 调用此接口可获取到用户收藏的MV
  */
-export function likedMVs(params: NCMAPI.mv_sublist[0]) {
+export function likedMVs(params: NCMAPI.mv_sublist[0]): Promise<LikedMVsResponse> {
   return request({
     url: '/mv/sublist',
     method: 'get',
@@ -125,7 +128,7 @@ export function likedMVs(params: NCMAPI.mv_sublist[0]) {
 /**
  * 上传歌曲到云盘（需要登录）
  */
-export function uploadSong(file: File) {
+export function uploadSong(file: File)  {
   let formData = new FormData();
   formData.append('songFile', file);
   return request({
@@ -148,7 +151,7 @@ export function uploadSong(file: File) {
  * - limit : 返回数量 , 默认为 200
  * - offset : 偏移数量，用于分页 , 如 :( 页数 -1)*200, 其中 200 为 limit 的值 , 默认为 0 
  */
-export function cloudDisk(params: NCMAPI.user_cloud[0]) {
+export function cloudDisk(params: NCMAPI.user_cloud[0]): Promise<CloudDiskResponse> {
   return request({
     url: '/user/cloud',
     method: 'get',
@@ -159,7 +162,7 @@ export function cloudDisk(params: NCMAPI.user_cloud[0]) {
 /**
  * 获取云盘歌曲详情（需要登录）
  */
-export function cloudDiskTrackDetail(id: NCMAPI.user_cloud_detail[0]['id']) {
+export function cloudDiskTrackDetail(id: NCMAPI.user_cloud_detail[0]['id'])  {
   return request({
     url: '/user/cloud/detail',
     method: 'get',

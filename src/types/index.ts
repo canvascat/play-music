@@ -246,7 +246,6 @@ export interface MVBr {
 
 // 播放器相关类型
 export interface PlayerState {
-  id: number;
   playing: boolean;
   progress: number;
   enabled: boolean;
@@ -254,16 +253,8 @@ export interface PlayerState {
   repeatMode: RepeatMode;
   reversed: boolean;
   volume: number;
-  volumeBeforeMuted: number;
-  playlist: {
-    id: number;
-    tracks: Track[];
-  };
-  currentTrackIndex: number;
   playlistSource: PlaylistSource;
-  personalFMTrack: Track | null;
-  personalFMLoading: boolean;
-  personalFMNextLoading: boolean;
+  personalFMTrack?: Track;
 }
 
 export type RepeatMode = 'off' | 'on' | 'one';
@@ -310,7 +301,7 @@ export interface GlobalState {
   liked: {
     songs: number[];
     songsWithDetails: Track[];
-    playlists: number[];
+    playlists: Playlist[];
     albums: number[];
     artists: number[];
     mvs: number[];
@@ -320,17 +311,12 @@ export interface GlobalState {
       allData: Track[];
     };
   };
-  contextMenu: {
-    clickObjectID: number;
-    showMenu: boolean;
-  };
   dailyTracks: Track[];
   lastfm: Record<string, any>;
   player: PlayerState;
   settings: Settings;
   data: {
     user: User | null;
-    loginMode: string | null;
     likedSongPlaylistID: number;
   };
 }
@@ -405,14 +391,17 @@ export interface PaginationParams {
 export interface EventBus {
   'player:progress': number;
   'player:track-change': Track;
-  'player:play': void;
-  'player:pause': void;
-  'player:next': void;
-  'player:previous': void;
+  'player:play': null;
+  'player:pause': null;
+  'player:next': null;
+  'player:previous': null;
   'player:repeat-mode-change': RepeatMode;
   'player:shuffle-change': boolean;
   'player:volume-change': number;
-  'toast:show': { message: string; type?: 'success' | 'error' | 'warning' | 'info' };
+  'toast:show': {
+    message: string;
+    type?: 'success' | 'error' | 'warning' | 'info';
+  };
 }
 
 // 组件通用Props类型

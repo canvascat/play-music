@@ -78,34 +78,32 @@
 </template>
 
 <script setup lang="ts">
-import QRCode from 'qrcode';
 import md5 from 'crypto-js/md5';
 import NProgress from 'nprogress';
+import QRCode from 'qrcode';
+import { onBeforeUnmount, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import * as api from '@/api';
 import { useStore } from '@/store/pinia';
 import { setCookies } from '@/utils/auth';
 import nativeAlert from '@/utils/nativeAlert';
-import * as api from '@/api';
-import { onBeforeUnmount, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 
+const route = useRoute();
+const router = useRouter();
+const processing = ref(false);
+const mode = ref('qrCode');
+const countryCode = ref('+86');
+const phoneNumber = ref('');
+const email = ref('');
+const password = ref('');
 
-const route = useRoute()
-const router = useRouter()
-const processing = ref(false)
-const mode = ref('qrCode')
-const countryCode = ref('+86')
-const phoneNumber = ref('')
-const email = ref('')
-const password = ref('')
-
-const inputFocus = ref('')
-const qrCodeKey = ref('')
-const qrCodeSvg = ref('')
-const qrCodeInformation = ref('打开网易云音乐APP扫码登录')
-let qrCodeCheckInterval: number | undefined
+const inputFocus = ref('');
+const qrCodeKey = ref('');
+const qrCodeSvg = ref('');
+const qrCodeInformation = ref('打开网易云音乐APP扫码登录');
+let qrCodeCheckInterval: number | undefined;
 
 const isElectron = window.IS_ELECTRON;
-
 
 if (['phone', 'email', 'qrCode'].includes(route.query.mode as string)) {
   mode.value = route.query.mode as string;
@@ -114,9 +112,9 @@ getQrCodeKey();
 
 onBeforeUnmount(() => {
   clearInterval(qrCodeCheckInterval);
-})
+});
 
-const { updateData, fetchUserProfile, fetchLikedPlaylist } = useStore()
+const { fetchUserProfile, fetchLikedPlaylist } = useStore();
 
 function validatePhone() {
   if (
@@ -146,28 +144,30 @@ function validateEmail() {
 function login() {
   if (mode.value === 'phone') {
     processing.value = validatePhone();
-    if (!processing.value) return;
-    api.auth.loginWithPhone({
-      countrycode: countryCode.value.replace('+', '').replace(/\s/g, ''),
-      phone: phoneNumber.value.replace(/\s/g, ''),
-      password: 'fakePassword',
-      md5_password: md5(password.value).toString(),
-    })
+    if (!processing.value) { return; }
+    api.auth
+      .loginWithPhone({
+        countrycode: countryCode.value.replace('+', '').replace(/\s/g, ''),
+        phone: phoneNumber.value.replace(/\s/g, ''),
+        password: 'fakePassword',
+        md5_password: md5(password.value).toString(),
+      })
       .then(handleLoginResponse)
-      .catch(error => {
+      .catch((error) => {
         processing.value = false;
         nativeAlert(`发生错误，请检查你的账号密码是否正确\n${error}`);
       });
   } else {
     processing.value = validateEmail();
-    if (!processing.value) return;
-    api.auth.loginWithEmail({
-      email: email.value.replace(/\s/g, ''),
-      password: 'fakePassword',
-      md5_password: md5(password.value).toString(),
-    })
+    if (!processing.value) { return; }
+    api.auth
+      .loginWithEmail({
+        email: email.value.replace(/\s/g, ''),
+        password: 'fakePassword',
+        md5_password: md5(password.value).toString(),
+      })
       .then(handleLoginResponse)
-      .catch(error => {
+      .catch((error) => {
         processing.value = false;
         nativeAlert(`发生错误，请检查你的账号密码是否正确\n${error}`);
       });
@@ -180,7 +180,6 @@ function handleLoginResponse(data) {
   }
   if (data.code === 200) {
     setCookies(data.cookie);
-    updateData({ key: 'loginMode', value: 'account' });
     fetchUserProfile().then(() => {
       fetchLikedPlaylist().then(() => {
         router.push({ path: '/library' });
@@ -192,7 +191,7 @@ function handleLoginResponse(data) {
   }
 }
 function getQrCodeKey() {
-  return api.auth.loginQrCodeKey().then(result => {
+  return api.auth.loginQrCodeKey().then((result) => {
     if (result.code === 200) {
       qrCodeKey.value = result.data.unikey;
       QRCode.toString(
@@ -207,12 +206,12 @@ function getQrCodeKey() {
           type: 'svg',
         }
       )
-        .then(svg => {
+        .then((svg) => {
           qrCodeSvg.value = `data:image/svg+xml;utf8,${encodeURIComponent(
             svg
           )}`;
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         })
         .finally(() => {
@@ -227,7 +226,7 @@ function checkQrCodeLogin() {
   clearInterval(qrCodeCheckInterval);
   qrCodeCheckInterval = setInterval(() => {
     if (qrCodeKey.value === '') return;
-    api.auth.loginQrCodeCheck(qrCodeKey.value).then(result => {
+    api.auth.loginQrCodeCheck(qrCodeKey.value).then((result) => {
       if (result.code === 800) {
         getQrCodeKey(); // 重新生成QrCode
         qrCodeInformation.value = '二维码已失效，请重新扫码';
@@ -253,7 +252,6 @@ function changeMode(mode) {
     clearInterval(qrCodeCheckInterval);
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
