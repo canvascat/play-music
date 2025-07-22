@@ -1,10 +1,10 @@
-import { playlistCategories } from '@/utils/staticData';
 import shortcuts from '@/utils/shortcuts';
+import { playlistCategories } from '@/utils/staticData';
 
 console.debug('[debug][initLocalStorage.js]');
 const enabledPlaylistCategories = playlistCategories
-  .filter(c => c.enable)
-  .map(c => c.name);
+  .filter((c) => c.enable)
+  .map((c) => c.name);
 
 const localStorage = {
   player: {},
@@ -12,7 +12,7 @@ const localStorage = {
     lang: null,
     musicLanguage: 'all',
     appearance: 'auto',
-    musicQuality: 320000,
+    musicQuality: 320_000,
     lyricFontSize: 28,
     outputDevice: 'default',
     showPlaylistsByAppleMusic: true,
@@ -38,13 +38,12 @@ const localStorage = {
     },
     enableRealIP: false,
     realIP: null,
-    shortcuts: shortcuts,
+    shortcuts,
   },
   data: {
     user: {},
     likedSongPlaylistID: 0,
     lastRefreshCookieDate: 0,
-    loginMode: null,
   },
 };
 

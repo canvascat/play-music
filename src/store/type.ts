@@ -1,10 +1,7 @@
-import type { User } from "@/types";
-
-type LoginMode = 'account' | 'phone' | 'email';
+import type { User } from '@/types';
 
 export interface DataStore {
   user: User;
-  loginMode: LoginMode | null;
   likedSongPlaylistID: number;
   lastRefreshCookieDate: number;
 }

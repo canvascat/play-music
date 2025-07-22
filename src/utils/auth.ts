@@ -4,44 +4,29 @@ import { useStore } from '@/store/pinia';
 
 export function setCookies(string: string) {
   const cookies = string.split(';;');
-  cookies.map(cookie => {
-    document.cookie = cookie;
+  for (const cookie of cookies) {
     const cookieKeyValue = cookie.split(';')[0].split('=');
+    Cookies.set(cookieKeyValue[0], cookieKeyValue[1]);
     localStorage.setItem(`cookie-${cookieKeyValue[0]}`, cookieKeyValue[1]);
-  });
+  }
 }
 
 export function getCookie(key: string) {
   return Cookies.get(key) ?? localStorage.getItem(`cookie-${key}`);
 }
 
-export function removeCookie(key: string) {
+function removeCookie(key: string) {
   Cookies.remove(key);
   localStorage.removeItem(`cookie-${key}`);
 }
 
-// MUSIC_U 只有在账户登录的情况下才有
-export function isLoggedIn() {
+// 账号登录
+export function isAccountLoggedIn() {
   return getCookie('MUSIC_U') !== undefined;
 }
 
-// 账号登录
-export function isAccountLoggedIn() {
-  return (
-    getCookie('MUSIC_U') !== undefined &&
-    useStore().data.loginMode === 'account'
-  );
-}
-
-// 用户名搜索（用户数据为只读）
-export function isUsernameLoggedIn() {
-  return useStore().data.loginMode === 'username';
-}
-
-// 账户登录或者用户名搜索都判断为登录，宽松检查
-export function isLooseLoggedIn() {
-  return isAccountLoggedIn() || isUsernameLoggedIn();
-}
+/** @deprecated */
+export const isLooseLoggedIn = isAccountLoggedIn;
 
 export function doLogout() {
   api.auth.logout();
@@ -50,8 +35,6 @@ export function doLogout() {
   const store = useStore();
   // 更新状态仓库中的用户信息
   store.updateData({ key: 'user', value: {} });
-  // 更新状态仓库中的登录状态
-  store.updateData({ key: 'loginMode', value: null });
   // 更新状态仓库中的喜欢列表
   store.updateData({ key: 'likedSongPlaylistID', value: undefined });
 }

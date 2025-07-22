@@ -1,13 +1,13 @@
-import { useStore } from '@/store/pinia';
-import request, { noCacheParams } from '@/utils/request';
-import { mapTrackPlayableStatus } from '@/utils/common';
+import { useStore } from "@/store/pinia";
+import { mapTrackPlayableStatus } from "@/utils/common";
 import {
-  cacheTrackDetail,
-  getTrackDetailFromCache,
-  cacheLyric,
-  getLyricFromCache,
-} from '@/utils/db';
-import * as NCMAPI from './NCMAPI';
+	cacheLyric,
+	cacheTrackDetail,
+	getLyricFromCache,
+	getTrackDetailFromCache,
+} from "@/utils/db";
+import request, { noCacheParams } from "@/utils/request";
+import type * as NCMAPI from "./NCMAPI";
 
 /**
  * 获取音乐 url
@@ -15,21 +15,21 @@ import * as NCMAPI from './NCMAPI';
  * !!!未登录状态返回试听片段(返回字段包含被截取的正常歌曲的开始时间和结束时间)
  * @param {string} id - 音乐的 id，例如 id=405998841,33894312
  */
-export function getMP3(id: NCMAPI.song_url[0]['id']) {
-  const getBr = () => {
-    // 当返回的 quality >= 400000时，就会优先返回 hi-res
-    const quality = useStore().settings?.musicQuality ?? '320000';
-    return quality === 'flac' ? '350000' : quality;
-  };
+export function getMP3(id: NCMAPI.song_url[0]["id"]) {
+	const getBr = () => {
+		// 当返回的 quality >= 400000时，就会优先返回 hi-res
+		const quality = useStore().settings?.musicQuality ?? "320000";
+		return quality === "flac" ? "350000" : quality;
+	};
 
-  return request({
-    url: '/song/url',
-    method: 'get',
-    params: {
-      id,
-      br: getBr(),
-    },
-  });
+	return request({
+		url: "/song/url",
+		method: "get",
+		params: {
+			id,
+			br: getBr(),
+		},
+	});
 }
 
 /**
@@ -37,36 +37,36 @@ export function getMP3(id: NCMAPI.song_url[0]['id']) {
  * 说明 : 调用此接口 , 传入音乐 id(支持多个 id, 用 , 隔开), 可获得歌曲详情(注意:歌曲封面现在需要通过专辑内容接口获取)
  * @param {string} ids - 音乐 id, 例如 ids=405998841,33894312
  */
-export function getTrackDetail(ids: NCMAPI.song_detail[0]['ids']) {
-  const fetchLatest = () => {
-    return request({
-      url: '/song/detail',
-      method: 'get',
-      params: {
-        ids,
-      },
-    }).then(data => {
-      data.songs.map(song => {
-        const privileges = data.privileges.find(t => t.id === song.id);
-        cacheTrackDetail(song, privileges);
-      });
-      data.songs = mapTrackPlayableStatus(data.songs, data.privileges);
-      return data;
-    });
-  };
-  fetchLatest();
+export function getTrackDetail(ids: NCMAPI.song_detail[0]["ids"]) {
+	const fetchLatest = () => {
+		return request({
+			url: "/song/detail",
+			method: "get",
+			params: {
+				ids,
+			},
+		}).then((data) => {
+			data.songs.map((song) => {
+				const privileges = data.privileges.find((t) => t.id === song.id);
+				cacheTrackDetail(song, privileges);
+			});
+			data.songs = mapTrackPlayableStatus(data.songs, data.privileges);
+			return data;
+		});
+	};
+	fetchLatest();
 
-  let idsInArray = [String(ids)];
-  if (typeof ids === 'string') {
-    idsInArray = ids.split(',');
-  }
+	let idsInArray = [String(ids)];
+	if (typeof ids === "string") {
+		idsInArray = ids.split(",");
+	}
 
-  return getTrackDetailFromCache(idsInArray).then(result => {
-    if (result) {
-      result.songs = mapTrackPlayableStatus(result.songs, result.privileges);
-    }
-    return result ?? fetchLatest();
-  });
+	return getTrackDetailFromCache(idsInArray).then((result) => {
+		if (result) {
+			result.songs = mapTrackPlayableStatus(result.songs, result.privileges);
+		}
+		return result ?? fetchLatest();
+	});
 }
 
 /**
@@ -74,25 +74,25 @@ export function getTrackDetail(ids: NCMAPI.song_detail[0]['ids']) {
  * 说明 : 调用此接口 , 传入音乐 id 可获得对应音乐的歌词 ( 不需要登录 )
  * @param {number} id - 音乐 id
  */
-export function getLyric(id: NCMAPI.lyric[0]['id']) {
-  const fetchLatest = () => {
-    return request({
-      url: '/lyric',
-      method: 'get',
-      params: {
-        id,
-      },
-    }).then(result => {
-      cacheLyric(id, result);
-      return result;
-    });
-  };
+export function getLyric(id: string | number) {
+	const fetchLatest = () => {
+		return request({
+			url: "/lyric",
+			method: "get",
+			params: {
+				id,
+			},
+		}).then((result) => {
+			cacheLyric(id, result);
+			return result;
+		});
+	};
 
-  fetchLatest();
+	fetchLatest();
 
-  return getLyricFromCache(id).then(result => {
-    return result ?? fetchLatest();
-  });
+	return getLyricFromCache(id).then((result) => {
+		return result ?? fetchLatest();
+	});
 }
 
 /**
@@ -100,29 +100,28 @@ export function getLyric(id: NCMAPI.lyric[0]['id']) {
  * 说明 : 调用此接口 , 可获取新歌速递
  * @param {number} type - 地区类型 id, 对应以下: 全部:0 华语:7 欧美:96 日本:8 韩国:16
  */
-export function topSong(type: NCMAPI.top_song[0]['type']) {
-  return request({
-    url: '/top/song',
-    method: 'get',
-    params: {
-      type,
-    },
-  });
+export function topSong(type: NCMAPI.top_song[0]["type"]) {
+	return request({
+		url: "/top/song",
+		method: "get",
+		params: {
+			type,
+		},
+	});
 }
 
 /**
  * 喜欢音乐
  * 说明 : 调用此接口 , 传入音乐 id, 可喜欢该音乐
  * - id - 歌曲 id
- * - like - 默认为 true 即喜欢 , 若传 false, 则取消喜欢 
+ * - like - 默认为 true 即喜欢 , 若传 false, 则取消喜欢
  */
 export function likeATrack(params: NCMAPI.like[0]) {
- 
-  return request({
-    url: '/like',
-    method: 'get',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/like",
+		method: "get",
+		params: noCacheParams(params),
+	});
 }
 
 /**
@@ -134,9 +133,9 @@ export function likeATrack(params: NCMAPI.like[0]) {
  * - time - 歌曲播放时间,单位为秒
  */
 export function scrobble(params: NCMAPI.scrobble[0]) {
-  return request({
-    url: '/scrobble',
-    method: 'get',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/scrobble",
+		method: "get",
+		params: noCacheParams(params),
+	});
 }
