@@ -1,36 +1,29 @@
 import type {
-  AlbumDetailResponse,
-  LikedAlbumsResponse,
-  NewAlbumResponse,
-} from '@/types/api';
-import { mapTrackPlayableStatus } from '@/utils/common';
-import { cacheAlbum, getAlbumFromCache } from '@/utils/db';
-import request, { noCacheParams } from '@/utils/request';
-import type * as NCMAPI from './NCMAPI';
+	AlbumDetailResponse,
+	LikedAlbumsResponse,
+	NewAlbumResponse,
+} from "@/types/api";
+import { mapTrackPlayableStatus } from "@/utils/common";
+import * as db from "@/utils/db/index";
+import request, { noCacheParams } from "@/utils/request";
+import type * as NCMAPI from "./NCMAPI";
 
 /**
  * 获取专辑内容
  * 说明 : 调用此接口 , 传入专辑 id, 可获得专辑内容
  */
-export function getAlbum(id: string | number) {
-  const fetchLatest = () => {
-    return request({
-      url: '/album',
-      method: 'get',
-      params: {
-        id,
-      },
-    }).then((data) => {
-      cacheAlbum(id, data);
-      data.songs = mapTrackPlayableStatus(data.songs);
-      return data;
-    });
-  };
-  fetchLatest();
+export async function getAlbum(id: number): Promise<AlbumDetailResponse> {
+	let result = await db.album.read(id);
+	if (result) return result;
+	result = await request<AlbumDetailResponse>({
+		url: "/album",
+		method: "get",
+		params: { id },
+	});
 
-  return getAlbumFromCache(id).then((result) => {
-    return result ?? fetchLatest();
-  });
+	result.songs = mapTrackPlayableStatus(result.songs);
+	db.album.write(id, result);
+	return result;
 }
 
 /**
@@ -41,13 +34,13 @@ export function getAlbum(id: string | number) {
  * - area - ALL:全部,ZH:华语,EA:欧美,KR:韩国,JP:日本
  */
 export function newAlbums(
-  params: NCMAPI.album_new[0]
+	params: NCMAPI.album_new[0],
 ): Promise<NewAlbumResponse> {
-  return request({
-    url: '/album/new',
-    method: 'get',
-    params,
-  });
+	return request({
+		url: "/album/new",
+		method: "get",
+		params,
+	});
 }
 
 /**
@@ -57,13 +50,13 @@ export function newAlbums(
  * @param {number} id
  */
 export function albumDynamicDetail(
-  id: NCMAPI.album_detail_dynamic[0]['id']
+	id: NCMAPI.album_detail_dynamic[0]["id"],
 ): Promise<AlbumDetailResponse> {
-  return request({
-    url: '/album/detail/dynamic',
-    method: 'get',
-    params: noCacheParams({ id }),
-  });
+	return request({
+		url: "/album/detail/dynamic",
+		method: "get",
+		params: noCacheParams({ id }),
+	});
 }
 
 /**
@@ -73,11 +66,11 @@ export function albumDynamicDetail(
  * - t - 1 为收藏,其他为取消收藏
  */
 export function likeAAlbum(
-  params: NCMAPI.album_sub[0]
+	params: NCMAPI.album_sub[0],
 ): Promise<LikedAlbumsResponse> {
-  return request({
-    url: '/album/sub',
-    method: 'post',
-    params,
-  });
+	return request({
+		url: "/album/sub",
+		method: "post",
+		params,
+	});
 }

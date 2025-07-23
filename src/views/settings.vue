@@ -54,19 +54,19 @@
           <select v-model="musicLanguage">
             <option value="all">{{
               $t('settings.MusicGenrePreference.none')
-              }}</option>
+            }}</option>
             <option value="zh">{{
               $t('settings.MusicGenrePreference.mandarin')
-              }}</option>
+            }}</option>
             <option value="ea">{{
               $t('settings.MusicGenrePreference.western')
-              }}</option>
+            }}</option>
             <option value="jp">{{
               $t('settings.MusicGenrePreference.japanese')
-              }}</option>
+            }}</option>
             <option value="kr">{{
               $t('settings.MusicGenrePreference.korean')
-              }}</option>
+            }}</option>
           </select>
         </div>
       </div>
@@ -578,8 +578,8 @@
                   shortcutInput.type === 'globalShortcut' &&
                   enableGlobalShortcut,
               }" @click.stop="
-                  readyToRecordShortcut(shortcut.id, 'globalShortcut')
-                  ">{{
+                readyToRecordShortcut(shortcut.id, 'globalShortcut')
+                ">{{
                   shortcutInput.id === shortcut.id &&
                     shortcutInput.type === 'globalShortcut' &&
                     recordedShortcutComputed !== ''
@@ -603,46 +603,46 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import { isLooseLoggedIn, doLogout } from '@/utils/auth';
-import * as api from '@/api';
-import { changeAppearance, bytesToSize } from '@/utils/common';
-import { countDBSize as countDBSizeApi, clearDB } from '@/utils/db';
-import pkg from '../../package.json';
-import { toast } from 'vue-sonner'
-import { ref, computed, onActivated } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
-import { isLinux } from '@/utils/platform';
+import { computed, onActivated, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+import { toast } from "vue-sonner";
+import * as api from "@/api";
+import { useStore } from "@/store/pinia";
+import { doLogout, isLooseLoggedIn } from "@/utils/auth";
+import { bytesToSize, changeAppearance } from "@/utils/common";
+import * as db from "@/utils/db/index";
+import { isLinux } from "@/utils/platform";
+import pkg from "../../package.json";
 
 const i18n = useI18n();
-const validShortcutCodes = ['=', '-', '~', '[', ']', ';', "'", ',', '.', '/'];
+const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
 const router = useRouter();
 
 const tracksCache = ref({
-  size: '0KB',
+  size: "0KB",
   length: 0,
 });
 
 const allOutputDevices = ref([
   {
-    deviceId: 'default',
-    label: 'settings.permissionRequired',
+    deviceId: "default",
+    label: "settings.permissionRequired",
   },
 ]);
 
 const shortcutInput = ref({
-  id: '',
-  type: '',
+  id: "",
+  type: "",
   recording: false,
 });
 
 const recordedShortcut = ref<KeyboardEvent[]>([]);
 
-const { player, settings, data, lastfm } = useStore()
+const { player, settings, data, lastfm } = useStore();
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
- 
+
 const version = pkg.version;
 
 const {
@@ -654,32 +654,34 @@ const {
   updateLastfm,
   updateShortcut,
   restoreDefaultShortcuts,
-} = useStore()
+} = useStore();
 
-const showUserInfo = computed(() => isLooseLoggedIn() && data.value.user.nickname);
+const showUserInfo = computed(
+  () => isLooseLoggedIn() && data.user.nickname,
+);
 
 const recordedShortcutComputed = computed(() => {
   let shortcut: string[] = [];
-  recordedShortcut.value.map(e => {
+  recordedShortcut.value.map((e) => {
     if (e.keyCode >= 65 && e.keyCode <= 90) {
       // A-Z
-      shortcut.push(e.code.replace('Key', ''));
-    } else if (e.key === 'Meta') {
+      shortcut.push(e.code.replace("Key", ""));
+    } else if (e.key === "Meta") {
       // ⌘ Command on macOS
-      shortcut.push('Command');
-    } else if (['Alt', 'Control', 'Shift'].includes(e.key)) {
+      shortcut.push("Command");
+    } else if (["Alt", "Control", "Shift"].includes(e.key)) {
       shortcut.push(e.key);
     } else if (e.keyCode >= 48 && e.keyCode <= 57) {
       // 0-9
-      shortcut.push(e.code.replace('Digit', ''));
+      shortcut.push(e.code.replace("Digit", ""));
     } else if (e.keyCode >= 112 && e.keyCode <= 123) {
       // F1-F12
       shortcut.push(e.code);
     } else if (
-      ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key)
+      ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)
     ) {
       // Arrows
-      shortcut.push(e.code.replace('Arrow', ''));
+      shortcut.push(e.code.replace("Arrow", ""));
     } else if (validShortcutCodes.includes(e.key)) {
       shortcut.push(e.key);
     }
@@ -700,7 +702,7 @@ const recordedShortcutComputed = computed(() => {
       return 0;
     }
   });
-  return shortcut.join('+');
+  return shortcut.join("+");
 });
 
 const lang = computed({
@@ -715,11 +717,11 @@ const lang = computed({
 
 const musicLanguage = computed({
   get() {
-    return settings.musicLanguage ?? 'all';
+    return settings.musicLanguage ?? "all";
   },
   set(value) {
     updateSettings({
-      key: 'musicLanguage',
+      key: "musicLanguage",
       value,
     });
   },
@@ -727,12 +729,12 @@ const musicLanguage = computed({
 
 const appearance = computed({
   get() {
-    if (settings.appearance === undefined) return 'auto';
+    if (settings.appearance === undefined) return "auto";
     return settings.appearance;
   },
   set(value) {
     updateSettings({
-      key: 'appearance',
+      key: "appearance",
       value,
     });
     changeAppearance(value);
@@ -750,9 +752,6 @@ const musicQuality = computed({
   },
 });
 
-
-
-
 const lyricFontSize = computed({
   get() {
     if (settings.lyricFontSize === undefined) return 28;
@@ -761,26 +760,22 @@ const lyricFontSize = computed({
   set(value) {
     changeLyricFontSize(value);
   },
-})
+});
 const outputDevice = computed({
   get() {
     const isValidDevice = allOutputDevices.value.find(
-      device => device.deviceId === settings.outputDevice
+      (device) => device.deviceId === settings.outputDevice,
     );
-    if (
-      settings.outputDevice === undefined ||
-      isValidDevice === undefined
-    )
-      return 'default'; // Default deviceId
+    if (settings.outputDevice === undefined || isValidDevice === undefined)
+      return "default"; // Default deviceId
     return settings.outputDevice;
   },
   set(deviceId) {
-    if (deviceId === settings.outputDevice || deviceId === undefined)
-      return;
+    if (deviceId === settings.outputDevice || deviceId === undefined) return;
     changeOutputDevice(deviceId);
     player.setOutputDevice();
   },
-})
+});
 const enableUnblockNeteaseMusic = computed({
   get() {
     const value = settings.enableUnblockNeteaseMusic;
@@ -788,11 +783,11 @@ const enableUnblockNeteaseMusic = computed({
   },
   set(value) {
     updateSettings({
-      key: 'enableUnblockNeteaseMusic',
+      key: "enableUnblockNeteaseMusic",
       value,
     });
   },
-})
+});
 const showPlaylistsByAppleMusic = computed({
   get() {
     if (settings.showPlaylistsByAppleMusic === undefined) return true;
@@ -800,11 +795,11 @@ const showPlaylistsByAppleMusic = computed({
   },
   set(value) {
     updateSettings({
-      key: 'showPlaylistsByAppleMusic',
+      key: "showPlaylistsByAppleMusic",
       value,
     });
   },
-})
+});
 const nyancatStyle = computed({
   get() {
     if (settings.nyancatStyle === undefined) return false;
@@ -812,11 +807,11 @@ const nyancatStyle = computed({
   },
   set(value) {
     updateSettings({
-      key: 'nyancatStyle',
+      key: "nyancatStyle",
       value,
     });
   },
-})
+});
 const automaticallyCacheSongs = computed({
   get() {
     if (settings.automaticallyCacheSongs === undefined) return false;
@@ -824,91 +819,91 @@ const automaticallyCacheSongs = computed({
   },
   set(value) {
     updateSettings({
-      key: 'automaticallyCacheSongs',
+      key: "automaticallyCacheSongs",
       value,
     });
     if (value === false) {
       clearCache();
     }
   },
-})
+});
 const showLyricsTranslation = computed({
   get() {
     return settings.showLyricsTranslation;
   },
   set(value) {
     updateSettings({
-      key: 'showLyricsTranslation',
+      key: "showLyricsTranslation",
       value,
     });
   },
-})
+});
 const lyricsBackground = computed({
   get() {
     return settings.lyricsBackground || false;
   },
   set(value) {
     updateSettings({
-      key: 'lyricsBackground',
+      key: "lyricsBackground",
       value,
     });
   },
-})
+});
 const showLyricsTime = computed({
   get() {
     return settings.showLyricsTime;
   },
   set(value) {
     updateSettings({
-      key: 'showLyricsTime',
+      key: "showLyricsTime",
       value,
     });
   },
-})
+});
 const enableOsdlyricsSupport = computed({
   get() {
     return settings.enableOsdlyricsSupport;
   },
   set(value) {
     updateSettings({
-      key: 'enableOsdlyricsSupport',
+      key: "enableOsdlyricsSupport",
       value,
     });
   },
-})
+});
 const closeAppOption = computed({
   get() {
     return settings.closeAppOption;
   },
   set(value) {
     updateSettings({
-      key: 'closeAppOption',
+      key: "closeAppOption",
       value,
     });
   },
-})
+});
 const enableDiscordRichPresence = computed({
   get() {
     return settings.enableDiscordRichPresence;
   },
   set(value) {
     updateSettings({
-      key: 'enableDiscordRichPresence',
+      key: "enableDiscordRichPresence",
       value,
     });
   },
-})
+});
 const subTitleDefault = computed({
   get() {
     return settings.subTitleDefault;
   },
   set(value) {
     updateSettings({
-      key: 'subTitleDefault',
+      key: "subTitleDefault",
       value,
     });
   },
-})
+});
 const enableReversedMode = computed({
   get() {
     if (settings.enableReversedMode === undefined) return false;
@@ -916,203 +911,202 @@ const enableReversedMode = computed({
   },
   set(value) {
     updateSettings({
-      key: 'enableReversedMode',
+      key: "enableReversedMode",
       value,
     });
     if (value === false) {
       player.reversed = false;
     }
   },
-})
+});
 const enableGlobalShortcut = computed({
   get() {
     return settings.enableGlobalShortcut;
   },
   set(value) {
     updateSettings({
-      key: 'enableGlobalShortcut',
+      key: "enableGlobalShortcut",
       value,
     });
   },
-})
+});
 const showLibraryDefault = computed({
   get() {
     return settings.showLibraryDefault || false;
   },
   set(value) {
     updateSettings({
-      key: 'showLibraryDefault',
+      key: "showLibraryDefault",
       value,
     });
   },
-})
+});
 const cacheLimit = computed({
   get() {
     return settings.cacheLimit || false;
   },
   set(value) {
     updateSettings({
-      key: 'cacheLimit',
+      key: "cacheLimit",
       value,
     });
   },
-})
+});
 const proxyProtocol = computed({
   get() {
-    return settings.proxyConfig?.protocol || 'noProxy';
+    return settings.proxyConfig?.protocol || "noProxy";
   },
   set(value) {
-    let config = settings.proxyConfig || {};
+    const config = settings.proxyConfig || {};
     config.protocol = value;
-    if (value === 'noProxy') {
-      window.ipcRenderer?.send('removeProxy');
-      toast('已关闭代理');
+    if (value === "noProxy") {
+      window.ipcRenderer?.send("removeProxy");
+      toast("已关闭代理");
     }
     updateSettings({
-      key: 'proxyConfig',
+      key: "proxyConfig",
       value: config,
     });
   },
-})
+});
 const proxyServer = computed({
   get() {
-    return settings.proxyConfig?.server || '';
+    return settings.proxyConfig?.server || "";
   },
   set(value) {
-    let config = settings.proxyConfig || {};
+    const config = settings.proxyConfig || {};
     config.server = value;
     updateSettings({
-      key: 'proxyConfig',
+      key: "proxyConfig",
       value: config,
     });
   },
-})
+});
 const enableRealIP = computed({
   get() {
     return settings.enableRealIP || false;
   },
   set(value) {
     updateSettings({
-      key: 'enableRealIP',
+      key: "enableRealIP",
       value: value,
     });
   },
-})
+});
 const realIP = computed({
   get() {
-    return settings.realIP || '';
+    return settings.realIP || "";
   },
   set(value) {
     updateSettings({
-      key: 'realIP',
+      key: "realIP",
       value: value,
     });
   },
-})
+});
 const proxyPort = computed({
   get() {
-    return settings.proxyConfig?.port || '';
+    return settings.proxyConfig?.port || "";
   },
   set(value) {
-    let config = settings.proxyConfig || {};
+    const config = settings.proxyConfig || {};
     config.port = value;
     updateSettings({
-      key: 'proxyConfig',
+      key: "proxyConfig",
       value: config,
     });
   },
-})
+});
 const unmSource = computed({
   get() {
-    return settings.unmSource || '';
+    return settings.unmSource || "";
   },
   /** @param {string?} value */
   set(value) {
     updateSettings({
-      key: 'unmSource',
+      key: "unmSource",
       value: value.length && value,
     });
   },
-})
+});
 const unmSearchMode = computed({
   get() {
-    return settings.unmSearchMode || 'fast-first';
+    return settings.unmSearchMode || "fast-first";
   },
   set(value) {
     updateSettings({
-      key: 'unmSearchMode',
+      key: "unmSearchMode",
       value: value,
     });
   },
-})
+});
 const unmEnableFlac = computed({
   get() {
     return settings.unmEnableFlac || false;
   },
   set(value) {
     updateSettings({
-      key: 'unmEnableFlac',
+      key: "unmEnableFlac",
       value: value || false,
     });
   },
-})
+});
 const unmProxyUri = computed({
   get() {
-    return settings.unmProxyUri || '';
+    return settings.unmProxyUri || "";
   },
   set(value) {
     updateSettings({
-      key: 'unmProxyUri',
+      key: "unmProxyUri",
       value: value.length && value,
     });
   },
-})
+});
 const unmJooxCookie = computed({
   get() {
-    return settings.unmJooxCookie || '';
+    return settings.unmJooxCookie || "";
   },
   set(value) {
     updateSettings({
-      key: 'unmJooxCookie',
+      key: "unmJooxCookie",
       value: value.length && value,
     });
   },
-})
+});
 const unmQQCookie = computed({
   get() {
-    return settings.unmQQCookie || '';
+    return settings.unmQQCookie || "";
   },
   set(value) {
     updateSettings({
-      key: 'unmQQCookie',
+      key: "unmQQCookie",
       value: value.length && value,
     });
   },
-})
+});
 const unmYtDlExe = computed({
   get() {
-    return settings.unmYtDlExe || '';
+    return settings.unmYtDlExe || "";
   },
   set(value) {
     updateSettings({
-      key: 'unmYtDlExe',
+      key: "unmYtDlExe",
       value: value.length && value,
     });
   },
-})
+});
 const enableCustomTitlebar = computed({
   get() {
     return settings.linuxEnableCustomTitlebar;
   },
   set(value) {
     updateSettings({
-      key: 'linuxEnableCustomTitlebar',
+      key: "linuxEnableCustomTitlebar",
       value,
     });
   },
-})
-const isLastfmConnected = computed(() =>  lastfm.key !== undefined)
-
+});
+const isLastfmConnected = computed(() => lastfm.key !== undefined);
 
 countDBSize();
 if (window.IS_ELECTRON) getAllOutputDevices();
@@ -1120,25 +1114,23 @@ if (window.IS_ELECTRON) getAllOutputDevices();
 onActivated(() => {
   countDBSize();
   if (window.IS_ELECTRON) getAllOutputDevices();
-})
-
-
+});
 
 function getAllOutputDevices() {
-  navigator.mediaDevices.enumerateDevices().then(devices => {
-    allOutputDevices.value = devices.filter(device => {
-      return device.kind == 'audiooutput';
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    allOutputDevices.value = devices.filter((device) => {
+      return device.kind == "audiooutput";
     });
     if (
       allOutputDevices.value.length > 0 &&
-      allOutputDevices.value[0].label !== ''
+      allOutputDevices.value[0].label !== ""
     ) {
       // withoutAudioPriviledge.value = false;
     } else {
       allOutputDevices.value = [
         {
-          deviceId: 'default',
-          label: 'settings.permissionRequired',
+          deviceId: "default",
+          label: "settings.permissionRequired",
         },
       ];
     }
@@ -1146,13 +1138,13 @@ function getAllOutputDevices() {
 }
 function logout() {
   doLogout();
-  router.push({ name: 'home' });
+  router.push({ name: "home" });
 }
 function countDBSize() {
-  countDBSizeApi().then(data => {
+  db.track.source.size().then((data) => {
     if (data === undefined) {
       tracksCache.value = {
-        size: '0KB',
+        size: "0KB",
         length: 0,
       };
       return;
@@ -1162,14 +1154,14 @@ function countDBSize() {
   });
 }
 function clearCache() {
-  clearDB().then(() => {
+  db.track.source.clear().then(() => {
     countDBSize();
   });
 }
 function lastfmConnect() {
   api.lastfm.auth();
-  let lastfmChecker = setInterval(() => {
-    const session = localStorage.getItem('lastfm');
+  const lastfmChecker = setInterval(() => {
+    const session = localStorage.getItem("lastfm");
     if (session) {
       updateLastfm(JSON.parse(session));
       clearInterval(lastfmChecker);
@@ -1177,66 +1169,62 @@ function lastfmConnect() {
   }, 1000);
 }
 function lastfmDisconnect() {
-  localStorage.removeItem('lastfm');
+  localStorage.removeItem("lastfm");
   updateLastfm({});
 }
 function sendProxyConfig() {
-  if (proxyProtocol.value === 'noProxy') return;
+  if (proxyProtocol.value === "noProxy") return;
   const config = settings.proxyConfig;
-  if (
-    config.server === '' ||
-    !config.port ||
-    config.protocol === 'noProxy'
-  ) {
-    window.ipcRenderer?.send('removeProxy');
+  if (config.server === "" || !config.port || config.protocol === "noProxy") {
+    window.ipcRenderer?.send("removeProxy");
   } else {
-    window.ipcRenderer?.send('setProxy', config);
+    window.ipcRenderer?.send("setProxy", config);
   }
-  toast('已更新代理设置');
+  toast("已更新代理设置");
 }
 function clickOutside() {
   exitRecordShortcut();
 }
 function formatShortcut(shortcut: string) {
   shortcut = shortcut
-    .replace(/\+/g, ' + ')
-    .replace('Up', '↑')
-    .replace('Down', '↓')
-    .replace('Right', '→')
-    .replace('Left', '←');
-  if (settings.lang === 'zh-CN') {
-    shortcut = shortcut.replace('Space', '空格');
-  } else if (settings.lang === 'zh-TW') {
-    shortcut = shortcut.replace('Space', '空白鍵');
+    .replace(/\+/g, " + ")
+    .replace("Up", "↑")
+    .replace("Down", "↓")
+    .replace("Right", "→")
+    .replace("Left", "←");
+  if (settings.lang === "zh-CN") {
+    shortcut = shortcut.replace("Space", "空格");
+  } else if (settings.lang === "zh-TW") {
+    shortcut = shortcut.replace("Space", "空白鍵");
   }
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     return shortcut
-      .replace('CommandOrControl', '⌘')
-      .replace('Command', '⌘')
-      .replace('Alt', '⌥')
-      .replace('Control', '⌃')
-      .replace('Shift', '⇧');
+      .replace("CommandOrControl", "⌘")
+      .replace("Command", "⌘")
+      .replace("Alt", "⌥")
+      .replace("Control", "⌃")
+      .replace("Shift", "⇧");
   }
-  return shortcut.replace('CommandOrControl', 'Ctrl');
+  return shortcut.replace("CommandOrControl", "Ctrl");
 }
 function readyToRecordShortcut(id, type) {
-  if (type === 'globalShortcut' && enableGlobalShortcut.value === false) {
+  if (type === "globalShortcut" && enableGlobalShortcut.value === false) {
     return;
   }
   shortcutInput.value = { id, type, recording: true };
   recordedShortcut.value = [];
-  window.ipcRenderer?.send('switchGlobalShortcutStatusTemporary', 'disable');
+  window.ipcRenderer?.send("switchGlobalShortcutStatusTemporary", "disable");
 }
 function handleShortcutKeydown(e: KeyboardEvent) {
   if (shortcutInput.value.recording === false) return;
   e.preventDefault();
-  if (recordedShortcut.value.find(s => s.keyCode === e.keyCode)) return;
+  if (recordedShortcut.value.find((s) => s.keyCode === e.keyCode)) return;
   recordedShortcut.value.push(e);
   if (
     (e.keyCode >= 65 && e.keyCode <= 90) || // A-Z
     (e.keyCode >= 48 && e.keyCode <= 57) || // 0-9
     (e.keyCode >= 112 && e.keyCode <= 123) || // F1-F12
-    ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(e.key) || // Arrows
+    ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key) || // Arrows
     validShortcutCodes.includes(e.key)
   ) {
     saveShortcut();
@@ -1257,22 +1245,20 @@ function saveShortcut() {
     shortcut: recordedShortcutComputed.value,
   };
   updateShortcut(payload);
-  window.ipcRenderer?.send('updateShortcut', payload);
-  toast('快捷键已保存');
+  window.ipcRenderer?.send("updateShortcut", payload);
+  toast("快捷键已保存");
   recordedShortcut.value = [];
 }
 function exitRecordShortcut() {
   if (shortcutInput.value.recording === false) return;
-  shortcutInput.value = { id: '', type: '', recording: false };
+  shortcutInput.value = { id: "", type: "", recording: false };
   recordedShortcut.value = [];
-  window.ipcRenderer?.send('switchGlobalShortcutStatusTemporary', 'enable');
+  window.ipcRenderer?.send("switchGlobalShortcutStatusTemporary", "enable");
 }
 // function restoreDefaultShortcuts() {
 //   this.restoreDefaultShortcuts();
 //   window.ipcRenderer?.send('restoreDefaultShortcuts');
 // }
-
-
 </script>
 
 <style lang="scss" scoped>

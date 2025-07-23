@@ -1,11 +1,7 @@
 import { useStore } from "@/store/pinia";
+import type { TrackDetailResponse, TrackLyricResponse } from "@/types/api";
 import { mapTrackPlayableStatus } from "@/utils/common";
-import {
-	cacheLyric,
-	cacheTrackDetail,
-	getLyricFromCache,
-	getTrackDetailFromCache,
-} from "@/utils/db";
+import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";
 import type * as NCMAPI from "./NCMAPI";
 
@@ -37,7 +33,9 @@ export function getMP3(id: NCMAPI.song_url[0]["id"]) {
  * 说明 : 调用此接口 , 传入音乐 id(支持多个 id, 用 , 隔开), 可获得歌曲详情(注意:歌曲封面现在需要通过专辑内容接口获取)
  * @param {string} ids - 音乐 id, 例如 ids=405998841,33894312
  */
-export function getTrackDetail(ids: NCMAPI.song_detail[0]["ids"]) {
+export function getTrackDetail(
+	ids: NCMAPI.song_detail[0]["ids"],
+): Promise<TrackDetailResponse> {
 	const fetchLatest = () => {
 		return request({
 			url: "/song/detail",
@@ -47,8 +45,8 @@ export function getTrackDetail(ids: NCMAPI.song_detail[0]["ids"]) {
 			},
 		}).then((data) => {
 			data.songs.map((song) => {
-				const privileges = data.privileges.find((t) => t.id === song.id);
-				cacheTrackDetail(song, privileges);
+				const privilege = data.privileges.find((t) => t.id === song.id);
+				db.track.detail.write(song, privilege);
 			});
 			data.songs = mapTrackPlayableStatus(data.songs, data.privileges);
 			return data;
@@ -61,7 +59,7 @@ export function getTrackDetail(ids: NCMAPI.song_detail[0]["ids"]) {
 		idsInArray = ids.split(",");
 	}
 
-	return getTrackDetailFromCache(idsInArray).then((result) => {
+	return db.track.detail.read(idsInArray).then((result) => {
 		if (result) {
 			result.songs = mapTrackPlayableStatus(result.songs, result.privileges);
 		}
@@ -74,25 +72,16 @@ export function getTrackDetail(ids: NCMAPI.song_detail[0]["ids"]) {
  * 说明 : 调用此接口 , 传入音乐 id 可获得对应音乐的歌词 ( 不需要登录 )
  * @param {number} id - 音乐 id
  */
-export function getLyric(id: string | number) {
-	const fetchLatest = () => {
-		return request({
-			url: "/lyric",
-			method: "get",
-			params: {
-				id,
-			},
-		}).then((result) => {
-			cacheLyric(id, result);
-			return result;
-		});
-	};
-
-	fetchLatest();
-
-	return getLyricFromCache(id).then((result) => {
-		return result ?? fetchLatest();
-	});
+export async function getLyric(id: number): Promise<TrackLyricResponse> {
+	let result = await db.lyric.read(id);
+	if (result) return result;
+	result = (await request({
+		url: "/lyric",
+		method: "get",
+		params: { id },
+	})) as TrackLyricResponse;
+	db.lyric.write(id, result);
+	return result;
 }
 
 /**

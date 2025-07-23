@@ -1,8 +1,10 @@
 // 核心音乐数据类型定义
+/** biome-ignore-all lint/suspicious/noExplicitAny: <explanation> */
 export interface Track {
 	id: number;
 	name: string;
 	ar: Artist[];
+	artists?: Artist[];
 	al: Album;
 	dt: number;
 	pop: number;
@@ -28,6 +30,7 @@ export interface Track {
 	mv: number;
 	publishTime: number;
 	tns?: string[];
+	no?: number; // 音轨号
 	pc?: {
 		nickname: string;
 		uid: number;
@@ -47,6 +50,7 @@ export interface Track {
 		userConsumable: boolean;
 	};
 	chargeInfoList?: any[];
+	playable?: boolean;
 }
 
 export interface Artist {
@@ -268,7 +272,13 @@ export interface PlaylistSource {
 export interface Settings {
 	lang: string;
 	appearance: "auto" | "light" | "dark";
-	musicQuality: "standard" | "higher" | "exhigh" | "lossless" | "hires";
+	musicQuality:
+		| "standard"
+		| "higher"
+		| "exhigh"
+		| "lossless"
+		| "flac"
+		| "hires";
 	lyricFontSize: number;
 	outputDevice: string;
 	showPlaylistsByAppleMusic: boolean;
@@ -293,6 +303,15 @@ export interface Settings {
 	shortcuts: Record<string, string>;
 	deviceId: string;
 	cacheLimit?: number;
+	// 新增的播放器相关设置
+	automaticallyCacheSongs?: boolean;
+	unmEnableFlac?: boolean;
+	unmProxyUri?: string;
+	unmSearchMode?: string;
+	unmJooxCookie?: string;
+	unmQQCookie?: string;
+	unmYtDlExe?: string;
+	enableOsdlyricsSupport?: boolean;
 }
 
 // 全局状态类型
@@ -346,6 +365,22 @@ export interface SearchResult {
 	};
 }
 
+// 歌词用户信息类型
+export interface LyricUser {
+	id: number;
+	status: number;
+	demand: number;
+	userid: number;
+	nickname: string;
+	uptime: number;
+}
+
+// 歌词内容类型
+export interface LyricContent {
+	version: number;
+	lyric: string;
+}
+
 // 歌词类型
 export interface LyricLine {
 	time: number;
@@ -353,23 +388,33 @@ export interface LyricLine {
 	content: string;
 }
 
+/**
+ * 歌词数据接口
+ * 包含原歌词、翻译歌词、音译歌词等多种类型的歌词数据
+ */
 export interface Lyric {
-	lrc: {
-		lyric: string;
-	};
-	tlyric: {
-		lyric: string;
-	};
-	romalrc?: {
-		lyric: string;
-	};
-	yrc?: {
-		lyric: string;
-	};
-	ytlf?: {
-		lyric: string;
-	};
-	code: number;
+	/** 是否显示歌词 */
+	sgc: boolean;
+	/** 是否显示翻译 */
+	sfy: boolean;
+	/** 是否显示音译 */
+	qfy: boolean;
+	/** 翻译歌词的用户信息 */
+	transUser: LyricUser;
+	/** 原歌词的用户信息 */
+	lyricUser: LyricUser;
+	/** 原歌词内容 */
+	lrc: LyricContent;
+	/** 音译歌词内容（韩文等） */
+	klyric?: LyricContent;
+	/** 翻译歌词内容 */
+	tlyric?: LyricContent;
+	/** 罗马音歌词内容 */
+	romalrc?: LyricContent;
+	/** 日文歌词内容（罗马音） */
+	yrc?: LyricContent;
+	/** 日文歌词内容 */
+	ytlf?: LyricContent;
 }
 
 // API响应基础类型
