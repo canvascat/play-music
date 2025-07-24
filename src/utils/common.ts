@@ -2,7 +2,7 @@ import { useStore } from "@/store/pinia";
 import type { Track, TrackPrivilege } from "@/types/index";
 import { isAccountLoggedIn } from "./auth";
 
-export function isTrackPlayable(track: Track) {
+function isTrackPlayable(track: Track, vipType?: number) {
 	const result = {
 		playable: true,
 		reason: "",
@@ -15,7 +15,7 @@ export function isTrackPlayable(track: Track) {
 		return result;
 	}
 	if (track.fee === 1 || track.privilege?.fee === 1) {
-		if (isAccountLoggedIn() && useStore().data.user.vipType === 11) {
+		if (vipType === 11) {
 			result.playable = true;
 		} else {
 			result.playable = false;
@@ -46,6 +46,7 @@ export function mapTrackPlayableStatus(
 	privileges: TrackPrivilege[] = [],
 ) {
 	if (tracks?.length === undefined) return tracks;
+	const vipType = useStore().data.user?.vipType;
 	return tracks.map((t) => {
 		const privilege = privileges.find((item) => item.id === t.id);
 		if (t.privilege) {
@@ -53,7 +54,7 @@ export function mapTrackPlayableStatus(
 		} else {
 			t.privilege = privilege;
 		}
-		const result = isTrackPlayable(t);
+		const result = isTrackPlayable(t, vipType);
 		t.playable = result.playable;
 		t.reason = result.reason;
 		return t;

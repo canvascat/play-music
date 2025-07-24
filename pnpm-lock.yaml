@@ -58,6 +58,9 @@ importers:
       es-toolkit:
         specifier: ^1.39.7
         version: 1.39.7
+      events:
+        specifier: ^3.3.0
+        version: 3.3.0
       howler:
         specifier: ^2.2.3
         version: 2.2.4
@@ -70,9 +73,6 @@ importers:
       md5:
         specifier: ^2.3.0
         version: 2.3.0
-      mitt:
-        specifier: ^3.0.1
-        version: 3.0.1
       music-metadata:
         specifier: ^7.5.3
         version: 7.14.0

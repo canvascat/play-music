@@ -336,7 +336,7 @@ export interface GlobalState {
 	player: PlayerState;
 	settings: Settings;
 	data: {
-		user: User | null;
+		user: User;
 		likedSongPlaylistID: number;
 	};
 }
