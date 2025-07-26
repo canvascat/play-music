@@ -1,6 +1,7 @@
-import request, { noCacheParams } from "@/utils/request";
+import type { PlaylistDetailResponse } from "@/types";
 import { mapTrackPlayableStatus } from "@/utils/common";
-import * as NCMAPI from "./NCMAPI";
+import request, { noCacheParams } from "@/utils/request";
+import type * as NCMAPI from "./NCMAPI";
 
 /**
  * 推荐歌单
@@ -40,8 +41,11 @@ export function dailyRecommendPlaylist(params?: NCMAPI.recommend_resource[0]) {
  * @param {number} id
  * @param {boolean=} noCache
  */
-export function getPlaylistDetail(id: string | number, noCache = false) {
-	let params: NCMAPI.playlist_detail[0] = { id };
+export function getPlaylistDetail(
+	id: string | number,
+	noCache = false,
+): Promise<PlaylistDetailResponse> {
+	const params: NCMAPI.playlist_detail[0] = { id };
 	return request({
 		url: "/playlist/detail",
 		method: "get",

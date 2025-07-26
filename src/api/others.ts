@@ -37,7 +37,7 @@ export function personalFM(): Promise<PersonalFMResponse> {
 		url: "/personal_fm",
 		method: "get",
 		params: {
-			timestamp: new Date().getTime(),
+			timestamp: Date.now(),
 		},
 	});
 }
@@ -47,7 +47,7 @@ export function fmTrash(id: number): Promise<ApiResponse> {
 		url: "/fm_trash",
 		method: "post",
 		params: {
-			timestamp: new Date().getTime(),
+			timestamp: Date.now(),
 			id,
 		},
 	});
