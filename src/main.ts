@@ -1,24 +1,23 @@
 import "@/index.css";
 import { createApp } from "vue";
 import App from "./App.vue";
-// import  App from './Demo.vue';
 import router from "./router";
 import { pinia, useStore } from "./store/pinia";
 import "@/utils/filters";
 import "@/assets/css/global.scss";
 import NProgress from "nprogress";
 import "@/assets/css/nprogress.css";
-import SvgIcon from "@/components/SvgIcon.vue";
 import { createI18n } from "vue-i18n";
+import SvgIcon from "@/components/SvgIcon.vue";
 import { messages } from "./locale";
 
 window.resetApp = () => {
 	localStorage.clear();
 	indexedDB.deleteDatabase("yesplaymusic");
-	document.cookie.split(";").forEach(function (c) {
+	document.cookie.split(";").forEach((c) => {
 		document.cookie = c
 			.replace(/^ +/, "")
-			.replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+			.replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
 	});
 	return "已重置应用，请刷新页面（按Ctrl/Command + R）";
 };
@@ -38,14 +37,6 @@ app.use(pinia);
 const store = useStore();
 
 store.$subscribe((_mutation, state) => {
-	// console.log(mutation, state, '---subscribe');
-	// const events = Array.isArray(mutation.events) ? mutation.events : [mutation.events];
-	// if(events.some(event => event.key === 'settings')) {
-	//   localStorage.setItem('settings', JSON.stringify(state.settings));
-	// }
-	// if(events.some(event => event.key === 'data')) {
-	//   localStorage.setItem('data', JSON.stringify(state.data));
-	// }
 	localStorage.setItem("data", JSON.stringify(state.data));
 	localStorage.setItem("settings", JSON.stringify(state.settings));
 });
