@@ -14,55 +14,55 @@
 </template>
 
 <script setup lang="ts">
-import Modal from '@/components/Modal.vue';
-import { useStore } from '@/store/pinia';
-import * as api from '@/api';
-import { toast } from 'vue-sonner'
-import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useModalStore } from '@/store/modal';
+import Modal from "@/components/Modal.vue";
+import { useStore } from "@/store/pinia";
+import * as api from "@/api";
+import { toast } from "vue-sonner";
+import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+import { useModalStore } from "@/store/modal";
 
 const { t } = useI18n();
-const modalStore = useModalStore()
-const title = ref('')
-const privatePlaylist = ref(false)
-const { updateData, fetchLikedPlaylist } = useStore()
+const modalStore = useModalStore();
+const title = ref("");
+const privatePlaylist = ref(false);
+const { updateData, fetchLikedPlaylist } = useStore();
 
-const show = computed(() => modalStore.show.newPlaylist)
-
-
+const show = computed(() => modalStore.show.newPlaylist);
 
 function close() {
-  modalStore.closeNewPlaylist()
-  title.value = ''
-  privatePlaylist.value = false 
+	modalStore.closeNewPlaylist();
+	title.value = "";
+	privatePlaylist.value = false;
 }
 
 function _createPlaylist() {
-  api.playlist.createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 }).then(data => {
-    if (data.code === 200) {
-      if (modalStore.afterCreateAddTrackID !== 0) {
-        api.playlist.addOrRemoveTrackFromPlaylist({
-          op: 'add',
-          pid: data.id,
-          tracks: `${modalStore.afterCreateAddTrackID}`,
-        }).then(data => {
-          if (data.body.code === 200) {
-            toast(t('toast.savedToPlaylist'));
-          } else {
-            toast(data.body.message);
-          } 
-        });
-      }
-      close()
-      toast('成功创建歌单');
-      updateData({ key: 'libraryPlaylistFilter', value: 'mine' });
-      fetchLikedPlaylist();
-    }
-  });
+	api.playlist
+		.createPlaylist({ name: title.value, privacy: privatePlaylist.value ? 10 : 0 })
+		.then((data) => {
+			if (data.code === 200) {
+				if (modalStore.afterCreateAddTrackID !== 0) {
+					api.playlist
+						.addOrRemoveTrackFromPlaylist({
+							op: "add",
+							pid: data.id,
+							tracks: `${modalStore.afterCreateAddTrackID}`,
+						})
+						.then((data) => {
+							if (data.body.code === 200) {
+								toast(t("toast.savedToPlaylist"));
+							} else {
+								toast(data.body.message);
+							}
+						});
+				}
+				close();
+				toast("成功创建歌单");
+				updateData({ key: "libraryPlaylistFilter", value: "mine" });
+				fetchLikedPlaylist();
+			}
+		});
 }
- 
-
 </script>
 
 <style lang="scss" scoped>

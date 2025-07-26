@@ -33,9 +33,7 @@ export function getMP3(id: NCMAPI.song_url[0]["id"]) {
  * 说明 : 调用此接口 , 传入音乐 id(支持多个 id, 用 , 隔开), 可获得歌曲详情(注意:歌曲封面现在需要通过专辑内容接口获取)
  * @param {string} ids - 音乐 id, 例如 ids=405998841,33894312
  */
-export function getTrackDetail(
-	ids: NCMAPI.song_detail[0]["ids"],
-): Promise<TrackDetailResponse> {
+export function getTrackDetail(ids: number | string): Promise<TrackDetailResponse> {
 	const fetchLatest = () => {
 		return request({
 			url: "/song/detail",

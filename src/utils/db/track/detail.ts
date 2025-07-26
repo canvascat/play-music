@@ -11,9 +11,7 @@ export function write(track: Track, privilege: TrackPrivilege) {
 }
 
 export async function read(ids: string[]) {
-	const tracks = await db.trackDetail
-		.filter((track) => ids.includes(String(track.id)))
-		.toArray();
+	const tracks = await db.trackDetail.filter((track) => ids.includes(String(track.id))).toArray();
 
 	const songs: Track[] = [];
 	const privileges: TrackPrivilege[] = [];

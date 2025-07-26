@@ -148,36 +148,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onActivated } from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from '@/store/pinia';
-import { isAccountLoggedIn } from '@/utils/auth';
-import * as api from '@/api';
-import NProgress from 'nprogress';
-import { resizeImage } from '@/utils/filters';
-import { toast } from 'vue-sonner';
-import { randomInt } from 'es-toolkit';
-import { useI18n } from 'vue-i18n';
+import { ref, computed, onMounted, onActivated } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "@/store/pinia";
+import { isAccountLoggedIn } from "@/utils/auth";
+import * as api from "@/api";
+import NProgress from "nprogress";
+import { resizeImage } from "@/utils/filters";
+import { toast } from "vue-sonner";
+import { randomInt } from "es-toolkit";
+import { useI18n } from "vue-i18n";
 
-import TrackList from '@/components/TrackList.vue';
-import CoverRow from '@/components/CoverRow.vue';
-import SvgIcon from '@/components/SvgIcon.vue';
-import MvRow from '@/components/MvRow.vue';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { useModalStore } from '@/store/modal';
+import TrackList from "@/components/TrackList.vue";
+import CoverRow from "@/components/CoverRow.vue";
+import SvgIcon from "@/components/SvgIcon.vue";
+import MvRow from "@/components/MvRow.vue";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { useModalStore } from "@/store/modal";
 // 定义接口
 interface Playlist {
-  id: number;
-  creator: {
-    userId: number;
-  };
-  [key: string]: any;
+	id: number;
+	creator: {
+		userId: number;
+	};
+	[key: string]: any;
 }
 
 interface CloudDiskItem {
-  songId: number;
-  songName: string;
-  [key: string]: any;
+	songId: number;
+	songName: string;
+	[key: string]: any;
 }
 
 /**
@@ -187,200 +193,185 @@ interface CloudDiskItem {
  * @returns {string} The lyric part
  */
 function extractLyricPart(rawLyric: string): string {
-  return rawLyric.split(']').pop()?.trim() || '';
+	return rawLyric.split("]").pop()?.trim() || "";
 }
 
 const router = useRouter();
 const { t } = useI18n();
-const modalStore = useModalStore()
+const modalStore = useModalStore();
 const {
-  data,
-  liked,
-  player,
-  updateData,
-  fetchLikedSongsWithDetails,
-  fetchLikedSongs,
-  fetchLikedPlaylist,
-  fetchLikedAlbums,
-  fetchLikedArtists,
-  fetchLikedMVs,
-  fetchCloudDisk,
-  fetchPlayHistory,
-  updateLikedXXX
+	data,
+	liked,
+	player,
+	updateData,
+	fetchLikedSongsWithDetails,
+	fetchLikedSongs,
+	fetchLikedPlaylist,
+	fetchLikedAlbums,
+	fetchLikedArtists,
+	fetchLikedMVs,
+	fetchCloudDisk,
+	fetchPlayHistory,
+	updateLikedXXX,
 } = useStore();
 
 // 响应式数据
 const show = ref(false);
 
 const lyric = ref<string>();
-const currentTab = ref('playlists');
-const playHistoryMode = ref<'week' | 'all'>('week');
+const currentTab = ref("playlists");
+const playHistoryMode = ref<"week" | "all">("week");
 const library = ref<HTMLElement>();
 const cloudDiskUploadInput = ref<HTMLInputElement>();
 
 // 计算属性
 const pickedLyric = computed((): string[] => {
-  // Returns [] if we got no lyrics.
-  if (!lyric.value) return [];
+	// Returns [] if we got no lyrics.
+	if (!lyric.value) return [];
 
-  const lyricLine = lyric.value
-    .split('\n')
-    .filter(line => !line.includes('作词') && !line.includes('作曲'));
+	const lyricLine = lyric.value
+		.split("\n")
+		.filter((line) => !line.includes("作词") && !line.includes("作曲"));
 
-  // Pick 3 or fewer lyrics based on the lyric lines.
-  const lyricsToPick = Math.min(lyricLine.length, 3);
+	// Pick 3 or fewer lyrics based on the lyric lines.
+	const lyricsToPick = Math.min(lyricLine.length, 3);
 
-  // The upperBound of the lyric line to pick
-  const randomUpperBound = lyricLine.length - lyricsToPick;
-  const startLyricLineIndex = randomInt(0, randomUpperBound - 1);
+	// The upperBound of the lyric line to pick
+	const randomUpperBound = lyricLine.length - lyricsToPick;
+	const startLyricLineIndex = randomInt(0, randomUpperBound - 1);
 
-  // Pick lyric lines to render.
-  return lyricLine
-    .slice(startLyricLineIndex, startLyricLineIndex + lyricsToPick)
-    .map(extractLyricPart);
+	// Pick lyric lines to render.
+	return lyricLine
+		.slice(startLyricLineIndex, startLyricLineIndex + lyricsToPick)
+		.map(extractLyricPart);
 });
 
 const playlistFilter = computed(() => {
-  return data.libraryPlaylistFilter || 'all';
+	return data.libraryPlaylistFilter || "all";
 });
 
 const filterPlaylists = computed((): Playlist[] => {
-  const playlists = liked.playlists.slice(1);
-  const userId = data.user.userId;
-  if (playlistFilter.value === 'mine') {
-    return playlists.filter(p => p.creator.userId === userId);
-  } else if (playlistFilter.value === 'liked') {
-    return playlists.filter(p => p.creator.userId !== userId);
-  }
-  return playlists;
+	const playlists = liked.playlists.slice(1);
+	const userId = data.user.userId;
+	if (playlistFilter.value === "mine") {
+		return playlists.filter((p) => p.creator.userId === userId);
+	} else if (playlistFilter.value === "liked") {
+		return playlists.filter((p) => p.creator.userId !== userId);
+	}
+	return playlists;
 });
 
 const playHistoryList = computed(() => {
-  if (show.value && playHistoryMode.value === 'week') {
-    return liked.playHistory.weekData;
-  }
-  if (show.value && playHistoryMode.value === 'all') {
-    return liked.playHistory.allData;
-  }
-  return [];
+	if (show.value && playHistoryMode.value === "week") {
+		return liked.playHistory.weekData;
+	}
+	if (show.value && playHistoryMode.value === "all") {
+		return liked.playHistory.allData;
+	}
+	return [];
 });
 
 // 生命周期
 onMounted(() => {
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-  loadData();
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+	loadData();
 });
 
 onActivated(() => {
-  // this.$parent.$refs.scrollbar.restorePosition();
-  loadData();
+	// this.$parent.$refs.scrollbar.restorePosition();
+	loadData();
 });
 
 // 方法
 const loadData = () => {
-  if (liked.songsWithDetails.length > 0) {
-    NProgress.done();
-    show.value = true;
-    fetchLikedSongsWithDetails();
-    getRandomLyric();
-  } else {
-    fetchLikedSongsWithDetails().then(() => {
-      NProgress.done();
-      show.value = true;
-      getRandomLyric();
-    });
-  }
-  fetchLikedSongs();
-  fetchLikedPlaylist();
-  fetchLikedAlbums();
-  fetchLikedArtists();
-  fetchLikedMVs();
-  fetchCloudDisk();
-  fetchPlayHistory();
+	if (liked.songsWithDetails.length > 0) {
+		NProgress.done();
+		show.value = true;
+		fetchLikedSongsWithDetails();
+		getRandomLyric();
+	} else {
+		fetchLikedSongsWithDetails().then(() => {
+			NProgress.done();
+			show.value = true;
+			getRandomLyric();
+		});
+	}
+	fetchLikedSongs();
+	fetchLikedPlaylist();
+	fetchLikedAlbums();
+	fetchLikedArtists();
+	fetchLikedMVs();
+	fetchCloudDisk();
+	fetchPlayHistory();
 };
 
 const playLikedSongs = () => {
-  player.playPlaylistByID(
-    liked.playlists[0].id,
-    'first',
-    true
-  );
+	player.playPlaylistByID(liked.playlists[0].id, "first", true);
 };
 
 const playIntelligenceList = () => {
-  player.playIntelligenceListById(
-    liked.playlists[0].id,
-    'first',
-    true
-  );
+	player.playIntelligenceListById(liked.playlists[0].id, "first", true);
 };
 
 const updateCurrentTab = (tab: string) => {
-  if (!isAccountLoggedIn() && tab !== 'playlists') {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  currentTab.value = tab;
-  // TODO scrollTo({ top: 375, behavior: 'smooth' });
+	if (!isAccountLoggedIn() && tab !== "playlists") {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	currentTab.value = tab;
+	// TODO scrollTo({ top: 375, behavior: 'smooth' });
 };
 
 const goToLikedSongsList = () => {
-  router.push({ path: '/library/liked-songs' });
+	router.push({ path: "/library/liked-songs" });
 };
 
 const getRandomLyric = () => {
-  if (liked.songs.length === 0) return;
-  api.track.getLyric(
-    liked.songs[randomInt(0, liked.songs.length - 1)]
-  ).then(data => {
-    if (data.lrc !== undefined) {
-      const isInstrumental = data.lrc.lyric
-        .split('\n')
-        .filter(l => l.includes('纯音乐，请欣赏'));
-      if (isInstrumental.length === 0) {
-        lyric.value = data.lrc.lyric;
-      }
-    }
-  });
+	if (liked.songs.length === 0) return;
+	api.track.getLyric(liked.songs[randomInt(0, liked.songs.length - 1)]).then((data) => {
+		if (data.lrc !== undefined) {
+			const isInstrumental = data.lrc.lyric.split("\n").filter((l) => l.includes("纯音乐，请欣赏"));
+			if (isInstrumental.length === 0) {
+				lyric.value = data.lrc.lyric;
+			}
+		}
+	});
 };
 
 const openAddPlaylistModal = () => {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  modalStore.showNewPlaylist()
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	modalStore.showNewPlaylist();
 };
 
-
-
-
 const changePlaylistFilter = (type: string) => {
-  updateData({ key: 'libraryPlaylistFilter', value: type });
-  window.scrollTo({ top: 375, behavior: 'smooth' });
+	updateData({ key: "libraryPlaylistFilter", value: type });
+	window.scrollTo({ top: 375, behavior: "smooth" });
 };
 
 const selectUploadFiles = () => {
-  cloudDiskUploadInput.value?.click();
+	cloudDiskUploadInput.value?.click();
 };
 
 const uploadSongToCloudDisk = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  const files = target.files;
-  if (!files || files.length === 0) return;
+	const target = e.target as HTMLInputElement;
+	const files = target.files;
+	if (!files || files.length === 0) return;
 
-  api.user.uploadSong(files[0]).then(result => {
-    if (result.code === 200) {
-      let newCloudDisk = liked.cloudDisk;
-      newCloudDisk.unshift(result.privateCloud);
-      updateLikedXXX({
-        name: 'cloudDisk',
-        data: newCloudDisk,
-      });
-    }
-  });
+	api.user.uploadSong(files[0]).then((result) => {
+		if (result.code === 200) {
+			let newCloudDisk = liked.cloudDisk;
+			newCloudDisk.unshift(result.privateCloud);
+			updateLikedXXX({
+				name: "cloudDisk",
+				data: newCloudDisk,
+			});
+		}
+	});
 };
 </script>
 

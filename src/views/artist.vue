@@ -126,25 +126,29 @@
 </template>
 
 <script setup lang="ts">
+import { useStore } from "@/store/pinia";
 
-import { useStore } from '@/store/pinia';
-
-import * as api from '@/api';
-import { isAccountLoggedIn } from '@/utils/auth';
-import NProgress from 'nprogress';
-import { resizeImage, formatDate, formatAlbumType } from '@/utils/filters';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
-import TrackList from '@/components/TrackList.vue';
-import CoverRow from '@/components/CoverRow.vue';
-import Cover from '@/components/Cover.vue';
-import MvRow from '@/components/MvRow.vue';
-import Description from '@/components/Description.tsx';
-import { copyText } from '@/utils/copy';
-import { toast } from 'vue-sonner'
-import { ref, computed, onActivated } from 'vue';
-import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+import * as api from "@/api";
+import { isAccountLoggedIn } from "@/utils/auth";
+import NProgress from "nprogress";
+import { resizeImage, formatDate, formatAlbumType } from "@/utils/filters";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
+import TrackList from "@/components/TrackList.vue";
+import CoverRow from "@/components/CoverRow.vue";
+import Cover from "@/components/Cover.vue";
+import MvRow from "@/components/MvRow.vue";
+import Description from "@/components/Description.tsx";
+import { copyText } from "@/utils/copy";
+import { toast } from "vue-sonner";
+import { ref, computed, onActivated } from "vue";
+import { useRoute, useRouter, onBeforeRouteUpdate } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
@@ -152,18 +156,17 @@ const { t } = useI18n();
 const { player } = useStore();
 const show = ref(false);
 const artist = ref({
-  img1v1Url:
-    'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg',
+	img1v1Url: "https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg",
 });
 const popularTracks = ref([]);
 const albumsData = ref([]);
 const latestRelease = ref({
-  picUrl: '',
-  publishTime: 0,
-  id: 0,
-  name: '',
-  type: '',
-  size: '',
+	picUrl: "",
+	publishTime: 0,
+	id: 0,
+	name: "",
+	type: "",
+	size: "",
 });
 const showMorePopTracks = ref(false);
 
@@ -173,119 +176,110 @@ const similarArtists = ref([]);
 const mvHover = ref(false);
 
 onBeforeRouteUpdate((to, _from, next) => {
-  artist.value.img1v1Url =
-    'https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg';
-  loadData(to.params.id as string, next);
+	artist.value.img1v1Url =
+		"https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg";
+	loadData(to.params.id as string, next);
 });
 
 const albums = computed(() => {
-  return albumsData.value.filter(
-    a => a.type === '专辑' || a.type === '精选集'
-  );
+	return albumsData.value.filter((a) => a.type === "专辑" || a.type === "精选集");
 });
 const eps = computed(() => {
-  return albumsData.value.filter(a =>
-    ['EP/Single', 'EP', 'Single'].includes(a.type)
-  );
+	return albumsData.value.filter((a) => ["EP/Single", "EP", "Single"].includes(a.type));
 });
 const latestMV = computed(() => {
-  const mv = mvs.value[0] || {};
-  return {
-    id: mv.id || mv.vid,
-    name: mv.name || mv.title,
-    coverUrl: `${mv.imgurl16v9 || mv.cover || mv.coverUrl}?param=464y260`,
-    publishTime: mv.publishTime,
-  };
+	const mv = mvs.value[0] || {};
+	return {
+		id: mv.id || mv.vid,
+		name: mv.name || mv.title,
+		coverUrl: `${mv.imgurl16v9 || mv.cover || mv.coverUrl}?param=464y260`,
+		publishTime: mv.publishTime,
+	};
 });
 
 onActivated(() => {
-  if (artist.value?.id?.toString() !== route.params.id) {
-    loadData(route.params.id);
-  } else {
-    // TODO scrollbar.restorePosition();
-  }
-})
-
+	if (artist.value?.id?.toString() !== route.params.id) {
+		loadData(route.params.id);
+	} else {
+		// TODO scrollbar.restorePosition();
+	}
+});
 
 function loadData(id: string, next?: () => void) {
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-  show.value = false;
-  // TODO scrollTo({ top: 0 });
-  api.artist.getArtist(id).then(data => {
-    artist.value = data.artist;
-    setPopularTracks(data.hotSongs);
-    if (next !== undefined) next();
-    NProgress.done();
-    show.value = true;
-  });
-  api.artist.getArtistAlbum({ id: id, limit: 200 }).then(data => {
-    albumsData.value = data.hotAlbums;
-    latestRelease.value = data.hotAlbums[0];
-  });
-  api.artist.artistMv({ id }).then(data => {
-    mvs.value = data.mvs;
-    hasMoreMV.value = data.hasMore;
-  });
-  if (isAccountLoggedIn()) {
-    api.artist.similarArtists(id).then(data => {
-      similarArtists.value = data.artists;
-    });
-  }
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+	show.value = false;
+	// TODO scrollTo({ top: 0 });
+	api.artist.getArtist(id).then((data) => {
+		artist.value = data.artist;
+		setPopularTracks(data.hotSongs);
+		if (next !== undefined) next();
+		NProgress.done();
+		show.value = true;
+	});
+	api.artist.getArtistAlbum({ id: id, limit: 200 }).then((data) => {
+		albumsData.value = data.hotAlbums;
+		latestRelease.value = data.hotAlbums[0];
+	});
+	api.artist.artistMv({ id }).then((data) => {
+		mvs.value = data.mvs;
+		hasMoreMV.value = data.hasMore;
+	});
+	if (isAccountLoggedIn()) {
+		api.artist.similarArtists(id).then((data) => {
+			similarArtists.value = data.artists;
+		});
+	}
 }
 function setPopularTracks(hotSongs) {
-  const trackIDs = hotSongs.map(t => t.id);
-  api.track.getTrackDetail(trackIDs.join(',')).then(data => {
-    popularTracks.value = data.songs;
-  });
+	const trackIDs = hotSongs.map((t) => t.id);
+	api.track.getTrackDetail(trackIDs.join(",")).then((data) => {
+		popularTracks.value = data.songs;
+	});
 }
 
 function goToMv(id: string) {
-  router.push({ path: '/mv/' + id });
+	router.push({ path: "/mv/" + id });
 }
-function playPopularSongs(trackID = 'first') {
-  let trackIDs = popularTracks.value.map(t => t.id);
-  player.replacePlaylist(
-    trackIDs,
-    artist.value.id,
-    'artist',
-    trackID
-  );
+function playPopularSongs(trackID = "first") {
+	let trackIDs = popularTracks.value.map((t) => t.id);
+	player.replacePlaylist(trackIDs, artist.value.id, "artist", trackID);
 }
 function followArtist() {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  api.artist.followAArtist({
-    id: artist.value.id,
-    t: artist.value.followed ? 0 : 1,
-  }).then(data => {
-    if (data.code === 200) artist.value.followed = !artist.value.followed;
-  });
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	api.artist
+		.followAArtist({
+			id: artist.value.id,
+			t: artist.value.followed ? 0 : 1,
+		})
+		.then((data) => {
+			if (data.code === 200) artist.value.followed = !artist.value.followed;
+		});
 }
-function scrollTo(div: string, block: ScrollLogicalPosition = 'center') {
-  document.getElementById(div).scrollIntoView({
-    behavior: 'smooth',
-    block,
-  });
+function scrollTo(div: string, block: ScrollLogicalPosition = "center") {
+	document.getElementById(div).scrollIntoView({
+		behavior: "smooth",
+		block,
+	});
 }
-
 
 function copyUrl(id: string) {
-  copyText(`https://music.163.com/#/artist?id=${id}`)
-    .then(function () {
-      toast(t('toast.copied'));
-    })
-    .catch(error => {
-      toast(`${t('toast.copyFailed')}${error}`);
-    });
+	copyText(`https://music.163.com/#/artist?id=${id}`)
+		.then(function () {
+			toast(t("toast.copied"));
+		})
+		.catch((error) => {
+			toast(`${t("toast.copyFailed")}${error}`);
+		});
 }
 function openInBrowser(id: string) {
-  const url = `https://music.163.com/#/artist?id=${id}`;
-  window.open(url);
-} 
+	const url = `https://music.163.com/#/artist?id=${id}`;
+	window.open(url);
+}
 </script>
 
 <style lang="scss" scoped>

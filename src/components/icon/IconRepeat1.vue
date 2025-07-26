@@ -4,6 +4,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'IconRepeat1'
-})
+	name: "IconRepeat1",
+});
 </script>

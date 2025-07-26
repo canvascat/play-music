@@ -27,41 +27,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter, RouterLink } from 'vue-router';
+import { ref } from "vue";
+import { useRouter, RouterLink } from "vue-router";
 
 // 定义接口
 interface Creator {
-  userName: string;
-  userId: number;
+	userName: string;
+	userId: number;
 }
 
 interface MvItem {
-  id?: number;
-  vid?: number;
-  name?: string;
-  title?: string;
-  imgurl16v9?: string;
-  cover?: string;
-  coverUrl?: string;
-  artistName?: string;
-  artistId?: number;
-  creator?: Creator[];
-  publishTime?: string;
+	id?: number;
+	vid?: number;
+	name?: string;
+	title?: string;
+	imgurl16v9?: string;
+	cover?: string;
+	coverUrl?: string;
+	artistName?: string;
+	artistId?: number;
+	creator?: Creator[];
+	publishTime?: string;
 }
 
 // 定义props
 interface Props {
-  playing?: boolean;
-  mvs: MvItem[];
-  subtitle?: 'artist' | 'publishTime';
-  /** @deprecated */
-  withoutPadding?: boolean;
+	playing?: boolean;
+	mvs: MvItem[];
+	subtitle?: "artist" | "publishTime";
+	/** @deprecated */
+	withoutPadding?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  subtitle: 'artist',
-  withoutPadding: false,
+	subtitle: "artist",
+	withoutPadding: false,
 });
 
 const router = useRouter();
@@ -69,46 +69,46 @@ const hoverVideoID = ref(0);
 
 // 方法
 const goToMv = (id: number) => {
-  let query: Record<string, any> = {};
-  if (typeof props.playing === 'boolean') {
-    query = { autoplay: props.playing };
-  }
-  router.push({ path: '/mv/' + id, query });
+	let query: Record<string, any> = {};
+	if (typeof props.playing === "boolean") {
+		query = { autoplay: props.playing };
+	}
+	router.push({ path: "/mv/" + id, query });
 };
 
 const getUrl = (mv: MvItem): string => {
-  const url = mv.imgurl16v9 ?? mv.cover ?? mv.coverUrl ?? '';
-  return url.replace(/^http:/, 'https:') + '?param=464y260';
+	const url = mv.imgurl16v9 ?? mv.cover ?? mv.coverUrl ?? "";
+	return url.replace(/^http:/, "https:") + "?param=464y260";
 };
 
 const getID = (mv: MvItem): number => {
-  if (mv.id !== undefined) return mv.id;
-  if (mv.vid !== undefined) return mv.vid;
-  return 0;
+	if (mv.id !== undefined) return mv.id;
+	if (mv.vid !== undefined) return mv.vid;
+	return 0;
 };
 
 const getTitle = (mv: MvItem): string => {
-  if (mv.name !== undefined) return mv.name;
-  if (mv.title !== undefined) return mv.title;
-  return '';
+	if (mv.name !== undefined) return mv.name;
+	if (mv.title !== undefined) return mv.title;
+	return "";
 };
 
 const getSubtitle = (mv: MvItem): string => {
-  if (props.subtitle === 'artist') {
-    let artistName = 'null';
-    let artistID = 0;
-    if (mv.artistName !== undefined) {
-      artistName = mv.artistName;
-      artistID = mv.artistId ?? 0;
-    } else if (mv.creator !== undefined && mv.creator.length > 0) {
-      artistName = mv.creator[0].userName;
-      artistID = mv.creator[0].userId;
-    }
-    return `<a href="/artist/${artistID}">${artistName}</a>`;
-  } else if (props.subtitle === 'publishTime') {
-    return mv.publishTime ?? '';
-  }
-  return '';
+	if (props.subtitle === "artist") {
+		let artistName = "null";
+		let artistID = 0;
+		if (mv.artistName !== undefined) {
+			artistName = mv.artistName;
+			artistID = mv.artistId ?? 0;
+		} else if (mv.creator !== undefined && mv.creator.length > 0) {
+			artistName = mv.creator[0].userName;
+			artistID = mv.creator[0].userId;
+		}
+		return `<a href="/artist/${artistID}">${artistName}</a>`;
+	} else if (props.subtitle === "publishTime") {
+		return mv.publishTime ?? "";
+	}
+	return "";
 };
 </script>
 

@@ -16,42 +16,41 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type CSSProperties } from 'vue';
-import { useStore } from '@/store/pinia';
-import { useRouter } from 'vue-router';
-import { IconPlay } from '@/components/icon';
+import { computed, ref, type CSSProperties } from "vue";
+import { useStore } from "@/store/pinia";
+import { useRouter } from "vue-router";
+import { IconPlay } from "@/components/icon";
 
 const { player } = useStore();
 const playActions = {
-  album: player.playAlbumByID,
-  playlist: player.playPlaylistByID,
-  artist: player.playArtistByID,
+	album: player.playAlbumByID,
+	playlist: player.playPlaylistByID,
+	artist: player.playArtistByID,
 };
 
 interface Props {
-  id: number;
-  type: keyof typeof playActions;
-  imageUrl: string;
-  fixedSize?: number;
-  playButtonSize?: number;
-  coverHover?: boolean;
-  alwaysShowPlayButton?: boolean;
-  alwaysShowShadow?: boolean;
-  clickCoverToPlay?: boolean;
-  shadowMargin?: number;
-  radius?: number;
+	id: number;
+	type: keyof typeof playActions;
+	imageUrl: string;
+	fixedSize?: number;
+	playButtonSize?: number;
+	coverHover?: boolean;
+	alwaysShowPlayButton?: boolean;
+	alwaysShowShadow?: boolean;
+	clickCoverToPlay?: boolean;
+	shadowMargin?: number;
+	radius?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-
-  fixedSize: 0,
-  playButtonSize: 22,
-  coverHover: true,
-  alwaysShowPlayButton: true,
-  alwaysShowShadow: false,
-  clickCoverToPlay: false,
-  shadowMargin: 12,
-  radius: 12,
+	fixedSize: 0,
+	playButtonSize: 22,
+	coverHover: true,
+	alwaysShowPlayButton: true,
+	alwaysShowShadow: false,
+	clickCoverToPlay: false,
+	shadowMargin: 12,
+	radius: 12,
 });
 
 const router = useRouter();
@@ -59,38 +58,36 @@ const router = useRouter();
 const focus = ref(false);
 
 const imageStyles = computed(() => {
-  let styles: CSSProperties = {};
-  if (props.fixedSize !== 0) {
-    styles.width = props.fixedSize + 'px';
-    styles.height = props.fixedSize + 'px';
-  }
-  if (props.type === 'artist') styles.borderRadius = '50%';
-  return styles;
+	let styles: CSSProperties = {};
+	if (props.fixedSize !== 0) {
+		styles.width = props.fixedSize + "px";
+		styles.height = props.fixedSize + "px";
+	}
+	if (props.type === "artist") styles.borderRadius = "50%";
+	return styles;
 });
 
 const playButtonStyles = computed(() => {
-  let styles: CSSProperties = {};
-  styles.width = props.playButtonSize + '%';
-  styles.height = props.playButtonSize + '%';
-  return styles;
+	let styles: CSSProperties = {};
+	styles.width = props.playButtonSize + "%";
+	styles.height = props.playButtonSize + "%";
+	return styles;
 });
 
 const shadowStyles = computed(() => {
-  let styles: CSSProperties = {};
-  styles.backgroundImage = `url(${props.imageUrl})`;
-  if (props.type === 'artist') styles.borderRadius = '50%';
-  return styles;
+	let styles: CSSProperties = {};
+	styles.backgroundImage = `url(${props.imageUrl})`;
+	if (props.type === "artist") styles.borderRadius = "50%";
+	return styles;
 });
 
 const play = () => {
-  playActions[props.type].bind(player)(props.id);
+	playActions[props.type].bind(player)(props.id);
 };
 
 const goTo = () => {
-  router.push({ name: props.type, params: { id: props.id } });
+	router.push({ name: props.type, params: { id: props.id } });
 };
-
-
 </script>
 
 <style lang="scss" scoped>

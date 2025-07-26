@@ -5,11 +5,11 @@
 </template>
 
 <script setup lang="ts">
-import type { VNode } from 'vue';
+import type { VNode } from "vue";
 
-defineOptions({ name: 'ButtonIcon' });
+defineOptions({ name: "ButtonIcon" });
 defineSlots<{
-  default: () => VNode;
+	default: () => VNode;
 }>();
 </script>
 

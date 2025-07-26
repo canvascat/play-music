@@ -97,196 +97,197 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import * as api from '@/api';
-import { splitSoundtrackAlbumTitle, splitAlbumTitle } from '@/utils/common';
-import NProgress from 'nprogress';
-import { isAccountLoggedIn } from '@/utils/auth';
-import { cloneDeep, groupBy, sortBy } from 'es-toolkit';
-import { toPairs } from 'es-toolkit/compat';
-import { resizeImage, formatDate, formatTime, formatAlbumType } from '@/utils/filters';
-import { useI18n } from 'vue-i18n';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
-import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
-import TrackList from '@/components/TrackList.vue';
-import CoverRow from '@/components/CoverRow.vue';
-import Cover from '@/components/Cover.vue';
-import Description from '@/components/Description.tsx';
-import { copyText } from '@/utils/copy.ts';
-import { toast } from 'vue-sonner'
-import { computed, ref, toValue, shallowRef } from 'vue';
-import { onBeforeRouteUpdate, useRouter } from 'vue-router';
+import { useStore } from "@/store/pinia";
+import * as api from "@/api";
+import { splitSoundtrackAlbumTitle, splitAlbumTitle } from "@/utils/common";
+import NProgress from "nprogress";
+import { isAccountLoggedIn } from "@/utils/auth";
+import { cloneDeep, groupBy, sortBy } from "es-toolkit";
+import { toPairs } from "es-toolkit/compat";
+import { resizeImage, formatDate, formatTime, formatAlbumType } from "@/utils/filters";
+import { useI18n } from "vue-i18n";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import ExplicitSymbol from "@/components/ExplicitSymbol.vue";
+import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
+import TrackList from "@/components/TrackList.vue";
+import CoverRow from "@/components/CoverRow.vue";
+import Cover from "@/components/Cover.vue";
+import Description from "@/components/Description.tsx";
+import { copyText } from "@/utils/copy.ts";
+import { toast } from "vue-sonner";
+import { computed, ref, toValue, shallowRef } from "vue";
+import { onBeforeRouteUpdate, useRouter } from "vue-router";
 
 const { t } = useI18n();
 
-
 interface Track {
-  id: number;
-  dt: number;
-  cd: number;
+	id: number;
+	dt: number;
+	cd: number;
 }
 
 interface AlbumDynamicDetail {
-  isSub: boolean;
+	isSub: boolean;
 }
 
 interface Album {
-  id: number;
-  picUrl: string;
-  name: string;
-  artist: {
-    id: number;
-    name: string;
-  };
-  type: string;
-  mark: number;
-  publishTime: number;
-  size: number;
-  description: string;
-  company: string;
+	id: number;
+	picUrl: string;
+	name: string;
+	artist: {
+		id: number;
+		name: string;
+	};
+	type: string;
+	mark: number;
+	publishTime: number;
+	size: number;
+	description: string;
+	company: string;
 }
 
 const show = ref(false);
 const album = ref<Album>({
-  id: 0,
-  picUrl: '',
-  name: '',
-  artist: {
-    id: 0,
-    name: '',
-  },
-  type: '',
-  mark: 0,
-  publishTime: 0,
-  size: 0,
-  description: 'default description',
-  company: '',
+	id: 0,
+	picUrl: "",
+	name: "",
+	artist: {
+		id: 0,
+		name: "",
+	},
+	type: "",
+	mark: 0,
+	publishTime: 0,
+	size: 0,
+	description: "default description",
+	company: "",
 });
 
 const tracks = shallowRef<Track[]>([]);
 const moreAlbums = ref<Album[]>([]);
 const dynamicDetail = ref<AlbumDynamicDetail>({ isSub: false });
-const subtitle = ref('');
-const title = ref('');
+const subtitle = ref("");
+const title = ref("");
 
 onBeforeRouteUpdate((to, _from, next) => {
-  show.value = false;
-  loadData(to.params.id as string);
-  next();
+	show.value = false;
+	loadData(to.params.id as string);
+	next();
 });
 
 const albumTime = computed(() => {
-  return tracks.value.reduce((acc, track) => acc + track.dt, 0);
+	return tracks.value.reduce((acc, track) => acc + track.dt, 0);
 });
 
 const filteredMoreAlbums = computed(() => {
-
-  let _moreAlbums = moreAlbums.value.filter(a => a.id !== album.value.id);
-  let realAlbums = _moreAlbums.filter(a => a.type === '专辑');
-  let eps = _moreAlbums.filter(a => a.type === 'EP' || (a.type === 'EP/Single' && a.size > 1));
-  let restItems = _moreAlbums.filter(a => realAlbums.find(a1 => a1.id === a.id) === undefined && eps.find(a1 => a1.id === a.id) === undefined);
-  if (realAlbums.length === 0) {
-    return [...realAlbums, ...eps, ...restItems].slice(0, 5);
-  } else {
-    return [...realAlbums, ...restItems].slice(0, 5);
-  }
+	let _moreAlbums = moreAlbums.value.filter((a) => a.id !== album.value.id);
+	let realAlbums = _moreAlbums.filter((a) => a.type === "专辑");
+	let eps = _moreAlbums.filter((a) => a.type === "EP" || (a.type === "EP/Single" && a.size > 1));
+	let restItems = _moreAlbums.filter(
+		(a) =>
+			realAlbums.find((a1) => a1.id === a.id) === undefined &&
+			eps.find((a1) => a1.id === a.id) === undefined,
+	);
+	if (realAlbums.length === 0) {
+		return [...realAlbums, ...eps, ...restItems].slice(0, 5);
+	} else {
+		return [...realAlbums, ...restItems].slice(0, 5);
+	}
 });
 
 const tracksByDisc = computed(() => {
+	if (tracks.value.length <= 1) return [];
 
-  if (tracks.value.length <= 1) return [];
-
-  const pairs = toPairs(groupBy(toValue(tracks), item => item.cd));
-  return sortBy(pairs, p => p[0]).map(items => ({
-    disc: items[0],
-    tracks: items[1],
-  }));
+	const pairs = toPairs(groupBy(toValue(tracks), (item) => item.cd));
+	return sortBy(pairs, (p) => p[0]).map((items) => ({
+		disc: items[0],
+		tracks: items[1],
+	}));
 });
 const router = useRouter();
 loadData(router.currentRoute.value.params.id as string);
 
 const { player } = useStore();
 
-const playAlbumByID = (id: number, trackID: string = 'first') => {
-  player.playAlbumByID(id, trackID);
+const playAlbumByID = (id: number, trackID: string = "first") => {
+	player.playAlbumByID(id, trackID);
 };
 
 function likeAlbum(showToast = false) {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  api.album.likeAAlbum({
-    id: album.value.id,
-    t: dynamicDetail.value.isSub ? 0 : 1,
-  })
-    .then(data => {
-      if (data.code === 200) {
-        dynamicDetail.value.isSub = !dynamicDetail.value.isSub;
-        if (showToast)
-          toast(
-            dynamicDetail.value.isSub ? '已保存到音乐库' : '已从音乐库删除'
-          );
-      }
-    })
-    .catch(error => {
-      toast(`${error.response.data.message || error}`);
-    });
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	api.album
+		.likeAAlbum({
+			id: album.value.id,
+			t: dynamicDetail.value.isSub ? 0 : 1,
+		})
+		.then((data) => {
+			if (data.code === 200) {
+				dynamicDetail.value.isSub = !dynamicDetail.value.isSub;
+				if (showToast) toast(dynamicDetail.value.isSub ? "已保存到音乐库" : "已从音乐库删除");
+			}
+		})
+		.catch((error) => {
+			toast(`${error.response.data.message || error}`);
+		});
 }
 function formatTitle() {
-  let splitTitle = splitSoundtrackAlbumTitle(album.value.name);
-  let splitTitle2 = splitAlbumTitle(splitTitle.title);
-  title.value = splitTitle2.title;
-  if (splitTitle.subtitle !== '' && splitTitle2.subtitle !== '') {
-    subtitle.value = splitTitle.subtitle + ' · ' + splitTitle2.subtitle;
-  } else {
-    subtitle.value =
-      splitTitle.subtitle === ''
-        ? splitTitle2.subtitle
-        : splitTitle.subtitle;
-  }
+	let splitTitle = splitSoundtrackAlbumTitle(album.value.name);
+	let splitTitle2 = splitAlbumTitle(splitTitle.title);
+	title.value = splitTitle2.title;
+	if (splitTitle.subtitle !== "" && splitTitle2.subtitle !== "") {
+		subtitle.value = splitTitle.subtitle + " · " + splitTitle2.subtitle;
+	} else {
+		subtitle.value = splitTitle.subtitle === "" ? splitTitle2.subtitle : splitTitle.subtitle;
+	}
 }
 function loadData(id: string) {
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-  api.album.getAlbum(id).then(data => {
-    console.debug(cloneDeep(data))
-    album.value = data.album;
-    tracks.value = data.songs;
-    formatTitle();
-    NProgress.done();
-    show.value = true;
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+	api.album.getAlbum(id).then((data) => {
+		console.debug(cloneDeep(data));
+		album.value = data.album;
+		tracks.value = data.songs;
+		formatTitle();
+		NProgress.done();
+		show.value = true;
 
-    // to get explicit mark
-    let trackIDs = tracks.value.map(t => t.id);
-    api.track.getTrackDetail(trackIDs.join(',')).then(data => {
-      tracks.value = data.songs;
-    });
+		// to get explicit mark
+		let trackIDs = tracks.value.map((t) => t.id);
+		api.track.getTrackDetail(trackIDs.join(",")).then((data) => {
+			tracks.value = data.songs;
+		});
 
-    // get more album by this artist
-    api.artist.getArtistAlbum({ id: album.value.artist.id, limit: 100 }).then(data => {
-      moreAlbums.value = data.hotAlbums;
-    });
-  });
-  api.album.albumDynamicDetail(id).then(data => {
-    dynamicDetail.value = data;
-  });
+		// get more album by this artist
+		api.artist.getArtistAlbum({ id: album.value.artist.id, limit: 100 }).then((data) => {
+			moreAlbums.value = data.hotAlbums;
+		});
+	});
+	api.album.albumDynamicDetail(id).then((data) => {
+		dynamicDetail.value = data;
+	});
 }
 
 function copyUrl(id: number | string) {
-  copyText(`https://music.163.com/#/album?id=${id}`)
-    .then(function () {
-      toast(t('toast.copied'));
-    })
-    .catch(error => {
-      toast(`${t('toast.copyFailed')}${error}`);
-    });
+	copyText(`https://music.163.com/#/album?id=${id}`)
+		.then(function () {
+			toast(t("toast.copied"));
+		})
+		.catch((error) => {
+			toast(`${t("toast.copyFailed")}${error}`);
+		});
 }
 function openInBrowser(id: number | string) {
-  const url = `https://music.163.com/#/album?id=${id}`;
-  window.open(url);
+	const url = `https://music.163.com/#/album?id=${id}`;
+	window.open(url);
 }
 </script>
 

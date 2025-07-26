@@ -35,127 +35,125 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import NProgress from 'nprogress';
-import * as api from '@/api';
-import { playlistCategories } from '@/utils/staticData';
-import { getRecommendPlayList as getRecommendPlayListApi } from '@/utils/playList';
-import { onBeforeRouteUpdate } from 'vue-router';
-import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
-import CoverRow from '@/components/CoverRow.vue';
-import SvgIcon from '@/components/SvgIcon.vue';
-import { ref, computed, onActivated } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useStore } from "@/store/pinia";
+import NProgress from "nprogress";
+import * as api from "@/api";
+import { playlistCategories } from "@/utils/staticData";
+import { getRecommendPlayList as getRecommendPlayListApi } from "@/utils/playList";
+import { onBeforeRouteUpdate } from "vue-router";
+import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
+import CoverRow from "@/components/CoverRow.vue";
+import SvgIcon from "@/components/SvgIcon.vue";
+import { ref, computed, onActivated } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const { settings, togglePlaylistCategory } = useStore();
 const show = ref(false);
 const playlists = ref([]);
-const activeCategory = ref('全部');
+const activeCategory = ref("全部");
 const loadingMore = ref(false);
 const showLoadMoreButton = ref(false);
 const hasMore = ref(true);
-const allBigCats = ref(['语种', '风格', '场景', '情感', '主题']);
+const allBigCats = ref(["语种", "风格", "场景", "情感", "主题"]);
 const showCatOptions = ref(false);
 const route = useRoute();
 const router = useRouter();
 
 onBeforeRouteUpdate((to, _from, next) => {
-  showLoadMoreButton.value = false;
-  hasMore.value = true;
-  playlists.value = [];
+	showLoadMoreButton.value = false;
+	hasMore.value = true;
+	playlists.value = [];
 
-  activeCategory.value = to.query.category as string;
-  getPlaylist();
-  next();
+	activeCategory.value = to.query.category as string;
+	getPlaylist();
+	next();
 });
 
-
-
 const subText = computed(() => {
-  if (activeCategory.value === '排行榜') return 'updateFrequency';
-  if (activeCategory.value === '推荐歌单') return 'copywriter';
-  return 'none';
+	if (activeCategory.value === "排行榜") return "updateFrequency";
+	if (activeCategory.value === "推荐歌单") return "copywriter";
+	return "none";
 });
 
 onActivated(() => {
-  loadData();
-  // TODO scrollbar.restorePosition();
+	loadData();
+	// TODO scrollbar.restorePosition();
 });
 
 function loadData() {
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-  const queryCategory = route.query.category as string;
-  if (queryCategory === undefined) {
-    playlists.value = [];
-    activeCategory.value = '全部';
-  } else {
-    activeCategory.value = queryCategory;
-  }
-  getPlaylist();
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+	const queryCategory = route.query.category as string;
+	if (queryCategory === undefined) {
+		playlists.value = [];
+		activeCategory.value = "全部";
+	} else {
+		activeCategory.value = queryCategory;
+	}
+	getPlaylist();
 }
 function goToCategory(Category) {
-  showCatOptions.value = false;
-  router.push({ name: 'explore', query: { category: Category } });
+	showCatOptions.value = false;
+	router.push({ name: "explore", query: { category: Category } });
 }
 function updatePlaylist(_playlists) {
-  playlists.value.push(..._playlists);
-  loadingMore.value = false;
-  showLoadMoreButton.value = true;
-  NProgress.done();
-  show.value = true;
+	playlists.value.push(..._playlists);
+	loadingMore.value = false;
+	showLoadMoreButton.value = true;
+	NProgress.done();
+	show.value = true;
 }
 function getPlaylist() {
-  loadingMore.value = true;
-  if (activeCategory.value === '推荐歌单') {
-    return getRecommendPlayList();
-  }
-  if (activeCategory.value === '精品歌单') {
-    return getHighQualityPlaylist();
-  }
-  if (activeCategory.value === '排行榜') {
-    return getTopLists();
-  }
-  return getTopPlayList();
+	loadingMore.value = true;
+	if (activeCategory.value === "推荐歌单") {
+		return getRecommendPlayList();
+	}
+	if (activeCategory.value === "精品歌单") {
+		return getHighQualityPlaylist();
+	}
+	if (activeCategory.value === "排行榜") {
+		return getTopLists();
+	}
+	return getTopPlayList();
 }
 function getRecommendPlayList() {
-  getRecommendPlayListApi(100, true).then(list => {
-    playlists.value = [];
-    updatePlaylist(list);
-  });
+	getRecommendPlayListApi(100, true).then((list) => {
+		playlists.value = [];
+		updatePlaylist(list);
+	});
 }
 function getHighQualityPlaylist() {
-  let _playlists = playlists.value;
-  let before =
-    _playlists.length !== 0 ? _playlists[_playlists.length - 1].updateTime : 0;
-      api.playlist.highQualityPlaylist({ limit: 50, before }).then(data => {
-    updatePlaylist(data.playlists);
-    hasMore.value = data.more;
-  });
+	let _playlists = playlists.value;
+	let before = _playlists.length !== 0 ? _playlists[_playlists.length - 1].updateTime : 0;
+	api.playlist.highQualityPlaylist({ limit: 50, before }).then((data) => {
+		updatePlaylist(data.playlists);
+		hasMore.value = data.more;
+	});
 }
 function getTopLists() {
-  api.playlist.toplists().then(data => {
-    playlists.value = [];
-    updatePlaylist(data.list);
-  });
+	api.playlist.toplists().then((data) => {
+		playlists.value = [];
+		updatePlaylist(data.list);
+	});
 }
 function getTopPlayList() {
-      api.playlist.topPlaylist({
-    cat: activeCategory.value,
-    offset: playlists.value.length,
-  }).then(data => {
-    updatePlaylist(data.playlists);
-    hasMore.value = data.more;
-  });
+	api.playlist
+		.topPlaylist({
+			cat: activeCategory.value,
+			offset: playlists.value.length,
+		})
+		.then((data) => {
+			updatePlaylist(data.playlists);
+			hasMore.value = data.more;
+		});
 }
 function getCatsByBigCat(name) {
-  return playlistCategories.filter(c => c.bigCat === name);
+	return playlistCategories.filter((c) => c.bigCat === name);
 }
 function toggleCat(name) {
-  togglePlaylistCategory(name);
+	togglePlaylistCategory(name);
 }
-
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,6 @@
-import request, { noCacheParams } from '@/utils/request';
-import { mapTrackPlayableStatus } from '@/utils/common';
-import * as NCMAPI from './NCMAPI'
+import request, { noCacheParams } from "@/utils/request";
+import { mapTrackPlayableStatus } from "@/utils/common";
+import * as NCMAPI from "./NCMAPI";
 
 /**
  * 推荐歌单
@@ -11,7 +11,7 @@ import * as NCMAPI from './NCMAPI'
  * @param {number=} params.limit
  */
 export function recommendPlaylist(params?: NCMAPI.personalized[0]) {
-  return request({ url: '/personalized', method: 'get', params });
+	return request({ url: "/personalized", method: "get", params });
 }
 
 /**
@@ -21,14 +21,14 @@ export function recommendPlaylist(params?: NCMAPI.personalized[0]) {
  * @param {number=} params.limit
  */
 export function dailyRecommendPlaylist(params?: NCMAPI.recommend_resource[0]) {
-  return request({
-    url: '/recommend/resource',
-    method: 'get',
-    params: {
-      params,
-      timestamp: Date.now(),
-    },
-  });
+	return request({
+		url: "/recommend/resource",
+		method: "get",
+		params: {
+			params,
+			timestamp: Date.now(),
+		},
+	});
 }
 /**
  * 获取歌单详情
@@ -41,20 +41,17 @@ export function dailyRecommendPlaylist(params?: NCMAPI.recommend_resource[0]) {
  * @param {boolean=} noCache
  */
 export function getPlaylistDetail(id: string | number, noCache = false) {
-  let params: NCMAPI.playlist_detail[0] = { id }; 
-  return request({
-    url: '/playlist/detail',
-    method: 'get',
-    params: noCacheParams(params, noCache),
-  }).then(data => {
-    if (data.playlist) {
-      data.playlist.tracks = mapTrackPlayableStatus(
-        data.playlist.tracks,
-        data.privileges || []
-      );
-    }
-    return data;
-  });
+	let params: NCMAPI.playlist_detail[0] = { id };
+	return request({
+		url: "/playlist/detail",
+		method: "get",
+		params: noCacheParams(params, noCache),
+	}).then((data) => {
+		if (data.playlist) {
+			data.playlist.tracks = mapTrackPlayableStatus(data.playlist.tracks, data.privileges || []);
+		}
+		return data;
+	});
 }
 /**
  * 获取精品歌单
@@ -64,11 +61,11 @@ export function getPlaylistDetail(id: string | number, noCache = false) {
  * - before: 分页参数,取上一页最后一个歌单的 updateTime 获取下一页数据
  */
 export function highQualityPlaylist(params?: NCMAPI.top_playlist_highquality[0]) {
-  return request({
-    url: '/top/playlist/highquality',
-    method: 'get',
-    params,
-  });
+	return request({
+		url: "/top/playlist/highquality",
+		method: "get",
+		params,
+	});
 }
 
 /**
@@ -76,14 +73,14 @@ export function highQualityPlaylist(params?: NCMAPI.top_playlist_highquality[0])
  * 说明 : 调用此接口 , 可获取网友精选碟歌单
  * - order: 可选值为 'new' 和 'hot', 分别对应最新和最热 , 默认为 'hot'
  * - cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部",可从歌单分类接口获取(/playlist/catlist)
- * - limit: 取出歌单数量 , 默认为 50 
+ * - limit: 取出歌单数量 , 默认为 50
  */
 export function topPlaylist(params?: NCMAPI.top_playlist[0]) {
-  return request({
-    url: '/top/playlist',
-    method: 'get',
-    params,
-  });
+	return request({
+		url: "/top/playlist",
+		method: "get",
+		params,
+	});
 }
 
 /**
@@ -91,10 +88,10 @@ export function topPlaylist(params?: NCMAPI.top_playlist[0]) {
  * 说明 : 调用此接口,可获取歌单分类,包含 category 信息
  */
 export function playlistCatlist() {
-  return request({
-    url: '/playlist/catlist',
-    method: 'get',
-  });
+	return request({
+		url: "/playlist/catlist",
+		method: "get",
+	});
 }
 
 /**
@@ -102,10 +99,10 @@ export function playlistCatlist() {
  * 说明 : 调用此接口,可获取所有榜单 接口地址 : /toplist
  */
 export function toplists() {
-  return request({
-    url: '/toplist',
-    method: 'get',
-  });
+	return request({
+		url: "/toplist",
+		method: "get",
+	});
 }
 
 /**
@@ -118,11 +115,11 @@ export function toplists() {
  * @param {number} params.id
  */
 export function subscribePlaylist(params: NCMAPI.playlist_subscribe[0]) {
-  return request({
-    url: '/playlist/subscribe',
-    method: 'post',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/playlist/subscribe",
+		method: "post",
+		params: noCacheParams(params),
+	});
 }
 
 /**
@@ -131,12 +128,12 @@ export function subscribePlaylist(params: NCMAPI.playlist_subscribe[0]) {
  * - id : 歌单id,可多个,用逗号隔开
  *  * @param {number} id
  */
-export function deletePlaylist(id: NCMAPI.playlist_delete[0]['id']) {
-  return request({
-    url: '/playlist/delete',
-    method: 'post',
-    params: { id },
-  });
+export function deletePlaylist(id: NCMAPI.playlist_delete[0]["id"]) {
+	return request({
+		url: "/playlist/delete",
+		method: "post",
+		params: { id },
+	});
 }
 
 /**
@@ -147,44 +144,41 @@ export function deletePlaylist(id: NCMAPI.playlist_delete[0]['id']) {
  * - type : 歌单类型,默认'NORMAL',传 'VIDEO'则为视频歌单
  */
 export function createPlaylist(params: NCMAPI.playlist_create[0]) {
-  return request({
-    url: '/playlist/create',
-    method: 'post',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/playlist/create",
+		method: "post",
+		params: noCacheParams(params),
+	});
 }
 
 /**
  * 对歌单添加或删除歌曲
  * 说明 : 调用此接口 , 可以添加歌曲到歌单或者从歌单删除某首歌曲 ( 需要登录 )
  * - op: 从歌单增加单曲为 add, 删除为 del
- * - pid: 歌单 id 
- * - tracks: 歌曲 id,可多个,用逗号隔开 
+ * - pid: 歌单 id
+ * - tracks: 歌曲 id,可多个,用逗号隔开
  */
 export function addOrRemoveTrackFromPlaylist(params: NCMAPI.playlist_tracks[0]) {
-  return request({
-    url: '/playlist/tracks',
-    method: 'post',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/playlist/tracks",
+		method: "post",
+		params: noCacheParams(params),
+	});
 }
 
 /**
  * 每日推荐歌曲
- * 说明 : 调用此接口 , 可获得每日推荐歌曲 ( 需要登录 ) 
+ * 说明 : 调用此接口 , 可获得每日推荐歌曲 ( 需要登录 )
  */
-export function dailyRecommendTracks( ) {
-  return request({
-    url: '/recommend/songs',
-    method: 'get',
-    params: noCacheParams({}),
-  }).then(result => {
-    result.data.dailySongs = mapTrackPlayableStatus(
-      result.data.dailySongs,
-      result.data.privileges
-    );
-    return result;
-  });
+export function dailyRecommendTracks() {
+	return request({
+		url: "/recommend/songs",
+		method: "get",
+		params: noCacheParams({}),
+	}).then((result) => {
+		result.data.dailySongs = mapTrackPlayableStatus(result.data.dailySongs, result.data.privileges);
+		return result;
+	});
 }
 
 /**
@@ -192,12 +186,12 @@ export function dailyRecommendTracks( ) {
  * 说明 : 登录后调用此接口 , 可获取心动模式/智能播放列表 必选参数 : id : 歌曲 id
  * - id : 歌曲 id
  * - pid : 歌单 id
- * - sid : 要开始播放的歌曲的 id (可选参数) 
+ * - sid : 要开始播放的歌曲的 id (可选参数)
  */
 export function intelligencePlaylist(params: NCMAPI.playmode_intelligence_list[0]) {
-  return request({
-    url: '/playmode/intelligence/list',
-    method: 'get',
-    params,
-  });
+	return request({
+		url: "/playmode/intelligence/list",
+		method: "get",
+		params,
+	});
 }

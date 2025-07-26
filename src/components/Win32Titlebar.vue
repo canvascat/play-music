@@ -23,31 +23,29 @@
 </template>
 
 <script setup lang="ts">
-import '@vscode/codicons/dist/codicon.css';
-import { ref, computed } from 'vue';
-import { useStore } from '@/store/pinia'; 
+import "@vscode/codicons/dist/codicon.css";
+import { ref, computed } from "vue";
+import { useStore } from "@/store/pinia";
 
 const isMaximized = ref(false);
 
 const title = computed(() => useStore().title);
 
 if (window.IS_ELECTRON === true) {
-  window.ipcRenderer?.on('isMaximized', (_, value) => {
-    isMaximized.value = value;
-  });
+	window.ipcRenderer?.on("isMaximized", (_, value) => {
+		isMaximized.value = value;
+	});
 }
 
-
 const windowMinimize = () => {
-  window.ipcRenderer?.send('minimize');
+	window.ipcRenderer?.send("minimize");
 };
 const windowMaxRestore = () => {
-  window.ipcRenderer?.send('maximizeOrUnmaximize');
+	window.ipcRenderer?.send("maximizeOrUnmaximize");
 };
 const windowClose = () => {
-  window.ipcRenderer?.send('close');
+	window.ipcRenderer?.send("close");
 };
-
 </script>
 
 <style lang="scss" scoped>

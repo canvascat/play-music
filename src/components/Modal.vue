@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { IconX } from '@/components/icon';
-import { computed } from 'vue';
+import { IconX } from "@/components/icon";
+import { computed } from "vue";
 
 interface Props {
-  show: boolean;
-  close: () => void;
-  title?: string;
-  showFooter?: boolean;
-  width?: string;
-  clickOutsideHide?: boolean;
-  minWidth?: string;
+	show: boolean;
+	close: () => void;
+	title?: string;
+	showFooter?: boolean;
+	width?: string;
+	clickOutsideHide?: boolean;
+	minWidth?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Title',
-  showFooter: true,
-  width: '50vw',
-  clickOutsideHide: false,
-  minWidth: 'calc(min(23rem, 100vw))',
+	title: "Title",
+	showFooter: true,
+	width: "50vw",
+	clickOutsideHide: false,
+	minWidth: "calc(min(23rem, 100vw))",
 });
 
 const modalStyles = computed(() => ({
-  width: props.width,
-  minWidth: props.minWidth,
+	width: props.width,
+	minWidth: props.minWidth,
 }));
 
 function clickOutside() {
-  if (props.clickOutsideHide) {
-    props.close();
-  }
+	if (props.clickOutsideHide) {
+		props.close();
+	}
 }
 </script>
 

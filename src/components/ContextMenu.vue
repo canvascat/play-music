@@ -9,59 +9,54 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'ContextMenu',
+	name: "ContextMenu",
 });
 
 const emit = defineEmits<{
-  closeMenu: []
+	closeMenu: [];
 }>();
 
-import { useStore } from '@/store/pinia';
-import { nextTick, reactive, ref } from 'vue';
+import { useStore } from "@/store/pinia";
+import { nextTick, reactive, ref } from "vue";
 
 const { player } = useStore();
 
-const menuRef = ref<HTMLDivElement | null>(null); 
+const menuRef = ref<HTMLDivElement | null>(null);
 
 const state = reactive({
-  showMenu: false,
-  top: '0px',
-  left: '0px',
+	showMenu: false,
+	top: "0px",
+	left: "0px",
 });
 
-
 function setMenu(top: number, left: number) {
-  let heightOffset = player.enabled ? 64 : 0;
-  let largestHeight =
-    window.innerHeight - menuRef.value!.offsetHeight - heightOffset;
-  let largestWidth = window.innerWidth - menuRef.value!.offsetWidth - 25;
-  if (top > largestHeight) top = largestHeight;
-  if (left > largestWidth) left = largestWidth;
-  state.top = top + 'px';
-  state.left = left + 'px';
+	let heightOffset = player.enabled ? 64 : 0;
+	let largestHeight = window.innerHeight - menuRef.value!.offsetHeight - heightOffset;
+	let largestWidth = window.innerWidth - menuRef.value!.offsetWidth - 25;
+	if (top > largestHeight) top = largestHeight;
+	if (left > largestWidth) left = largestWidth;
+	state.top = top + "px";
+	state.left = left + "px";
 }
 
 function closeMenu() {
-  state.showMenu = false;
-  emit('closeMenu');
+	state.showMenu = false;
+	emit("closeMenu");
 }
 
 function openMenu(e: MouseEvent) {
-  state.showMenu = true;
-  nextTick(() => {
-    menuRef.value!.focus();
-    setMenu(e.y, e.x);
-  });
-  e.preventDefault();
+	state.showMenu = true;
+	nextTick(() => {
+		menuRef.value!.focus();
+		setMenu(e.y, e.x);
+	});
+	e.preventDefault();
 }
 
-
-
 defineExpose({
-  openMenu,
-  closeMenu,
+	openMenu,
+	closeMenu,
 });
-
 </script>
 
 <style lang="scss" scoped>

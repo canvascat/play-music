@@ -93,28 +93,28 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import '@/assets/css/slider.css';
+import { useStore } from "@/store/pinia";
+import "@/assets/css/slider.css";
 
-import ButtonIcon from '@/components/ButtonIcon.vue';
-import VueSlider from 'vue-slider-component';
-import { goToListSource, hasListSource } from '@/utils/playList';
-import { formatTrackTime } from '@/utils/common';
-import { resizeImage } from '@/utils/filters';
-import { computed, onMounted, onBeforeMount, ref, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useRafFn } from '@vueuse/core';
+import ButtonIcon from "@/components/ButtonIcon.vue";
+import VueSlider from "vue-slider-component";
+import { goToListSource, hasListSource } from "@/utils/playList";
+import { formatTrackTime } from "@/utils/common";
+import { resizeImage } from "@/utils/filters";
+import { computed, onMounted, onBeforeMount, ref, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useRafFn } from "@vueuse/core";
 
 const { player, settings, toggleLyrics, likeATrack } = useStore();
 
 const currentTrack = computed(() => player.currentTrack);
 const volume = computed({
-  get() {
-    return player.volume;
-  },
-  set(value) {
-    player.volume = value;
-  },
+	get() {
+		return player.volume;
+	},
+	set(value) {
+		player.volume = value;
+	},
 });
 
 const audioSource = computed(() => player.audioSource);
@@ -124,105 +124,101 @@ const router = useRouter();
 // TODO
 const progress = ref(player.progress);
 useRafFn(() => {
-  progress.value = player.progress;
-})
+	progress.value = player.progress;
+});
 function updateProgress(value: number) {
-  player.progress = value;
-  progress.value = value;
+	player.progress = value;
+	progress.value = value;
 }
-
 
 onMounted(() => {
-  Object.assign(window, { player });
-  setupMediaControls();
-  window.addEventListener('keydown', handleKeydown);
-})
+	Object.assign(window, { player });
+	setupMediaControls();
+	window.addEventListener("keydown", handleKeydown);
+});
 onBeforeMount(() => {
-  window.removeEventListener('keydown', handleKeydown);
-})
+	window.removeEventListener("keydown", handleKeydown);
+});
 
 function playPrevTrack() {
-  player.playPrevTrack();
+	player.playPrevTrack();
 }
 function playOrPause() {
-  player.playOrPause();
+	player.playOrPause();
 }
 function playNextTrack() {
-  if (player.isPersonalFM) {
-    player.playNextFMTrack();
-  } else {
-    player.playNextTrack();
-  }
+	if (player.isPersonalFM) {
+		player.playNextFMTrack();
+	} else {
+		player.playNextTrack();
+	}
 }
 function goToNextTracksPage() {
-  if (player.isPersonalFM) return;
-  route.name === 'next'
-    ? router.go(-1)
-    : router.push({ name: 'next' });
+	if (player.isPersonalFM) return;
+	route.name === "next" ? router.go(-1) : router.push({ name: "next" });
 }
 
 function hasList() {
-  return hasListSource();
+	return hasListSource();
 }
 function goToList() {
-  goToListSource();
+	goToListSource();
 }
 function goToAlbum() {
-  if (!player.currentTrack?.al?.id) return;
-  router.push({ path: '/album/' + player.currentTrack.al.id });
+	if (!player.currentTrack?.al?.id) return;
+	router.push({ path: "/album/" + player.currentTrack.al.id });
 }
 function goToArtist(id: number) {
-  router.push({ path: '/artist/' + id });
+	router.push({ path: "/artist/" + id });
 }
 function moveToFMTrash() {
-  player.moveToFMTrash();
+	player.moveToFMTrash();
 }
 function switchRepeatMode() {
-  player.switchRepeatMode();
+	player.switchRepeatMode();
 }
 function switchShuffle() {
-  player.switchShuffle();
+	player.switchShuffle();
 }
 function switchReversed() {
-  player.switchReversed();
+	player.switchReversed();
 }
 function mute() {
-  player.mute();
+	player.mute();
 }
 
 function setupMediaControls() {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.setActionHandler('play', () => {
-      playOrPause();
-    });
-    navigator.mediaSession.setActionHandler('pause', () => {
-      playOrPause();
-    });
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      playPrevTrack();
-    });
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      playNextTrack();
-    });
-  }
+	if ("mediaSession" in navigator) {
+		navigator.mediaSession.setActionHandler("play", () => {
+			playOrPause();
+		});
+		navigator.mediaSession.setActionHandler("pause", () => {
+			playOrPause();
+		});
+		navigator.mediaSession.setActionHandler("previoustrack", () => {
+			playPrevTrack();
+		});
+		navigator.mediaSession.setActionHandler("nexttrack", () => {
+			playNextTrack();
+		});
+	}
 }
 
 function handleKeydown(event: KeyboardEvent) {
-  switch (event.code) {
-    case 'MediaPlayPause':
-      playOrPause();
-      break;
-    case 'MediaTrackPrevious':
-      playPrevTrack();
-      break;
-    case 'MediaTrackNext':
-      playNextTrack();
-      break;
-    default:
-      break;
-  }
+	switch (event.code) {
+		case "MediaPlayPause":
+			playOrPause();
+			break;
+		case "MediaTrackPrevious":
+			playPrevTrack();
+			break;
+		case "MediaTrackNext":
+			playNextTrack();
+			break;
+		default:
+			break;
+	}
 }
-
 </script>
 
 <style lang="scss" scoped>

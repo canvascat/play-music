@@ -18,65 +18,58 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import * as api from '@/api';
-import { isAccountLoggedIn } from '@/utils/auth';
-import { noop, sample } from 'es-toolkit';
-import { toast } from 'vue-sonner'
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { IconPlay } from '@/components/icon';
+import { useStore } from "@/store/pinia";
+import * as api from "@/api";
+import { isAccountLoggedIn } from "@/utils/auth";
+import { noop, sample } from "es-toolkit";
+import { toast } from "vue-sonner";
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { IconPlay } from "@/components/icon";
 
 const defaultCovers = [
-  'https://p2.music.126.net/0-Ybpa8FrDfRgKYCTJD8Xg==/109951164796696795.jpg',
-  'https://p2.music.126.net/QxJA2mr4hhb9DZyucIOIQw==/109951165422200291.jpg',
-  'https://p1.music.126.net/AhYP9TET8l-VSGOpWAKZXw==/109951165134386387.jpg',
+	"https://p2.music.126.net/0-Ybpa8FrDfRgKYCTJD8Xg==/109951164796696795.jpg",
+	"https://p2.music.126.net/QxJA2mr4hhb9DZyucIOIQw==/109951165422200291.jpg",
+	"https://p1.music.126.net/AhYP9TET8l-VSGOpWAKZXw==/109951165134386387.jpg",
 ];
-
 
 const { dailyTracks, updateDailyTracks, player } = useStore();
 const router = useRouter();
 const { t } = useI18n();
 
 const coverUrl = computed(() => {
-  return `${dailyTracks[0]?.al.picUrl || sample(defaultCovers)
-    }?param=1024y1024`;
+	return `${dailyTracks[0]?.al.picUrl || sample(defaultCovers)}?param=1024y1024`;
 });
 
 function loadDailyTracks() {
-  if (!isAccountLoggedIn()) return;
-      api.playlist.dailyRecommendTracks()
-    .then(result => {
-      updateDailyTracks(result.data.dailySongs);
-    })
-    .catch(noop);
+	if (!isAccountLoggedIn()) return;
+	api.playlist
+		.dailyRecommendTracks()
+		.then((result) => {
+			updateDailyTracks(result.data.dailySongs);
+		})
+		.catch(noop);
 }
 
 function goToDailyTracks() {
-  router.push({ name: 'dailySongs' });
+	router.push({ name: "dailySongs" });
 }
 
 function playDailyTracks() {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  let trackIDs = dailyTracks.map(t => t.id);
-  player.replacePlaylist(
-    trackIDs,
-    '/daily/songs',
-    'url',
-    dailyTracks[0].id
-  );
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	let trackIDs = dailyTracks.map((t) => t.id);
+	player.replacePlaylist(trackIDs, "/daily/songs", "url", dailyTracks[0].id);
 }
-
 
 if (dailyTracks.length === 0) loadDailyTracks();
 
 defineExpose({
-  loadDailyTracks
-})
+	loadDailyTracks,
+});
 </script>
 
 <style lang="scss" scoped>

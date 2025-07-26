@@ -48,169 +48,159 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useStore } from '@/store/pinia';
-import * as api from '@/api';
-import { isAccountLoggedIn } from '@/utils/auth';
-import { resizeImage } from '@/utils/filters';
-import { toast } from 'vue-sonner'
-import { useI18n } from 'vue-i18n';
-import TrackListItem from '@/components/TrackListItem.vue'; 
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger, ContextMenuSeparator } from '@/components/ui/context-menu'
-import { copyText } from '@/utils/copy';
-import { useModalStore } from '@/store/modal';
-
+import { ref } from "vue";
+import { useStore } from "@/store/pinia";
+import * as api from "@/api";
+import { isAccountLoggedIn } from "@/utils/auth";
+import { resizeImage } from "@/utils/filters";
+import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
+import TrackListItem from "@/components/TrackListItem.vue";
+import {
+	ContextMenu,
+	ContextMenuContent,
+	ContextMenuItem,
+	ContextMenuTrigger,
+	ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import { copyText } from "@/utils/copy";
+import { useModalStore } from "@/store/modal";
 
 const { t } = useI18n();
-const modalStore = useModalStore()
-const emits = defineEmits(['removeTrack']);
+const modalStore = useModalStore();
+const emits = defineEmits(["removeTrack"]);
 interface Props {
-  tracks?: any[];
-  type?: 'tracklist' | 'album' | 'playlist' | 'cloudDisk';
-  id?: number;
-  dbclickTrackFunc?: string;
-  albumObject?: any;
-  extraContextMenuItem?: string[];
-  columnNumber?: number;
-  highlightPlayingTrack?: boolean;
-  itemKey?: string;
+	tracks?: any[];
+	type?: "tracklist" | "album" | "playlist" | "cloudDisk";
+	id?: number;
+	dbclickTrackFunc?: string;
+	albumObject?: any;
+	extraContextMenuItem?: string[];
+	columnNumber?: number;
+	highlightPlayingTrack?: boolean;
+	itemKey?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  tracks: () => [],
-  type: 'tracklist',
-  id: 0,
-  dbclickTrackFunc: 'default',
-  albumObject: () => ({
-    artist: {
-      name: '',
-    },
-  }),
-  extraContextMenuItem: () => [ ],
-  columnNumber: 4,
-  highlightPlayingTrack: true,
-  itemKey: 'id',
-})
-const { liked, player, likeATrack, updateLikedXXX } = useStore()
+	tracks: () => [],
+	type: "tracklist",
+	id: 0,
+	dbclickTrackFunc: "default",
+	albumObject: () => ({
+		artist: {
+			name: "",
+		},
+	}),
+	extraContextMenuItem: () => [],
+	columnNumber: 4,
+	highlightPlayingTrack: true,
+	itemKey: "id",
+});
+const { liked, player, likeATrack, updateLikedXXX } = useStore();
 
 const listStyles = ref({
-  // display: 'grid',
-  // gap: '4px',
-  // gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
-})
+	// display: 'grid',
+	// gap: '4px',
+	// gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
+});
 
-
-
-if (props.type === 'tracklist') {
-  listStyles.value = {
-    display: 'grid',
-    gap: '4px',
-    gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
-  };
+if (props.type === "tracklist") {
+	listStyles.value = {
+		display: "grid",
+		gap: "4px",
+		gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
+	};
 }
-
-
 
 function playThisList(trackID: string) {
-  if (props.dbclickTrackFunc === 'default') {
-    playThisListDefault(trackID);
-  } else if (props.dbclickTrackFunc === 'none') {
-    // do nothing
-  } else if (props.dbclickTrackFunc === 'playTrackOnListByID') {
-    player.playTrackOnListByID(trackID);
-  } else if (props.dbclickTrackFunc === 'playPlaylistByID') {
-    player.playPlaylistByID(props.id, trackID);
-  } else if (props.dbclickTrackFunc === 'playAList') {
-    let trackIDs = props.tracks.map(t => t.id || t.songId);
-    player.replacePlaylist(trackIDs, props.id, 'artist', trackID);
-  } else if (props.dbclickTrackFunc === 'dailyTracks') {
-    let trackIDs = props.tracks.map(t => t.id);
-    player.replacePlaylist(trackIDs, '/daily/songs', 'url', trackID);
-  } else if (props.dbclickTrackFunc === 'playCloudDisk') {
-    let trackIDs = props.tracks.map(t => t.id || t.songId);
-    player.replacePlaylist(trackIDs, props.id, 'cloudDisk', trackID);
-  }
+	if (props.dbclickTrackFunc === "default") {
+		playThisListDefault(trackID);
+	} else if (props.dbclickTrackFunc === "none") {
+		// do nothing
+	} else if (props.dbclickTrackFunc === "playTrackOnListByID") {
+		player.playTrackOnListByID(trackID);
+	} else if (props.dbclickTrackFunc === "playPlaylistByID") {
+		player.playPlaylistByID(props.id, trackID);
+	} else if (props.dbclickTrackFunc === "playAList") {
+		let trackIDs = props.tracks.map((t) => t.id || t.songId);
+		player.replacePlaylist(trackIDs, props.id, "artist", trackID);
+	} else if (props.dbclickTrackFunc === "dailyTracks") {
+		let trackIDs = props.tracks.map((t) => t.id);
+		player.replacePlaylist(trackIDs, "/daily/songs", "url", trackID);
+	} else if (props.dbclickTrackFunc === "playCloudDisk") {
+		let trackIDs = props.tracks.map((t) => t.id || t.songId);
+		player.replacePlaylist(trackIDs, props.id, "cloudDisk", trackID);
+	}
 }
 function playThisListDefault(trackID: string) {
-  if (props.type === 'playlist') {
-    player.playPlaylistByID(props.id, trackID);
-  } else if (props.type === 'album') {
-    player.playAlbumByID(props.id, trackID);
-  } else if (props.type === 'tracklist') {
-    let trackIDs = props.tracks.map(t => t.id);
-    player.replacePlaylist(trackIDs, props.id, 'artist', trackID);
-  }
+	if (props.type === "playlist") {
+		player.playPlaylistByID(props.id, trackID);
+	} else if (props.type === "album") {
+		player.playAlbumByID(props.id, trackID);
+	} else if (props.type === "tracklist") {
+		let trackIDs = props.tracks.map((t) => t.id);
+		player.replacePlaylist(trackIDs, props.id, "artist", trackID);
+	}
 }
 function play(trackID: string) {
-  player.addTrackToPlayNext(trackID, true);
+	player.addTrackToPlayNext(trackID, true);
 }
 function addToQueue(trackID: string) {
-  player.addTrackToPlayNext(trackID);
+	player.addTrackToPlayNext(trackID);
 }
 function like(trackID: string) {
-  likeATrack(trackID);
+	likeATrack(trackID);
 }
 function addTrackToPlaylist(trackID: string) {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  modalStore.showAddTrackToPlaylist(trackID)
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	modalStore.showAddTrackToPlaylist(trackID);
 }
 function removeTrackFromPlaylist(track: any) {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  if (confirm(`确定要从歌单删除 ${track.name}？`)) {
-    let trackID = track.id;
-    api.playlist.addOrRemoveTrackFromPlaylist({
-      op: 'del',
-      pid: props.id,
-      tracks: trackID,
-    }).then(data => {
-      toast(
-        data.body.code === 200
-          ? t('toast.removedFromPlaylist')
-          : data.body.message
-      );
-      emits('removeTrack', trackID);
-    });
-  }
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	if (confirm(`确定要从歌单删除 ${track.name}？`)) {
+		let trackID = track.id;
+		api.playlist
+			.addOrRemoveTrackFromPlaylist({
+				op: "del",
+				pid: props.id,
+				tracks: trackID,
+			})
+			.then((data) => {
+				toast(data.body.code === 200 ? t("toast.removedFromPlaylist") : data.body.message);
+				emits("removeTrack", trackID);
+			});
+	}
 }
 function copyLink(trackID: string) {
-  copyText(
-    `https://music.163.com/song?id=${trackID}`
-  )
-    .then(() => {
-      toast(t('toast.copied'));
-    })
-    .catch(err => {
-      toast(`${t('toast.copyFailed')}${err}`);
-    });
+	copyText(`https://music.163.com/song?id=${trackID}`)
+		.then(() => {
+			toast(t("toast.copied"));
+		})
+		.catch((err) => {
+			toast(`${t("toast.copyFailed")}${err}`);
+		});
 }
 function removeTrackFromQueue(trackID: string) {
-  player.removeTrackFromQueue(
-    trackID
-  );
+	player.removeTrackFromQueue(trackID);
 }
 function removeTrackFromCloudDisk(track: any) {
-  if (confirm(`确定要从云盘删除 ${track.songName}？`)) {
-    // ?? 这里track.songId 和 track.id 不一样
-    let trackID = track.songId;
-    api.user.cloudDiskTrackDelete(trackID).then(data => {
-      toast(
-        data.code === 200 ? '已将此歌曲从云盘删除' : data.message
-      );
-      let newCloudDisk = liked.cloudDisk.filter(
-        t => t.songId !== trackID
-      );
-      updateLikedXXX({
-        name: 'cloudDisk',
-        data: newCloudDisk,
-      });
-    });
-  }
+	if (confirm(`确定要从云盘删除 ${track.songName}？`)) {
+		// ?? 这里track.songId 和 track.id 不一样
+		let trackID = track.songId;
+		api.user.cloudDiskTrackDelete(trackID).then((data) => {
+			toast(data.code === 200 ? "已将此歌曲从云盘删除" : data.message);
+			let newCloudDisk = liked.cloudDisk.filter((t) => t.songId !== trackID);
+			updateLikedXXX({
+				name: "cloudDisk",
+				data: newCloudDisk,
+			});
+		});
+	}
 }
-
 </script>

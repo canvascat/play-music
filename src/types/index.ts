@@ -1,4 +1,7 @@
 // 核心音乐数据类型定义
+
+import type Player from "@/utils/Player";
+
 /** biome-ignore-all lint/suspicious/noExplicitAny: <explanation> */
 export interface Track {
 	id: number;
@@ -249,7 +252,7 @@ export interface MVBr {
 }
 
 // 播放器相关类型
-export interface PlayerState {
+export interface PlayerState extends Player {
 	playing: boolean;
 	progress: number;
 	enabled: boolean;
@@ -258,7 +261,7 @@ export interface PlayerState {
 	reversed: boolean;
 	volume: number;
 	playlistSource: PlaylistSource;
-	personalFMTrack?: Track;
+	personalFMTrack: Track;
 }
 
 export type RepeatMode = "off" | "on" | "one";
@@ -272,13 +275,7 @@ export interface PlaylistSource {
 export interface Settings {
 	lang: string;
 	appearance: "auto" | "light" | "dark";
-	musicQuality:
-		| "standard"
-		| "higher"
-		| "exhigh"
-		| "lossless"
-		| "flac"
-		| "hires";
+	musicQuality: "standard" | "higher" | "exhigh" | "lossless" | "flac" | "hires";
 	lyricFontSize: number;
 	outputDevice: string;
 	showPlaylistsByAppleMusic: boolean;

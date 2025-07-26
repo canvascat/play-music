@@ -88,28 +88,28 @@
 </template>
 
 <script setup lang="ts">
-import ArtistsInLine from '@/components/ArtistsInLine.vue';
-import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
-import { useStore } from '@/store/pinia'; 
-import { isNil } from 'es-toolkit';
-import { formatTime } from '@/utils/filters';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import type { Track, Artist, Album } from '@/types';
+import ArtistsInLine from "@/components/ArtistsInLine.vue";
+import ExplicitSymbol from "@/components/ExplicitSymbol.vue";
+import { useStore } from "@/store/pinia";
+import { isNil } from "es-toolkit";
+import { formatTime } from "@/utils/filters";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import type { Track, Artist, Album } from "@/types";
 
-defineOptions({ name: 'TrackListItem' });
+defineOptions({ name: "TrackListItem" });
 
 interface Props {
-  trackProp: Track | any;
-  trackNo?: number;
-  highlightPlayingTrack?: boolean;
-  type?: 'album' | 'playlist' | 'tracklist' | 'cloudDisk';
-  albumArtistName?: string;
+	trackProp: Track | any;
+	trackNo?: number;
+	highlightPlayingTrack?: boolean;
+	type?: "album" | "playlist" | "tracklist" | "cloudDisk";
+	albumArtistName?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  highlightPlayingTrack: true,
-  type: 'playlist'
+	highlightPlayingTrack: true,
+	type: "playlist",
 });
 
 const router = useRouter();
@@ -120,92 +120,82 @@ const hover = ref(false);
 const trackStyle = ref({});
 
 const track = computed((): Track => {
-  return props.type === 'cloudDisk'
-    ? props.trackProp.simpleSong
-    : props.trackProp;
+	return props.type === "cloudDisk" ? props.trackProp.simpleSong : props.trackProp;
 });
 const playable = computed((): boolean => {
-  return track.value?.privilege?.pl > 0 || track.value?.playable;
+	return track.value?.privilege?.pl > 0 || track.value?.playable;
 });
 
 const imgUrl = computed((): string => {
-  let image =
-    track.value?.al?.picUrl ??
-    track.value?.album?.picUrl ??
-    'https://p2.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg';
-  return image + '?param=224y224';
+	let image =
+		track.value?.al?.picUrl ??
+		track.value?.album?.picUrl ??
+		"https://p2.music.126.net/UeTuwE7pvjBpypWLudqukA==/3132508627578625.jpg";
+	return image + "?param=224y224";
 });
 
 const artists = computed((): Artist[] => {
-  const { ar, artists } = track.value;
-  if (!isNil(ar)) return ar;
-  if (!isNil(artists)) return artists;
-  return [];
+	const { ar, artists } = track.value;
+	if (!isNil(ar)) return ar;
+	if (!isNil(artists)) return artists;
+	return [];
 });
 
 const album = computed((): Album => {
-  return track.value.album || track.value.al || track.value?.simpleSong?.al;
+	return track.value.album || track.value.al || track.value?.simpleSong?.al;
 });
 const subTitle = computed((): string | undefined => {
-  let tn = undefined;
-  if (
-    track.value?.tns?.length > 0 &&
-    track.value.name !== track.value.tns[0]
-  ) {
-    tn = track.value.tns[0];
-  }
+	let tn = undefined;
+	if (track.value?.tns?.length > 0 && track.value.name !== track.value.tns[0]) {
+		tn = track.value.tns[0];
+	}
 
-  //优先显示alia
-  if (settings.subTitleDefault) {
-    return track.value?.alia?.length > 0 ? track.value.alia[0] : tn;
-  } else {
-    return tn === undefined ? track.value.alia[0] : tn;
-  }
+	//优先显示alia
+	if (settings.subTitleDefault) {
+		return track.value?.alia?.length > 0 ? track.value.alia[0] : tn;
+	} else {
+		return tn === undefined ? track.value.alia[0] : tn;
+	}
 });
 
 const isAlbum = computed((): boolean => {
-  return props.type === 'album';
+	return props.type === "album";
 });
 
 const isSubTitle = computed((): boolean => {
-  return (
-    (track.value?.tns?.length > 0 &&
-      track.value.name !== track.value.tns[0]) ||
-    track.value.alia?.length > 0
-  );
+	return (
+		(track.value?.tns?.length > 0 && track.value.name !== track.value.tns[0]) ||
+		track.value.alia?.length > 0
+	);
 });
 
 const isPlaylist = computed((): boolean => {
-  return props.type === 'playlist';
+	return props.type === "playlist";
 });
 
 const isLiked = computed((): boolean => {
-  return false;
-  // return this.$parent.liked.songs.includes(this.track?.id);
+	return false;
+	// return this.$parent.liked.songs.includes(this.track?.id);
 });
 
 const isPlaying = computed((): boolean => {
-  return player.currentTrack.id === track.value?.id;
+	return player.currentTrack.id === track.value?.id;
 });
 
 const focus = computed((): boolean => {
-  return hover.value;
+	return hover.value;
 });
 
 const showUnavailableSongInGreyStyle = computed((): boolean => {
-  return window.IS_ELECTRON
-    ? !settings.enableUnblockNeteaseMusic
-    : true;
+	return window.IS_ELECTRON ? !settings.enableUnblockNeteaseMusic : true;
 });
 
 const trackClass = computed((): string[] => {
-  let classList = [props.type || 'playlist'];
-  if (!playable.value && showUnavailableSongInGreyStyle.value)
-    classList.push('disable');
-  if (isPlaying.value && props.highlightPlayingTrack)
-    classList.push('playing');
-  if (focus.value) classList.push('focus');
-  return classList;
+	let classList = [props.type || "playlist"];
+	if (!playable.value && showUnavailableSongInGreyStyle.value) classList.push("disable");
+	if (isPlaying.value && props.highlightPlayingTrack) classList.push("playing");
+	if (focus.value) classList.push("focus");
+	return classList;
 });
 
 // isMenuOpened() {
@@ -213,32 +203,32 @@ const trackClass = computed((): string[] => {
 // },
 
 const showLikeButton = computed((): boolean => {
-  return props.type !== 'tracklist' && props.type !== 'cloudDisk';
+	return props.type !== "tracklist" && props.type !== "cloudDisk";
 });
 
 const showOrderNumber = computed((): boolean => {
-  return props.type === 'album';
+	return props.type === "album";
 });
 
 const showAlbumName = computed((): boolean => {
-  return props.type !== 'album' && props.type !== 'tracklist';
+	return props.type !== "album" && props.type !== "tracklist";
 });
 
 const showTrackTime = computed((): boolean => {
-  return props.type !== 'tracklist';
+	return props.type !== "tracklist";
 });
 
 const goToAlbum = (): void => {
-  if (track.value.al.id === 0) return;
-  router.push({ path: '/album/' + track.value.al.id });
+	if (track.value.al.id === 0) return;
+	router.push({ path: "/album/" + track.value.al.id });
 };
 
 const playTrack = (): void => {
-  // this.$parent.playThisList(this.track.id);
+	// this.$parent.playThisList(this.track.id);
 };
 
 const likeThisSong = (): void => {
-  // this.$parent.likeATrack(this.track.id);
+	// this.$parent.likeATrack(this.track.id);
 };
 </script>
 

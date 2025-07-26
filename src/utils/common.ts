@@ -24,27 +24,17 @@ function isTrackPlayable(track: Track, vipType?: number) {
 	} else if (track.fee === 4 || track.privilege?.fee === 4) {
 		result.playable = false;
 		result.reason = "付费专辑";
-	} else if (
-		track.noCopyrightRcmd !== null &&
-		track.noCopyrightRcmd !== undefined
-	) {
+	} else if (track.noCopyrightRcmd !== null && track.noCopyrightRcmd !== undefined) {
 		result.playable = false;
 		result.reason = "无版权";
-	} else if (
-		track.privilege?.st &&
-		track.privilege.st < 0 &&
-		isAccountLoggedIn()
-	) {
+	} else if (track.privilege?.st && track.privilege.st < 0 && isAccountLoggedIn()) {
 		result.playable = false;
 		result.reason = "已下架";
 	}
 	return result;
 }
 
-export function mapTrackPlayableStatus(
-	tracks: Track[],
-	privileges: TrackPrivilege[] = [],
-) {
+export function mapTrackPlayableStatus(tracks: Track[], privileges: TrackPrivilege[] = []) {
 	if (tracks?.length === undefined) return tracks;
 	const vipType = useStore().data.user?.vipType;
 	return tracks.map((t) => {
@@ -63,9 +53,7 @@ export function mapTrackPlayableStatus(
 
 export function changeAppearance(appearance?: "auto" | "dark" | "light") {
 	if (appearance === "auto" || appearance === undefined) {
-		appearance = window.matchMedia("(prefers-color-scheme: dark)").matches
-			? "dark"
-			: "light";
+		appearance = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 	}
 	document.body.setAttribute("data-theme", appearance);
 	document
@@ -154,10 +142,8 @@ export function bytesToSize(bytes: number) {
 	const lang = useStore().settings.lang;
 
 	if (bytes < kiloBytes) return bytes + (lang === "en" ? " Bytes" : "字节");
-	else if (bytes < megaBytes)
-		return `${(bytes / kiloBytes).toFixed(decimal)} KB`;
-	else if (bytes < gigaBytes)
-		return `${(bytes / megaBytes).toFixed(decimal)} MB`;
+	else if (bytes < megaBytes) return `${(bytes / kiloBytes).toFixed(decimal)} KB`;
+	else if (bytes < gigaBytes) return `${(bytes / megaBytes).toFixed(decimal)} MB`;
 	else return `${(bytes / gigaBytes).toFixed(decimal)} GB`;
 }
 

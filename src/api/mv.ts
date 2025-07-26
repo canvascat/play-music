@@ -1,5 +1,5 @@
-import request, { noCacheParams } from '@/utils/request';
-import * as MCNAPI from './NCMAPI';
+import request, { noCacheParams } from "@/utils/request";
+import * as MCNAPI from "./NCMAPI";
 
 // TODO 删除mv相关功能
 
@@ -10,12 +10,12 @@ import * as MCNAPI from './NCMAPI';
  * - 调用例子 : /mv/detail?mvid=5436712
  
  */
-export function mvDetail(mvid: MCNAPI.mv_detail[0]['mvid']) {
-  return request({
-    url: '/mv/detail',
-    method: 'get',
-    params: noCacheParams({ mvid }),
-  });
+export function mvDetail(mvid: MCNAPI.mv_detail[0]["mvid"]) {
+	return request({
+		url: "/mv/detail",
+		method: "get",
+		params: noCacheParams({ mvid }),
+	});
 }
 
 /**
@@ -26,23 +26,23 @@ export function mvDetail(mvid: MCNAPI.mv_detail[0]['mvid']) {
  * - 调用例子 : /mv/url?id=5436712 /mv/url?id=10896407&r=1080
  */
 export function mvUrl(params: MCNAPI.mv_url[0]) {
-  return request({
-    url: '/mv/url',
-    method: 'get',
-    params,
-  });
+	return request({
+		url: "/mv/url",
+		method: "get",
+		params,
+	});
 }
 
 /**
  * 相似 mv
- * 说明 : 调用此接口 , 传入 mvid 可获取相似 mv 
+ * 说明 : 调用此接口 , 传入 mvid 可获取相似 mv
  */
-export function simiMv(mvid: MCNAPI.simi_mv[0]['mvid']) {
-  return request({
-    url: '/simi/mv',
-    method: 'get',
-    params: { mvid },
-  });
+export function simiMv(mvid: MCNAPI.simi_mv[0]["mvid"]) {
+	return request({
+		url: "/simi/mv",
+		method: "get",
+		params: { mvid },
+	});
 }
 
 /**
@@ -53,9 +53,9 @@ export function simiMv(mvid: MCNAPI.simi_mv[0]['mvid']) {
  */
 
 export function likeAMV(params: MCNAPI.mv_sub[0]) {
-  return request({
-    url: '/mv/sub',
-    method: 'post',
-    params: noCacheParams(params),
-  });
+	return request({
+		url: "/mv/sub",
+		method: "post",
+		params: noCacheParams(params),
+	});
 }

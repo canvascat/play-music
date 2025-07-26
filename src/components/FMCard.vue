@@ -28,72 +28,59 @@
 </template>
 
 <script setup lang="ts">
-import ButtonIcon from '@/components/ButtonIcon.vue';
-import ArtistsInLine from '@/components/ArtistsInLine.vue';
+import ButtonIcon from "@/components/ButtonIcon.vue";
+import ArtistsInLine from "@/components/ArtistsInLine.vue";
 
-import { useStore } from '@/store/pinia';
-import * as Vibrant from 'node-vibrant/dist/vibrant.worker.min.js';
-import Color from 'color';
-import { resizeImage } from '@/utils/filters';
-import { ref, computed, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { useStore } from "@/store/pinia";
+import * as Vibrant from "node-vibrant/dist/vibrant.worker.min.js";
+import Color from "color";
+import { resizeImage } from "@/utils/filters";
+import { ref, computed, watch } from "vue";
+import { useRouter } from "vue-router";
 const { player } = useStore();
 
 const router = useRouter();
 
-
-const background = ref('');
-
+const background = ref("");
 
 const track = computed(() => player.personalFMTrack);
 const isPlaying = computed(() => player.playing && player.isPersonalFM);
 const artists = computed(() => track.value.artists || track.value.ar || []);
-const nextTrackCover = computed(() => `${player._personalFMNextTrack?.album?.picUrl.replace(
-  'http://',
-  'https://'
-)}?param=512y512`);
+const nextTrackCover = computed(
+	() =>
+		`${player._personalFMNextTrack?.album?.picUrl.replace("http://", "https://")}?param=512y512`,
+);
 
 watch(track, () => {
-  getColor();
+	getColor();
 });
 
-
 const play = () => {
-  player.playPersonalFM();
+	player.playPersonalFM();
 };
 const next = () => {
-  player.playNextFMTrack();
+	player.playNextFMTrack();
 };
 const goToAlbum = () => {
-  if (track.value.album.id === 0) return;
-  router.push({ path: '/album/' + track.value.album.id });
+	if (track.value.album.id === 0) return;
+	router.push({ path: "/album/" + track.value.album.id });
 };
 const moveToFMTrash = () => {
-  player.moveToFMTrash();
+	player.moveToFMTrash();
 };
 const getColor = () => {
-  if (!track.value.album?.picUrl) return;
-  const cover = `${track.value.album.picUrl.replace(
-    'http://',
-    'https://'
-  )}?param=512y512`;
-  Vibrant.from(cover, { colorCount: 1 })
-    .getPalette()
-    .then(palette => {
-      const color = Color.rgb(palette.Vibrant._rgb)
-        .darken(0.1)
-        .rgb()
-        .string();
-      const color2 = Color.rgb(palette.Vibrant._rgb)
-        .lighten(0.28)
-        .rotate(-30)
-        .rgb()
-        .string();
-      background.value = `linear-gradient(to top left, ${color}, ${color2})`;
-    });
+	if (!track.value.album?.picUrl) return;
+	const cover = `${track.value.album.picUrl.replace("http://", "https://")}?param=512y512`;
+	Vibrant.from(cover, { colorCount: 1 })
+		.getPalette()
+		.then((palette) => {
+			const color = Color.rgb(palette.Vibrant._rgb).darken(0.1).rgb().string();
+			const color2 = Color.rgb(palette.Vibrant._rgb).lighten(0.28).rotate(-30).rgb().string();
+			background.value = `linear-gradient(to top left, ${color}, ${color2})`;
+		});
 };
 
-getColor()
+getColor();
 </script>
 
 <style lang="scss" scoped>

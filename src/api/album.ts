@@ -1,8 +1,4 @@
-import type {
-	AlbumDetailResponse,
-	LikedAlbumsResponse,
-	NewAlbumResponse,
-} from "@/types/api";
+import type { AlbumDetailResponse, LikedAlbumsResponse, NewAlbumResponse } from "@/types/api";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";
@@ -33,9 +29,7 @@ export async function getAlbum(id: number): Promise<AlbumDetailResponse> {
  * - offset - 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
  * - area - ALL:全部,ZH:华语,EA:欧美,KR:韩国,JP:日本
  */
-export function newAlbums(
-	params: NCMAPI.album_new[0],
-): Promise<NewAlbumResponse> {
+export function newAlbums(params: NCMAPI.album_new[0]): Promise<NewAlbumResponse> {
 	return request({
 		url: "/album/new",
 		method: "get",
@@ -65,9 +59,7 @@ export function albumDynamicDetail(
  * - id - 返专辑 id
  * - t - 1 为收藏,其他为取消收藏
  */
-export function likeAAlbum(
-	params: NCMAPI.album_sub[0],
-): Promise<LikedAlbumsResponse> {
+export function likeAAlbum(params: NCMAPI.album_sub[0]): Promise<LikedAlbumsResponse> {
 	return request({
 		url: "/album/sub",
 		method: "post",

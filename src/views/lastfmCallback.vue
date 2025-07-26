@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import * as api from '@/api';
-import { useStore } from '@/store/pinia';
-import { ref, onMounted } from 'vue';
+import * as api from "@/api";
+import { useStore } from "@/store/pinia";
+import { ref, onMounted } from "vue";
 
-const message = ref('请稍等...');
+const message = ref("请稍等...");
 const done = ref(false);
 const { updateLastfm } = useStore();
 
 onMounted(() => {
-  const token = new URLSearchParams(window.location.search).get('token');
-  if (!token) {
-    message.value = '连接失败，请重试或联系开发者（无Token）';
-    done.value = true;
-    return;
-  }
-      api.lastfm.authGetSession(token).then(result => {
-    if (!result.data.session) {
-      message.value = '连接失败，请重试或联系开发者（无Session）';
-      done.value = true;
-      return;
-    }
-    localStorage.setItem('lastfm', JSON.stringify(result.data.session));
-    updateLastfm(result.data.session);
-    message.value = '已成功连接到 Last.fm';
-    done.value = true;
-  });
+	const token = new URLSearchParams(window.location.search).get("token");
+	if (!token) {
+		message.value = "连接失败，请重试或联系开发者（无Token）";
+		done.value = true;
+		return;
+	}
+	api.lastfm.authGetSession(token).then((result) => {
+		if (!result.data.session) {
+			message.value = "连接失败，请重试或联系开发者（无Session）";
+			done.value = true;
+			return;
+		}
+		localStorage.setItem("lastfm", JSON.stringify(result.data.session));
+		updateLastfm(result.data.session);
+		message.value = "已成功连接到 Last.fm";
+		done.value = true;
+	});
 });
 
 function close() {
-  window.close();
+	window.close();
 }
 </script>
 

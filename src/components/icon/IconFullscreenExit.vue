@@ -4,6 +4,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'IconFullscreenExit'
-})
+	name: "IconFullscreenExit",
+});
 </script>

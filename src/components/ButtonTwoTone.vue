@@ -1,37 +1,35 @@
 <script setup lang="ts">
-import { computed, type CSSProperties } from 'vue';
+import { computed, type CSSProperties } from "vue";
 
 interface Props {
-  iconClass?: string;
-  iconButton?: boolean;
-  horizontalPadding?: number;
-  color?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  shape?: string;
+	iconClass?: string;
+	iconButton?: boolean;
+	horizontalPadding?: number;
+	color?: string;
+	backgroundColor?: string;
+	textColor?: string;
+	shape?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  iconButton: false,
-  horizontalPadding: 16,
-  color: 'blue',
-  backgroundColor: '',
-  textColor: '',
-  shape: 'square',
+	iconButton: false,
+	horizontalPadding: 16,
+	color: "blue",
+	backgroundColor: "",
+	textColor: "",
+	shape: "square",
 });
 
 const buttonStyle = computed(() => {
-
-  const styles: CSSProperties = {
-    borderRadius: props.shape === 'round' ? '50%' : '8px',
-    padding: `8px ${props.horizontalPadding}px`,
-    // height: "38px",
-    width: props.shape === 'round' ? '38px' : 'auto',
-  };
-  if (props.backgroundColor !== '')
-    styles.backgroundColor = props.backgroundColor;
-  if (props.textColor !== '') styles.color = props.textColor;
-  return styles;
+	const styles: CSSProperties = {
+		borderRadius: props.shape === "round" ? "50%" : "8px",
+		padding: `8px ${props.horizontalPadding}px`,
+		// height: "38px",
+		width: props.shape === "round" ? "38px" : "auto",
+	};
+	if (props.backgroundColor !== "") styles.backgroundColor = props.backgroundColor;
+	if (props.textColor !== "") styles.color = props.textColor;
+	return styles;
 });
 </script>
 

@@ -34,8 +34,7 @@ export async function write(
 ) {
 	if (!window.IS_ELECTRON) return;
 	const name = trackInfo.name;
-	const artist =
-		trackInfo.ar?.[0]?.name || trackInfo.artists?.[0]?.name || "Unknown";
+	const artist = trackInfo.ar?.[0]?.name || trackInfo.artists?.[0]?.name || "Unknown";
 	let cover = trackInfo.al.picUrl;
 	if (cover.slice(0, 5) !== "https") {
 		cover = `https${cover.slice(4)}`;
@@ -63,9 +62,7 @@ export async function write(
 export async function read(id: number | string) {
 	const track = await db.trackSources.get(+id);
 	if (!track) return null;
-	console.debug(
-		`[debug][db.js] get track from cache 👉 ${track.name} by ${track.artist}`,
-	);
+	console.debug(`[debug][db.js] get track from cache 👉 ${track.name} by ${track.artist}`);
 	return track;
 }
 

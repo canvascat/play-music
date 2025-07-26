@@ -1,5 +1,6 @@
 import { shuffle } from "es-toolkit";
 import { Howl, Howler } from "howler";
+import { isProxy } from "vue";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
 import { pinia, useStore } from "@/store/pinia";
@@ -35,10 +36,12 @@ function setTitle(track?: Track): void {
 
 // TODO: 重构 分离播放器和播放列表
 
+const _howler = Symbol.for("howler");
+
 export default class Player {
 	// 播放器状态
 	/** howler (https://github.com/goldfire/howler.js) */
-	private _howler: Howl | null = null;
+	private [_howler]: Howl | null = null;
 	/** 是否正在播放中 */
 	private _playing: boolean = false;
 	/** 当前播放歌曲的进度 */
@@ -91,10 +94,6 @@ export default class Player {
 	private _personalFMNextTrack?: Track;
 
 	constructor() {
-		Object.defineProperty(this, "_howler", {
-			enumerable: false,
-		});
-
 		this._init();
 	}
 
@@ -129,7 +128,7 @@ export default class Player {
 	}
 	set volume(volume) {
 		this._volume = volume;
-		this._howler?.volume(volume);
+		this[_howler]?.volume(volume);
 	}
 	get list() {
 		return this.shuffle ? this._shuffledList : this._list;
@@ -180,24 +179,24 @@ export default class Player {
 		return this._progress;
 	}
 	set progress(value) {
-		this._howler?.seek(value);
+		this[_howler]?.seek(value);
 	}
 	get isCurrentTrackLiked() {
 		return this.currentTrack && useStore(pinia).liked.songs.includes(this.currentTrack.id);
 	}
 
 	get audioSource() {
-		return (this._howler as any)?._src?.includes("kuwo.cn") ? "音源来自酷我音乐" : "";
+		return (this[_howler] as any)?._src?.includes("kuwo.cn") ? "音源来自酷我音乐" : "";
 	}
 
 	private _init() {
 		this._loadSelfFromLocalStorage();
-		this._howler?.volume(this.volume);
+		this[_howler]?.volume(this.volume);
 
 		if (this._enabled) {
 			// 恢复当前播放歌曲
 			this._replaceCurrentTrack(this.currentTrackID, false).then(() => {
-				this._howler?.seek(this._progress || 0);
+				this[_howler]?.seek(this._progress || 0);
 			}); // update audio source and init howler
 			this._initMediaSession();
 		}
@@ -224,8 +223,8 @@ export default class Player {
 	}
 	private _setIntervals() {
 		setInterval(() => {
-			if (this._howler === null) return;
-			this._progress = this._howler.seek();
+			if (this[_howler] === null) return;
+			this._progress = this[_howler].seek();
 		}, 1000);
 	}
 	private _getNextTrack(): [trackID: number, index: number] {
@@ -273,7 +272,7 @@ export default class Player {
 
 	private _playAudioSource(source: string, autoplay = true) {
 		Howler.unload();
-		this._howler = new Howl({
+		this[_howler] = new Howl({
 			src: [source],
 			html5: true,
 			preload: true,
@@ -282,7 +281,8 @@ export default class Player {
 				this._nextTrackCallback();
 			},
 		});
-		this._howler.on("loaderror", (_, errCode) => {
+
+		this[_howler].on("loaderror", (_, errCode) => {
 			// https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
 			// code 3: MEDIA_ERR_DECODE
 			if (errCode === 3) {
@@ -297,7 +297,7 @@ export default class Player {
 					// 如果 replaced 为 false，代表当前的 track 已经不是这里想要替换的track
 					// 此时则不修改当前的歌曲进度
 					if (replaced) {
-						this._howler?.seek(t);
+						this[_howler]?.seek(t);
 						this.play();
 					}
 				});
@@ -430,7 +430,7 @@ export default class Player {
 			});
 	}
 	private _replaceCurrentTrack(
-		id,
+		id: number,
 		autoplay = true,
 		ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK,
 	) {
@@ -665,7 +665,7 @@ export default class Player {
 		// TODO: 切换歌曲时增加加载中的状态
 		const [trackID, index] = this._getNextTrack();
 		if (trackID === undefined) {
-			this._howler?.stop();
+			this[_howler]?.stop();
 			this._setPlaying(false);
 			return false;
 		}
@@ -732,22 +732,23 @@ export default class Player {
 	}
 
 	pause() {
-		this._howler?.fade(this.volume, 0, PLAY_PAUSE_FADE_DURATION);
+		this[_howler]?.fade(this.volume, 0, PLAY_PAUSE_FADE_DURATION);
 
-		this._howler?.once("fade", () => {
-			this._howler?.pause();
+		this[_howler]?.once("fade", () => {
+			this[_howler]?.pause();
 			this._setPlaying(false);
 			setTitle();
 			this._pauseDiscordPresence(this._currentTrack!);
 		});
 	}
 	play() {
-		if (this._howler?.playing()) return;
+		if (this[_howler]?.playing()) return;
 
-		this._howler?.play();
+		this[_howler]?.play();
 
-		this._howler?.once("play", () => {
-			this._howler?.fade(0, this.volume, PLAY_PAUSE_FADE_DURATION);
+		this[_howler]?.once("play", () => {
+			console.debug("play", this[_howler], isProxy(this[_howler]));
+			this[_howler]?.fade(0, this.volume, PLAY_PAUSE_FADE_DURATION);
 
 			// 播放时确保开启player.
 			// 避免因"忘记设置"导致在播放时播放器不显示的Bug
@@ -768,7 +769,7 @@ export default class Player {
 		});
 	}
 	playOrPause() {
-		if (this._howler?.playing()) {
+		if (this[_howler]?.playing()) {
 			this.pause();
 		} else {
 			this.play();
@@ -776,12 +777,12 @@ export default class Player {
 	}
 	seek(time: number | null = null) {
 		if (time !== null) {
-			this._howler?.seek(time);
+			this[_howler]?.seek(time);
 			if (this._playing && this._currentTrack) {
 				this._playDiscordPresence(this._currentTrack, this.seek(null));
 			}
 		}
-		return this._howler === null ? 0 : this._howler.seek();
+		return this[_howler] === null ? 0 : this[_howler].seek();
 	}
 	mute() {
 		if (this.volume === 0) {
@@ -791,12 +792,15 @@ export default class Player {
 			this.volume = 0;
 		}
 	}
+	// TODO
 	setOutputDevice() {
 		// TODO: 设置输出设备
-		// if (this._howler?._sounds.length <= 0 || !this._howler?._sounds[0]._node) {
+		// if (this[_howler]?._sounds.length <= 0 || !this[_howler]?._sounds[0]._node) {
 		//   return;
 		// }
-		// this._howler?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
+		// const audio: HTMLAudioElement = (this[_howler] as any)?._sounds[0]._node
+		// audio.setSinkId(useStore(pinia).settings.outputDevice);
+		// this[_howler]?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
 	}
 
 	replacePlaylist(

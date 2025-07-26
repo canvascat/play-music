@@ -54,18 +54,17 @@
 </template>
 
 <script setup lang="ts">
-import * as api from '@/api';
-import NProgress from 'nprogress';
-import { toast } from 'vue-sonner'
+import * as api from "@/api";
+import NProgress from "nprogress";
+import { toast } from "vue-sonner";
 
-import TrackList from '@/components/TrackList.vue';
-import MvRow from '@/components/MvRow.vue';
-import CoverRow from '@/components/CoverRow.vue';
-import { ref, computed, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import TrackList from "@/components/TrackList.vue";
+import MvRow from "@/components/MvRow.vue";
+import CoverRow from "@/components/CoverRow.vue";
+import { ref, computed, watch } from "vue";
+import { useRoute } from "vue-router";
 
 const route = useRoute();
-
 
 const show = ref(false);
 const tracks = ref([]);
@@ -74,105 +73,103 @@ const albums = ref([]);
 const playlists = ref([]);
 const musicVideos = ref([]);
 
-
-const keywords = computed(() => route.params.keywords as string ?? '');
+const keywords = computed(() => (route.params.keywords as string) ?? "");
 const haveResult = computed(() => {
-  return (
-    tracks.value.length +
-    artists.value.length +
-    albums.value.length +
-    playlists.value.length +
-    musicVideos.value.length >
-    0
-  );
-})
+	return (
+		tracks.value.length +
+			artists.value.length +
+			albums.value.length +
+			playlists.value.length +
+			musicVideos.value.length >
+		0
+	);
+});
 
-watch(() => keywords.value, (newKeywords) => {
-  if (newKeywords.length === 0) return;
-  getData();
-})
+watch(
+	() => keywords.value,
+	(newKeywords) => {
+		if (newKeywords.length === 0) return;
+		getData();
+	},
+);
 
-getData()
+getData();
 
-
-function search(type = 'all') {
-  const typeTable = {
-    all: 1018,
-    musicVideos: 1004,
-    tracks: 1,
-    albums: 10,
-    artists: 100,
-    playlists: 1000,
-  };
-      return api.others.search({
-    keywords: keywords.value,
-    type: typeTable[type],
-    limit: 16,
-  })
-    .then(result => {
-      return { result: result.result, type };
-    })
-    .catch(err => {
-      toast(err.response.data.msg || err.response.data.message);
-    });
+function search(type = "all") {
+	const typeTable = {
+		all: 1018,
+		musicVideos: 1004,
+		tracks: 1,
+		albums: 10,
+		artists: 100,
+		playlists: 1000,
+	};
+	return api.others
+		.search({
+			keywords: keywords.value,
+			type: typeTable[type],
+			limit: 16,
+		})
+		.then((result) => {
+			return { result: result.result, type };
+		})
+		.catch((err) => {
+			toast(err.response.data.msg || err.response.data.message);
+		});
 }
 function getData() {
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-  show.value = false;
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+	show.value = false;
 
-  const requestAll = requests => {
-    const currentKeywords = keywords.value;
-    Promise.all(requests).then(results => {
-      if (currentKeywords != keywords.value) return;
-      results.map(result => {
-        const searchType = result.type;
-        if (result.result === undefined) return;
-        result = result.result;
-        switch (searchType) {
-          case 'all':
-            // this.result = result;
-            break;
-          case 'musicVideos':
-            musicVideos.value = result.mvs ?? [];
-            break;
-          case 'artists':
-            artists.value = result.artists ?? [];
-            break;
-          case 'albums':
-            albums.value = result.albums ?? [];
-            break;
-          case 'tracks':
-            tracks.value = result.songs ?? [];
-            getTracksDetail();
-            break;
-          case 'playlists':
-            playlists.value = result.playlists ?? [];
-            break;
-        }
-      });
-      NProgress.done();
-      show.value = true;
-    });
-  };
+	const requestAll = (requests) => {
+		const currentKeywords = keywords.value;
+		Promise.all(requests).then((results) => {
+			if (currentKeywords != keywords.value) return;
+			results.map((result) => {
+				const searchType = result.type;
+				if (result.result === undefined) return;
+				result = result.result;
+				switch (searchType) {
+					case "all":
+						// this.result = result;
+						break;
+					case "musicVideos":
+						musicVideos.value = result.mvs ?? [];
+						break;
+					case "artists":
+						artists.value = result.artists ?? [];
+						break;
+					case "albums":
+						albums.value = result.albums ?? [];
+						break;
+					case "tracks":
+						tracks.value = result.songs ?? [];
+						getTracksDetail();
+						break;
+					case "playlists":
+						playlists.value = result.playlists ?? [];
+						break;
+				}
+			});
+			NProgress.done();
+			show.value = true;
+		});
+	};
 
-  const requests = [
-    search('artists'),
-    search('albums'),
-    search('tracks'),
-  ];
-  const requests2 = [search('musicVideos'), search('playlists')];
+	const requests = [search("artists"), search("albums"), search("tracks")];
+	const requests2 = [search("musicVideos"), search("playlists")];
 
-  requestAll(requests);
-  requestAll(requests2);
+	requestAll(requests);
+	requestAll(requests2);
 }
 function getTracksDetail() {
-  const trackIDs = tracks.value.map(t => t.id);
-  if (trackIDs.length === 0) return;
-        api.track.getTrackDetail(trackIDs.join(',')).then(result => {
-    tracks.value = result.songs;
-  });
+	const trackIDs = tracks.value.map((t) => t.id);
+	if (trackIDs.length === 0) return;
+	api.track.getTrackDetail(trackIDs.join(",")).then((result) => {
+		tracks.value = result.songs;
+	});
 }
 </script>
 

@@ -54,19 +54,19 @@
           <select v-model="musicLanguage">
             <option value="all">{{
               $t('settings.MusicGenrePreference.none')
-            }}</option>
+              }}</option>
             <option value="zh">{{
               $t('settings.MusicGenrePreference.mandarin')
-            }}</option>
+              }}</option>
             <option value="ea">{{
               $t('settings.MusicGenrePreference.western')
-            }}</option>
+              }}</option>
             <option value="jp">{{
               $t('settings.MusicGenrePreference.japanese')
-            }}</option>
+              }}</option>
             <option value="kr">{{
               $t('settings.MusicGenrePreference.korean')
-            }}</option>
+              }}</option>
           </select>
         </div>
       </div>
@@ -609,7 +609,7 @@ import { useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
 import { useStore } from "@/store/pinia";
-import { doLogout, isLooseLoggedIn } from "@/utils/auth";
+import { doLogout, isAccountLoggedIn } from "@/utils/auth";
 import { bytesToSize, changeAppearance } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import { isLinux } from "@/utils/platform";
@@ -656,9 +656,7 @@ const {
   restoreDefaultShortcuts,
 } = useStore();
 
-const showUserInfo = computed(
-  () => isLooseLoggedIn() && data.user.nickname,
-);
+const showUserInfo = computed(() => isAccountLoggedIn() && data.user.nickname);
 
 const recordedShortcutComputed = computed(() => {
   let shortcut: string[] = [];
@@ -677,9 +675,7 @@ const recordedShortcutComputed = computed(() => {
     } else if (e.keyCode >= 112 && e.keyCode <= 123) {
       // F1-F12
       shortcut.push(e.code);
-    } else if (
-      ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)
-    ) {
+    } else if (["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"].includes(e.key)) {
       // Arrows
       shortcut.push(e.code.replace("Arrow", ""));
     } else if (validShortcutCodes.includes(e.key)) {
@@ -766,8 +762,7 @@ const outputDevice = computed({
     const isValidDevice = allOutputDevices.value.find(
       (device) => device.deviceId === settings.outputDevice,
     );
-    if (settings.outputDevice === undefined || isValidDevice === undefined)
-      return "default"; // Default deviceId
+    if (settings.outputDevice === undefined || isValidDevice === undefined) return "default"; // Default deviceId
     return settings.outputDevice;
   },
   set(deviceId) {
@@ -1121,10 +1116,7 @@ function getAllOutputDevices() {
     allOutputDevices.value = devices.filter((device) => {
       return device.kind == "audiooutput";
     });
-    if (
-      allOutputDevices.value.length > 0 &&
-      allOutputDevices.value[0].label !== ""
-    ) {
+    if (allOutputDevices.value.length > 0 && allOutputDevices.value[0].label !== "") {
       // withoutAudioPriviledge.value = false;
     } else {
       allOutputDevices.value = [

@@ -1,33 +1,27 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    },
-    /* Linting */
-    "strict": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    // "erasableSyntaxOnly": true,
-    "noUncheckedSideEffectImports": true,
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
+	"compilerOptions": {
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		/* Linting */
+		"strict": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		// "erasableSyntaxOnly": true,
+		"noUncheckedSideEffectImports": true,
 
-    "allowJs": true,
-    "checkJs": false,
-    "noImplicitAny": false, 
-    "noImplicitReturns": false,
-    
-    /* JSX Support */
-    "jsx": "preserve",
-    "jsxImportSource": "vue"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue"
-  ]
+		"allowJs": true,
+		"checkJs": false,
+		"noImplicitAny": false,
+		"noImplicitReturns": false,
+
+		/* JSX Support */
+		"jsx": "preserve",
+		"jsxImportSource": "vue"
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

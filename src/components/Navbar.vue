@@ -36,7 +36,7 @@
             <IconSettings />
             {{ $t('library.userProfileMenu.settings') }}
           </DropdownMenuItem>
-          <DropdownMenuItem v-if="!isLooseLoggedIn" @click="toLogin">
+          <DropdownMenuItem v-if="!isLoggedIn" @click="toLogin">
             <IconLogin />
             {{ $t('login.login') }}
           </DropdownMenuItem>
@@ -56,29 +56,43 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import { isLooseLoggedIn as getIsLooseLoggedIn, doLogout } from '@/utils/auth';
-import Win32Titlebar from '@/components/Win32Titlebar.vue';
-import LinuxTitlebar from '@/components/LinuxTitlebar.vue';
-import ButtonIcon from '@/components/ButtonIcon.vue';
-import { IconArrowRight, IconLogin, IconSettings, IconLogout, IconGithub, IconSearch, IconArrowLeft } from '@/components/icon';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
-import pkg from '../../package.json';
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import ButtonIcon from "@/components/ButtonIcon.vue";
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconGithub,
+  IconLogin,
+  IconLogout,
+  IconSearch,
+  IconSettings,
+} from "@/components/icon";
+import LinuxTitlebar from "@/components/LinuxTitlebar.vue";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Win32Titlebar from "@/components/Win32Titlebar.vue";
+import { cn } from "@/lib/utils";
+import { useStore } from "@/store/pinia";
+import { doLogout, isAccountLoggedIn } from "@/utils/auth";
+import pkg from "../../package.json";
 
 const inputFocus = ref(false);
-const keywords = ref('');
+const keywords = ref("");
 const enableWin32Titlebar = ref(false);
 const enableLinuxTitlebar = ref(false);
 
 const store = useStore();
-const isLooseLoggedIn = computed(() => getIsLooseLoggedIn());
+const isLoggedIn = computed(() => isAccountLoggedIn());
 const avatarUrl = computed(() => {
-  return store.data?.user?.avatarUrl && isLooseLoggedIn.value
+  return store.data?.user?.avatarUrl && isLoggedIn.value
     ? `${store.data?.user?.avatarUrl}?param=512y512`
-    : 'http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60';
+    : "http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60";
 });
 
 const router = useRouter();
@@ -98,33 +112,33 @@ const hasCustomTitlebar = computed(() => {
 //   }
 // },
 
-const go = (where: 'back' | 'forward') => {
-  if (where === 'back') router.go(-1);
+const go = (where: "back" | "forward") => {
+  if (where === "back") router.go(-1);
   else router.go(1);
 };
 
 const doSearch = () => {
   if (!keywords.value) return;
   if (
-    router.currentRoute.value.name === 'search' &&
+    router.currentRoute.value.name === "search" &&
     router.currentRoute.value.params.keywords === keywords.value
   ) {
     return;
   }
   router.push({
-    name: 'search',
+    name: "search",
     params: { keywords: keywords.value },
   });
 };
 
 const logout = () => {
-  if (!confirm('确定要退出登录吗？')) return;
+  if (!confirm("确定要退出登录吗？")) return;
   doLogout();
-  router.push({ name: 'home' });
+  router.push({ name: "home" });
 };
 
 const toSettings = () => {
-  router.push({ name: 'settings' });
+  router.push({ name: "settings" });
 };
 
 const toGitHub = () => {
@@ -132,7 +146,7 @@ const toGitHub = () => {
 };
 
 const toLogin = () => {
-  router.push({ name: 'login' });
+  router.push({ name: "login" });
 };
 </script>
 

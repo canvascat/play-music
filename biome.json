@@ -10,12 +10,25 @@
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineWidth": 100
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"complexity": {
+				"noUselessFragments": "error",
+				"noBannedTypes": "error"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUndeclaredVariables": "error"
+			},
+			"style": {
+				"useConst": "error",
+				"noNonNullAssertion": "error"
+			}
 		},
 		"domains": {
 			"vue": "recommended"
@@ -23,7 +36,8 @@
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"semicolons": "always"
 		}
 	},
 	"assist": {

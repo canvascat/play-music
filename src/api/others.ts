@@ -1,12 +1,12 @@
-import request from '@/utils/request';
-import { mapTrackPlayableStatus } from '@/utils/common';
-import type { SearchResponse, PersonalFMResponse, ApiResponse } from '@/types/api';
+import request from "@/utils/request";
+import { mapTrackPlayableStatus } from "@/utils/common";
+import type { SearchResponse, PersonalFMResponse, ApiResponse } from "@/types/api";
 
 interface SearchParams {
-  keywords: string;
-  limit?: number;
-  offset?: number;
-  type?: number;
+	keywords: string;
+	limit?: number;
+	offset?: number;
+	type?: number;
 }
 
 /**
@@ -20,35 +20,35 @@ interface SearchParams {
  * - 调用例子 : /search?keywords=海阔天空 /cloudsearch?keywords=海阔天空(更全)
  */
 export function search(params: SearchParams): Promise<SearchResponse> {
-  return request({
-    url: '/search',
-    method: 'get',
-    params,
-  }).then((data: SearchResponse) => {
-    if (data.result?.songs?.songs !== undefined) {
-      data.result.songs.songs = mapTrackPlayableStatus(data.result.songs.songs);
-    }
-    return data;
-  });
+	return request({
+		url: "/search",
+		method: "get",
+		params,
+	}).then((data: SearchResponse) => {
+		if (data.result?.songs?.songs !== undefined) {
+			data.result.songs.songs = mapTrackPlayableStatus(data.result.songs.songs);
+		}
+		return data;
+	});
 }
 
 export function personalFM(): Promise<PersonalFMResponse> {
-  return request({
-    url: '/personal_fm',
-    method: 'get',
-    params: {
-      timestamp: new Date().getTime(),
-    },
-  });
+	return request({
+		url: "/personal_fm",
+		method: "get",
+		params: {
+			timestamp: new Date().getTime(),
+		},
+	});
 }
 
 export function fmTrash(id: number): Promise<ApiResponse> {
-  return request({
-    url: '/fm_trash',
-    method: 'post',
-    params: {
-      timestamp: new Date().getTime(),
-      id,
-    },
-  });
+	return request({
+		url: "/fm_trash",
+		method: "post",
+		params: {
+			timestamp: new Date().getTime(),
+			id,
+		},
+	});
 }

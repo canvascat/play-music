@@ -47,9 +47,7 @@ const isAccountLoggedIn = computed(() => auth.isAccountLoggedIn());
 const route = useRoute();
 
 const showPlayer = computed(() => {
-  return !["mv", "loginUsername", "login", "lastfmCallback"].includes(
-    route.name as string,
-  );
+  return !["mv", "loginUsername", "login", "lastfmCallback"].includes(route.name as string);
 });
 
 const enablePlayer = computed(() => {
@@ -62,8 +60,7 @@ const showNavbar = computed(() => {
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.code === "Space") {
-    if (e.target && "tagName" in e.target && e.target.tagName === "INPUT")
-      return false;
+    if (e.target && "tagName" in e.target && e.target.tagName === "INPUT") return false;
     if (route.name === "mv") return false;
     e.preventDefault();
     player.value.playOrPause();
@@ -71,16 +68,14 @@ const handleKeydown = (e: KeyboardEvent) => {
 };
 
 function fetchData() {
-  if (!auth.isLooseLoggedIn()) return;
+  if (!auth.isAccountLoggedIn()) return;
   store.fetchLikedSongs();
   store.fetchLikedSongsWithDetails();
   store.fetchLikedPlaylist();
-  if (auth.isAccountLoggedIn()) {
-    store.fetchLikedAlbums();
-    store.fetchLikedArtists();
-    store.fetchLikedMVs();
-    store.fetchCloudDisk();
-  }
+  store.fetchLikedAlbums();
+  store.fetchLikedArtists();
+  store.fetchLikedMVs();
+  store.fetchCloudDisk();
 }
 
 onMounted(() => {

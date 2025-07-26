@@ -142,22 +142,27 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import NProgress from 'nprogress';
-import * as api from '@/api';
-import { isAccountLoggedIn } from '@/utils/auth';
-import nativeAlert from '@/utils/nativeAlert';
-import { resizeImage, formatDate } from '@/utils/filters';
-import { toast } from 'vue-sonner'
-import { useI18n } from 'vue-i18n';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import ButtonTwoTone from '@/components/ButtonTwoTone.vue';
-import TrackList from '@/components/TrackList.vue';
-import Cover from '@/components/Cover.vue';
-import Description from '@/components/Description.tsx';
-import { specialPlaylist } from '@/const';
-import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router'; 
+import { useStore } from "@/store/pinia";
+import NProgress from "nprogress";
+import * as api from "@/api";
+import { isAccountLoggedIn } from "@/utils/auth";
+import nativeAlert from "@/utils/nativeAlert";
+import { resizeImage, formatDate } from "@/utils/filters";
+import { toast } from "vue-sonner";
+import { useI18n } from "vue-i18n";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
+import TrackList from "@/components/TrackList.vue";
+import Cover from "@/components/Cover.vue";
+import Description from "@/components/Description.tsx";
+import { specialPlaylist } from "@/const";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
 const { player, data } = useStore();
 const route = useRoute();
@@ -166,190 +171,168 @@ const { t } = useI18n();
 
 const show = ref(false);
 const playlist = ref({
-  id: 0,
-  coverImgUrl: '',
-  creator: {
-    userId: '',
-  },
-  trackIds: [],
-  description: '',
+	id: 0,
+	coverImgUrl: "",
+	creator: {
+		userId: "",
+	},
+	trackIds: [],
+	description: "",
 });
- 
-const tracks = ref([])
-const loadingMore = ref(false)
-const hasMore = ref(false)
-const lastLoadedTrackIndex = ref(9)
-const displaySearchInPlaylist = ref(false) // 是否显示搜索框
-const searchKeyWords = ref('') // 搜索使用的关键字
-const inputSearchKeyWords = ref('') // 搜索框中正在输入的关键字
-const inputFocus = ref(false)
-let debounceTimeout: number
-const searchInputWidth = ref('0px') // 搜索框宽度
 
+const tracks = ref([]);
+const loadingMore = ref(false);
+const hasMore = ref(false);
+const lastLoadedTrackIndex = ref(9);
+const displaySearchInPlaylist = ref(false); // 是否显示搜索框
+const searchKeyWords = ref(""); // 搜索使用的关键字
+const inputSearchKeyWords = ref(""); // 搜索框中正在输入的关键字
+const inputFocus = ref(false);
+let debounceTimeout: number;
+const searchInputWidth = ref("0px"); // 搜索框宽度
 
 const isLikeSongsPage = computed(() => {
-  return route.name === 'likedSongs';
-})
+	return route.name === "likedSongs";
+});
 const specialPlaylistInfo = computed(() => {
-  return specialPlaylist[playlist.value.id];
-})
+	return specialPlaylist[playlist.value.id];
+});
 const isUserOwnPlaylist = computed(() => {
-  return (
-    playlist.value.creator.userId === data.user.userId &&
-    playlist.value.id !== data.likedSongPlaylistID
-  );
-})
+	return (
+		playlist.value.creator.userId === data.user.userId &&
+		playlist.value.id !== data.likedSongPlaylistID
+	);
+});
 const filteredTracks = computed(() => {
-  return tracks.value.filter(
-    track =>
-      (track.name &&
-        track.name
-          .toLowerCase()
-          .includes(searchKeyWords.value.toLowerCase())) ||
-      (track.al.name &&
-        track.al.name
-          .toLowerCase()
-          .includes(searchKeyWords.value.toLowerCase())) ||
-      track.ar.find(
-        artist =>
-          artist.name &&
-          artist.name
-            .toLowerCase()
-            .includes(searchKeyWords.value.toLowerCase())
-      )
-  );
-})
+	return tracks.value.filter(
+		(track) =>
+			(track.name && track.name.toLowerCase().includes(searchKeyWords.value.toLowerCase())) ||
+			(track.al.name && track.al.name.toLowerCase().includes(searchKeyWords.value.toLowerCase())) ||
+			track.ar.find(
+				(artist) =>
+					artist.name && artist.name.toLowerCase().includes(searchKeyWords.value.toLowerCase()),
+			),
+	);
+});
 
 onMounted(() => {
-  if (route.name === 'likedSongs') {
-    loadData(data.likedSongPlaylistID);
-  } else {
-    loadData(route.params.id);
-  }
-  setTimeout(() => {
-    if (!show.value) NProgress.start();
-  }, 1000);
-})
+	if (route.name === "likedSongs") {
+		loadData(data.likedSongPlaylistID);
+	} else {
+		loadData(route.params.id);
+	}
+	setTimeout(() => {
+		if (!show.value) NProgress.start();
+	}, 1000);
+});
 
-
-function playPlaylistByID(trackID = 'first') {
-  let trackIDs = playlist.value.trackIds.map(t => t.id);
-  player.replacePlaylist(
-    trackIDs,
-    playlist.value.id,
-    'playlist',
-    trackID
-  );
+function playPlaylistByID(trackID = "first") {
+	let trackIDs = playlist.value.trackIds.map((t) => t.id);
+	player.replacePlaylist(trackIDs, playlist.value.id, "playlist", trackID);
 }
 function likePlaylist(showToast = false) {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  api.playlist.subscribePlaylist({
-    id: playlist.value.id,
-    t: playlist.value.subscribed ? 2 : 1,
-  }).then(data => {
-    if (data.code === 200) {
-      playlist.value.subscribed = !playlist.value.subscribed;
-      if (showToast === true)
-        toast(
-          playlist.value.subscribed ? '已保存到音乐库' : '已从音乐库删除'
-        );
-    }
-    api.playlist.getPlaylistDetail(playlist.value.id, true).then(data => {
-      playlist.value = data.playlist;
-    });
-  });
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	api.playlist
+		.subscribePlaylist({
+			id: playlist.value.id,
+			t: playlist.value.subscribed ? 2 : 1,
+		})
+		.then((data) => {
+			if (data.code === 200) {
+				playlist.value.subscribed = !playlist.value.subscribed;
+				if (showToast === true)
+					toast(playlist.value.subscribed ? "已保存到音乐库" : "已从音乐库删除");
+			}
+			api.playlist.getPlaylistDetail(playlist.value.id, true).then((data) => {
+				playlist.value = data.playlist;
+			});
+		});
 }
 function loadData(id, next = undefined) {
-  playlist.value.id = id;
-  api.playlist.getPlaylistDetail(playlist.value.id, true)
-    .then(data => {
-      playlist.value = data.playlist;
-      tracks.value = data.playlist.tracks;
-      NProgress.done();
-      if (next !== undefined) next();
-      show.value = true;
-      lastLoadedTrackIndex.value = data.playlist.tracks.length - 1;
-      return data;
-    })
-    .then(() => {
-      if (playlist.value.trackCount > tracks.value.length) {
-        loadingMore.value = true;
-        loadMore();
-      }
-    });
+	playlist.value.id = id;
+	api.playlist
+		.getPlaylistDetail(playlist.value.id, true)
+		.then((data) => {
+			playlist.value = data.playlist;
+			tracks.value = data.playlist.tracks;
+			NProgress.done();
+			if (next !== undefined) next();
+			show.value = true;
+			lastLoadedTrackIndex.value = data.playlist.tracks.length - 1;
+			return data;
+		})
+		.then(() => {
+			if (playlist.value.trackCount > tracks.value.length) {
+				loadingMore.value = true;
+				loadMore();
+			}
+		});
 }
 function loadMore(loadNum = 100) {
-  let trackIDs = playlist.value.trackIds.filter((t, index) => {
-    if (
-      index > lastLoadedTrackIndex.value &&
-      index <= lastLoadedTrackIndex.value + loadNum
-    ) {
-      return t;
-    }
-  });
-  trackIDs = trackIDs.map(t => t.id);
-  api.track.getTrackDetail(trackIDs.join(',')).then(data => {
-    tracks.value.push(...data.songs);
-    lastLoadedTrackIndex.value += trackIDs.length;
-    loadingMore.value = false;
-    if (lastLoadedTrackIndex.value + 1 === playlist.value.trackIds.length) {
-      hasMore.value = false;
-    } else {
-      hasMore.value = true;
-    }
-  });
+	let trackIDs = playlist.value.trackIds.filter((t, index) => {
+		if (index > lastLoadedTrackIndex.value && index <= lastLoadedTrackIndex.value + loadNum) {
+			return t;
+		}
+	});
+	trackIDs = trackIDs.map((t) => t.id);
+	api.track.getTrackDetail(trackIDs.join(",")).then((data) => {
+		tracks.value.push(...data.songs);
+		lastLoadedTrackIndex.value += trackIDs.length;
+		loadingMore.value = false;
+		if (lastLoadedTrackIndex.value + 1 === playlist.value.trackIds.length) {
+			hasMore.value = false;
+		} else {
+			hasMore.value = true;
+		}
+	});
 }
 
 function deletePlaylist() {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  let confirmation = confirm(`确定要删除歌单 ${playlist.value.name}？`);
-  if (confirmation === true) {
-    api.playlist.deletePlaylist(playlist.value.id).then(data => {
-      if (data.code === 200) {
-        nativeAlert(`已删除歌单 ${playlist.value.name}`);
-        router.go(-1);
-      } else {
-        nativeAlert('发生错误');
-      }
-    });
-  }
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	let confirmation = confirm(`确定要删除歌单 ${playlist.value.name}？`);
+	if (confirmation === true) {
+		api.playlist.deletePlaylist(playlist.value.id).then((data) => {
+			if (data.code === 200) {
+				nativeAlert(`已删除歌单 ${playlist.value.name}`);
+				router.go(-1);
+			} else {
+				nativeAlert("发生错误");
+			}
+		});
+	}
 }
 function editPlaylist() {
-  nativeAlert('此功能开发中');
+	nativeAlert("此功能开发中");
 }
 function searchInPlaylist() {
-  displaySearchInPlaylist.value =
-    !displaySearchInPlaylist.value || isLikeSongsPage.value;
-  if (displaySearchInPlaylist.value == false) {
-    searchKeyWords.value = '';
-    inputSearchKeyWords.value = '';
-  } else {
-    searchInputWidth.value = '172px';
-    loadMore(500);
-  }
+	displaySearchInPlaylist.value = !displaySearchInPlaylist.value || isLikeSongsPage.value;
+	if (displaySearchInPlaylist.value == false) {
+		searchKeyWords.value = "";
+		inputSearchKeyWords.value = "";
+	} else {
+		searchInputWidth.value = "172px";
+		loadMore(500);
+	}
 }
 function removeTrack(trackID) {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  tracks.value = tracks.value.filter(t => t.id !== trackID);
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	tracks.value = tracks.value.filter((t) => t.id !== trackID);
 }
 function inputDebounce() {
-  if (debounceTimeout) clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(() => {
-    searchKeyWords.value = inputSearchKeyWords.value;
-  }, 600);
+	if (debounceTimeout) clearTimeout(debounceTimeout);
+	debounceTimeout = setTimeout(() => {
+		searchKeyWords.value = inputSearchKeyWords.value;
+	}, 600);
 }
- 
-
-
 </script>
 
 <style lang="scss" scoped>

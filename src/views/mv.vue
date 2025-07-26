@@ -43,48 +43,53 @@
 </template>
 
 <script setup lang="ts">
-import * as api from '@/api';
-import { isAccountLoggedIn } from '@/utils/auth';
-import NProgress from 'nprogress';
-import '@/assets/css/plyr.css';
-import Plyr from 'plyr';
+import * as api from "@/api";
+import { isAccountLoggedIn } from "@/utils/auth";
+import NProgress from "nprogress";
+import "@/assets/css/plyr.css";
+import Plyr from "plyr";
 
-import ButtonIcon from '@/components/ButtonIcon.vue';
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import MvRow from '@/components/MvRow.vue';
-import { useStore } from '@/store/pinia';
-import { copyText } from '@/utils/copy';
-import { formatPlayCount } from '@/utils/filters';
+import ButtonIcon from "@/components/ButtonIcon.vue";
+import {
+	DropdownMenu,
+	DropdownMenuTrigger,
+	DropdownMenuContent,
+	DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import MvRow from "@/components/MvRow.vue";
+import { useStore } from "@/store/pinia";
+import { copyText } from "@/utils/copy";
+import { formatPlayCount } from "@/utils/filters";
 
-import { onBeforeRouteUpdate, useRoute } from 'vue-router';
-import { onMounted, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { toast } from 'vue-sonner'
+import { onBeforeRouteUpdate, useRoute } from "vue-router";
+import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
+import { toast } from "vue-sonner";
 
 const { t } = useI18n();
 
 defineOptions({
-  name: 'mv',
+	name: "mv",
 });
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 
 onBeforeRouteUpdate((to, _from, next) => {
-  getData(to.params.id as string);
-  next();
+	getData(to.params.id as string);
+	next();
 });
 
 const mv = ref({
-  url: '',
-  data: {
-    id: '',
-    name: '',
-    artistName: '',
-    playCount: undefined as number | undefined,
-    publishTime: '',
-    cover: '',
-    artistId: '',
-  },
-  subed: false,
+	url: "",
+	data: {
+		id: "",
+		name: "",
+		artistName: "",
+		playCount: undefined as number | undefined,
+		publishTime: "",
+		cover: "",
+		artistId: "",
+	},
+	subed: false,
 });
 let mvPlayer: Plyr | null = null;
 const simiMvs = ref<any[]>([]);
@@ -92,72 +97,74 @@ const simiMvs = ref<any[]>([]);
 const { player } = useStore();
 const route = useRoute();
 onMounted(() => {
-  let videoOptions = {
-    settings: ['quality'],
-    autoplay: false,
-    quality: {
-      default: 1080,
-      options: [1080, 720, 480, 240],
-    },
-  };
-  videoOptions.autoplay = route.query.autoplay === 'true';
-  mvPlayer = new Plyr(videoPlayer.value!, videoOptions);
-  mvPlayer.volume = player.volume;
-  mvPlayer.on('playing', () => {
-    player.pause();
-  });
-  getData(route.params.id as string);
+	let videoOptions = {
+		settings: ["quality"],
+		autoplay: false,
+		quality: {
+			default: 1080,
+			options: [1080, 720, 480, 240],
+		},
+	};
+	videoOptions.autoplay = route.query.autoplay === "true";
+	mvPlayer = new Plyr(videoPlayer.value!, videoOptions);
+	mvPlayer.volume = player.volume;
+	mvPlayer.on("playing", () => {
+		player.pause();
+	});
+	getData(route.params.id as string);
 });
 
 function getData(id: string) {
-  api.mv.mvDetail(id).then(data => {
-    mv.value = data;
-    Promise.all(data.data.brs.map(br => api.mv.mvUrl({ id, r: br.br }))).then(results => {
-      let sources = results.map(result => {
-        return {
-          src: result.data.url.replace(/^http:/, 'https:'),
-          type: 'video/mp4',
-          size: result.data.r,
-        };
-      });
-      mvPlayer!.source = {
-        type: 'video',
-        title: mv.value.data.name,
-        sources: sources,
-        poster: mv.value.data.cover.replace(/^http:/, 'https:'),
-      };
-      NProgress.done();
-    });
-  });
-  api.mv.simiMv(id).then(data => {
-    simiMvs.value = data.mvs;
-  });
+	api.mv.mvDetail(id).then((data) => {
+		mv.value = data;
+		Promise.all(data.data.brs.map((br) => api.mv.mvUrl({ id, r: br.br }))).then((results) => {
+			let sources = results.map((result) => {
+				return {
+					src: result.data.url.replace(/^http:/, "https:"),
+					type: "video/mp4",
+					size: result.data.r,
+				};
+			});
+			mvPlayer!.source = {
+				type: "video",
+				title: mv.value.data.name,
+				sources: sources,
+				poster: mv.value.data.cover.replace(/^http:/, "https:"),
+			};
+			NProgress.done();
+		});
+	});
+	api.mv.simiMv(id).then((data) => {
+		simiMvs.value = data.mvs;
+	});
 }
 function likeMV() {
-  if (!isAccountLoggedIn()) {
-    toast(t('toast.needToLogin'));
-    return;
-  }
-  api.mv.likeAMV({
-    mvid: mv.value.data.id,
-    t: mv.value.subed ? 0 : 1,
-  }).then(data => {
-    if (data.code === 200) mv.value.subed = !mv.value.subed;
-  });
+	if (!isAccountLoggedIn()) {
+		toast(t("toast.needToLogin"));
+		return;
+	}
+	api.mv
+		.likeAMV({
+			mvid: mv.value.data.id,
+			t: mv.value.subed ? 0 : 1,
+		})
+		.then((data) => {
+			if (data.code === 200) mv.value.subed = !mv.value.subed;
+		});
 }
 
 function copyUrl(id: string) {
-  copyText(`https://music.163.com/#/mv?id=${id}`)
-    .then(function () {
-      toast(t('toast.copied'));
-    })
-    .catch(error => {
-      toast(`${t('toast.copyFailed')}${error}`);
-    });
+	copyText(`https://music.163.com/#/mv?id=${id}`)
+		.then(function () {
+			toast(t("toast.copied"));
+		})
+		.catch((error) => {
+			toast(`${t("toast.copyFailed")}${error}`);
+		});
 }
 function openInBrowser(id: string) {
-  const url = `https://music.163.com/#/mv?id=${id}`;
-  window.open(url);
+	const url = `https://music.163.com/#/mv?id=${id}`;
+	window.open(url);
 }
 </script>
 <style lang="scss" scoped>

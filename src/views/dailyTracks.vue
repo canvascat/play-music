@@ -14,11 +14,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useStore } from '@/store/pinia';
-import NProgress from 'nprogress';
-import * as api from '@/api';
-import TrackList from '@/components/TrackList.vue';
+import { ref, onMounted } from "vue";
+import { useStore } from "@/store/pinia";
+import NProgress from "nprogress";
+import * as api from "@/api";
+import TrackList from "@/components/TrackList.vue";
 
 const { dailyTracks, updateDailyTracks } = useStore();
 
@@ -27,24 +27,24 @@ const show = ref(false);
 
 // 生命周期
 onMounted(() => {
-  if (dailyTracks.length === 0) {
-    setTimeout(() => {
-      if (!show.value) NProgress.start();
-    }, 1000);
-    loadDailyTracks();
-  } else {
-    show.value = true;
-  }
-  // TODO scrollTo(0, 0);
+	if (dailyTracks.length === 0) {
+		setTimeout(() => {
+			if (!show.value) NProgress.start();
+		}, 1000);
+		loadDailyTracks();
+	} else {
+		show.value = true;
+	}
+	// TODO scrollTo(0, 0);
 });
 
 // 方法
 const loadDailyTracks = () => {
-  api.playlist.dailyRecommendTracks().then(result => {
-    updateDailyTracks(result.data.dailySongs);
-    NProgress.done();
-    show.value = true;
-  });
+	api.playlist.dailyRecommendTracks().then((result) => {
+		updateDailyTracks(result.data.dailySongs);
+		NProgress.done();
+		show.value = true;
+	});
 };
 </script>
 

@@ -4,6 +4,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'IconFm'
-})
+	name: "IconFm",
+});
 </script>

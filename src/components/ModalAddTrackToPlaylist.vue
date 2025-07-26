@@ -17,49 +17,50 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from '@/store/pinia';
-import Modal from '@/components/Modal.vue';
-import * as api from '@/api';
-import { resizeImage } from '@/utils/filters';
-import { toast } from 'vue-sonner'
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n'; 
-import { useModalStore } from '@/store/modal';
+import { useStore } from "@/store/pinia";
+import Modal from "@/components/Modal.vue";
+import * as api from "@/api";
+import { resizeImage } from "@/utils/filters";
+import { toast } from "vue-sonner";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import { useModalStore } from "@/store/modal";
 
-const modalStore = useModalStore()
+const modalStore = useModalStore();
 
 const { t } = useI18n();
 
-const { liked, data } = useStore()
+const { liked, data } = useStore();
 
-
-const show = computed(() => modalStore.show.addTrackToPlaylist)
+const show = computed(() => modalStore.show.addTrackToPlaylist);
 
 const ownPlaylists = computed(() => {
-  return liked.playlists.filter(p => p.creator.userId === data.user.userId && p.id !== data.likedSongPlaylistID)
-})
-
+	return liked.playlists.filter(
+		(p) => p.creator.userId === data.user.userId && p.id !== data.likedSongPlaylistID,
+	);
+});
 
 function addTrackToPlaylist(playlistID: string) {
-  api.playlist.addOrRemoveTrackFromPlaylist({
-    op: 'add',
-    pid: playlistID,
-    tracks: `${modalStore.selectedTrackID}`,
-  }).then(data => {
-    if (data.body.code === 200) {
-      modalStore.closeAddTrackToPlaylist()
-      toast(t('toast.savedToPlaylist'));
-    } else {
-      toast(data.body.message);
-    }
-  });
+	api.playlist
+		.addOrRemoveTrackFromPlaylist({
+			op: "add",
+			pid: playlistID,
+			tracks: `${modalStore.selectedTrackID}`,
+		})
+		.then((data) => {
+			if (data.body.code === 200) {
+				modalStore.closeAddTrackToPlaylist();
+				toast(t("toast.savedToPlaylist"));
+			} else {
+				toast(data.body.message);
+			}
+		});
 }
 
 function newPlaylist() {
-  modalStore.showNewPlaylist(modalStore.selectedTrackID)
-  modalStore.closeAddTrackToPlaylist()
+	modalStore.showNewPlaylist(modalStore.selectedTrackID);
+	modalStore.closeAddTrackToPlaylist();
 }
-
 </script>
 
 <style lang="scss" scoped>

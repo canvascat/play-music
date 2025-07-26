@@ -4,6 +4,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'IconArrowLeft'
-})
+	name: "IconArrowLeft",
+});
 </script>
