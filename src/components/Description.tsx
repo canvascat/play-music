@@ -1,15 +1,14 @@
 import { defineComponent } from "vue";
 import {
 	Dialog,
-	DialogTrigger,
 	DialogContent,
+	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogDescription,
+	DialogTrigger,
 } from "@/components/ui/dialog";
 
 export default defineComponent({
-	name: "Description",
 	props: {
 		description: {
 			type: String,

@@ -41,7 +41,7 @@ function parseLyric(lrc: string): ParsedLyric[] {
 	 * Find the appropriate index to push our parsed lyric.
 	 */
 	const binarySearch = (lyric: ParsedLyric) => {
-		let time = lyric.time;
+		const time = lyric.time;
 
 		let low = 0;
 		let high = parsedLyrics.length - 1;
@@ -80,30 +80,6 @@ function parseLyric(lrc: string): ParsedLyric[] {
 }
 
 function trimContent(content: string) {
-	let t = content.trim();
+	const t = content.trim();
 	return t.length < 1 ? content : t;
-}
-
-export async function copyLyric(lyric: string) {
-	const textToCopy = lyric;
-	if (navigator.clipboard && navigator.clipboard.writeText) {
-		try {
-			await navigator.clipboard.writeText(textToCopy);
-		} catch (_err) {
-			alert("复制失败，请手动复制！");
-		}
-	} else {
-		const tempInput = document.createElement("textarea");
-		tempInput.value = textToCopy;
-		tempInput.style.position = "absolute";
-		tempInput.style.left = "-9999px";
-		document.body.appendChild(tempInput);
-		tempInput.select();
-		try {
-			document.execCommand("copy");
-		} catch (_err) {
-			alert("复制失败，请手动复制！");
-		}
-		document.body.removeChild(tempInput);
-	}
 }

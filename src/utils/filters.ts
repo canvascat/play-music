@@ -1,3 +1,4 @@
+import type { Album } from "@/types";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -8,10 +9,10 @@ export function formatTime(Milliseconds: number, format = "HH:MM:SS") {
 	dayjs.extend(duration);
 	dayjs.extend(relativeTime);
 
-	let time = dayjs.duration(Milliseconds);
-	let hours = time.hours().toString();
-	let mins = time.minutes().toString();
-	let seconds = time.seconds().toString().padStart(2, "0");
+	const time = dayjs.duration(Milliseconds);
+	const hours = time.hours().toString();
+	const mins = time.minutes().toString();
+	const seconds = time.seconds().toString().padStart(2, "0");
 
 	if (format === "HH:MM:SS") {
 		return hours !== "0" ? `${hours}:${mins.padStart(2, "0")}:${seconds}` : `${mins}:${seconds}`;
@@ -45,7 +46,7 @@ export function formatDate(timestamp: number, format = "MMM D, YYYY") {
 	return dayjs(timestamp).format(format);
 }
 
-export function formatAlbumType(type: string, album: any) {
+export function formatAlbumType(type: string, album: Album) {
 	if (!type) return "";
 	if (type === "EP/Single") {
 		return album.size === 1 ? "Single" : "EP";
@@ -69,40 +70,17 @@ export function resizeImage(imgUrl: string, size = 512) {
 
 export function formatPlayCount(count?: number) {
 	if (!count) return "";
-	if (locale.global.locale === "zh-CN") {
-		if (count > 100000000) {
-			return `${Math.floor((count / 100000000) * 100) / 100}亿`; // 2.32 亿
-		}
-		if (count > 100000) {
-			return `${Math.floor((count / 10000) * 10) / 10}万`; // 232.1 万
-		}
-		if (count > 10000) {
-			return `${Math.floor((count / 10000) * 100) / 100}万`; // 2.3 万
-		}
-		return count;
-	} else if (locale.global.locale === "zh-TW") {
-		if (count > 100000000) {
-			return `${Math.floor((count / 100000000) * 100) / 100}億`; // 2.32 億
-		}
-		if (count > 100000) {
-			return `${Math.floor((count / 10000) * 10) / 10}萬`; // 232.1 萬
-		}
-		if (count > 10000) {
-			return `${Math.floor((count / 10000) * 100) / 100}萬`; // 2.3 萬
-		}
-		return count;
-	} else {
-		if (count > 10000000) {
-			return `${Math.floor((count / 1000000) * 10) / 10}M`; // 233.2M
-		}
-		if (count > 1000000) {
-			return `${Math.floor((count / 1000000) * 100) / 100}M`; // 2.3M
-		}
-		if (count > 1000) {
-			return `${Math.floor((count / 1000) * 100) / 100}K`; // 233.23K
-		}
-		return count;
+
+	if (count > 10000000) {
+		return `${Math.floor((count / 1000000) * 10) / 10}M`; // 233.2M
 	}
+	if (count > 1000000) {
+		return `${Math.floor((count / 1000000) * 100) / 100}M`; // 2.3M
+	}
+	if (count > 1000) {
+		return `${Math.floor((count / 1000) * 100) / 100}K`; // 233.23K
+	}
+	return count;
 }
 
 export function toHttps(url: string) {

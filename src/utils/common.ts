@@ -1,6 +1,12 @@
 import { useStore } from "@/store/pinia";
 import type { Track, TrackPrivilege } from "@/types/index";
 import { isAccountLoggedIn } from "./auth";
+import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
+import type { Palette } from "@vibrant/color";
+import Color from "color";
+import PipelineWorker from "node-vibrant/worker.worker?worker";
+
+Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 
 function isTrackPlayable(track: Track, vipType?: number) {
 	const result = {
@@ -153,4 +159,10 @@ export function formatTrackTime(value?: number | string) {
 	const min = ~~(value / 60);
 	const sec = (~~(value % 60)).toString().padStart(2, "0");
 	return `${min}:${sec}`;
+}
+
+export async function getImageColor(src: string, type: keyof Palette) {
+	const palette = await new Vibrant(src, { colorCount: 2 }).getPalette();
+	const rgb = palette[type]?.rgb;
+	return new Color(rgb);
 }

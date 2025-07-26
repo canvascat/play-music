@@ -5,3 +5,12 @@ declare interface Window {
 	ipcRenderer: any | null;
 	resetApp: () => string;
 }
+
+import "vue-router";
+
+declare module "vue-router" {
+	interface RouteMeta {
+		keepAlive?: boolean;
+		savePosition?: boolean;
+	}
+}

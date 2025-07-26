@@ -11,7 +11,7 @@ import { createI18n } from "vue-i18n";
 import SvgIcon from "@/components/SvgIcon.vue";
 import { messages } from "./locale";
 
-window.resetApp = () => {
+function resetApp() {
 	localStorage.clear();
 	indexedDB.deleteDatabase("yesplaymusic");
 	document.cookie.split(";").forEach((c) => {
@@ -20,7 +20,9 @@ window.resetApp = () => {
 			.replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
 	});
 	return "已重置应用，请刷新页面（按Ctrl/Command + R）";
-};
+}
+
+Object.assign(window, { resetApp });
 
 console.log(
 	"如出现问题，可尝试在本页输入 %cresetApp()%c 然后按回车重置应用。",
