@@ -136,6 +136,8 @@ export interface Playlist {
 	algTags?: any;
 	tracks?: Track[];
 	trackIds?: TrackId[];
+	englishTitle?: string;
+	updateFrequency?: string;
 }
 
 export interface TrackId {
@@ -284,7 +286,7 @@ export interface Settings {
 	enableReversedMode: boolean;
 	nyancatStyle: boolean;
 	showLyricsTranslation: boolean;
-	lyricsBackground: boolean;
+	lyricsBackground: boolean | "blur" | "dynamic";
 	closeAppOption: "ask" | "close" | "minimize";
 	enableDiscordRichPresence: boolean;
 	enableGlobalShortcut: boolean;
