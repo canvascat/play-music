@@ -2,6 +2,7 @@
 import * as api from "@/api";
 import { useStore } from "@/store/pinia";
 import { ref, onMounted } from "vue";
+import { IconX } from "@/components/icon";
 
 const message = ref("请稍等...");
 const done = ref(false);
@@ -33,68 +34,66 @@ function close() {
 </script>
 
 <template>
-  <div class="lastfm-callback">
-    <div class="section-1">
-      <img src="/img/logos/yesplaymusic.png" />
-      <svg-icon icon-class="x"></svg-icon>
-      <img src="/img/logos/lastfm.png" />
-    </div>
-    <div class="message">{{ message }}</div>
-    <button v-show="done" @click="close"> 完成 </button>
-  </div>
+	<div class="lastfm-callback">
+		<div class="section-1">
+			<img src="/img/logos/yesplaymusic.png" />
+			<IconX class="size-6" />
+			<img src="/img/logos/lastfm.png" />
+		</div>
+		<div class="message">{{ message }}</div>
+		<button v-show="done" @click="close">完成</button>
+	</div>
 </template>
 
 <style lang="scss" scoped>
 .lastfm-callback {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: calc(100vh - 192px);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 192px);
 }
 
 .section-1 {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
+	margin-bottom: 16px;
+	display: flex;
+	align-items: center;
 
-  img {
-    height: 64px;
-    margin: 20px;
-  }
+	img {
+		height: 64px;
+		margin: 20px;
+	}
 
-  .svg-icon {
-    height: 24px;
-    width: 24px;
-    color: rgba(82, 82, 82, 0.28);
-  }
+	.svg-icon {
+		color: rgba(82, 82, 82, 0.28);
+	}
 }
 
 .message {
-  font-size: 1.4rem;
-  font-weight: 500;
-  color: var(--color-text);
+	font-size: 1.4rem;
+	font-weight: 500;
+	color: var(--color-text);
 }
 
 button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  background-color: var(--color-primary-bg);
-  color: var(--color-primary);
-  border-radius: 8px;
-  margin-top: 24px;
-  transition: 0.2s;
-  padding: 8px 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	font-weight: 600;
+	background-color: var(--color-primary-bg);
+	color: var(--color-primary);
+	border-radius: 8px;
+	margin-top: 24px;
+	transition: 0.2s;
+	padding: 8px 16px;
 
-  &:hover {
-    transform: scale(1.06);
-  }
+	&:hover {
+		transform: scale(1.06);
+	}
 
-  &:active {
-    transform: scale(0.94);
-  }
+	&:active {
+		transform: scale(0.94);
+	}
 }
 </style>

@@ -1,45 +1,45 @@
 <template>
-  <div class="mv-page">
-    <div class="current-video">
-      <div class="video">
-        <video ref="videoPlayer" class="plyr"></video>
-      </div>
-      <div class="video-info">
-        <div class="title">
-          <router-link :to="'/artist/' + mv.data.artistId">{{
-            mv.data.artistName
-            }}</router-link>
-          -
-          {{ mv.data.name }}
-          <div class="buttons">
-            <button-icon class="button" v-on:click="likeMV">
-              <svg-icon v-if="mv.subed" icon-class="heart-solid"></svg-icon>
-              <svg-icon v-else icon-class="heart"></svg-icon>
-            </button-icon>
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child> <button-icon class="button">
-                  <svg-icon icon-class="more"></svg-icon>
-                </button-icon></DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem @click="copyUrl(mv.data.id)">{{ $t('contextMenu.copyUrl') }}</DropdownMenuItem>
-                <DropdownMenuItem @click="openInBrowser(mv.data.id)">{{ $t('contextMenu.openInBrowser') }}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-        <div class="info">
-          {{ formatPlayCount(mv.data.playCount) }} Views ·
-          {{ mv.data.publishTime }}
-        </div>
-      </div>
-    </div>
-    <div class="more-video">
-      <div class="section-title">{{ $t('mv.moreVideo') }}</div>
-      <MvRow :mvs="simiMvs" />
-    </div>
-
-  </div>
+	<div class="mv-page">
+		<div class="current-video">
+			<div class="video">
+				<video ref="videoPlayer" class="plyr"></video>
+			</div>
+			<div class="video-info">
+				<div class="title">
+					<router-link :to="'/artist/' + mv.data.artistId">{{ mv.data.artistName }}</router-link>
+					-
+					{{ mv.data.name }}
+					<div class="buttons">
+						<ButtonIcon class="button" v-on:click="likeMV">
+							<IconHeartSolid v-if="mv.subed" />
+							<IconHeart v-else />
+						</ButtonIcon>
+						<DropdownMenu>
+							<DropdownMenuTrigger as-child>
+								<ButtonIcon class="button"> <IconMore class="size-4" /> </ButtonIcon
+							></DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem @click="copyUrl(mv.data.id)">{{
+									$t("contextMenu.copyUrl")
+								}}</DropdownMenuItem>
+								<DropdownMenuItem @click="openInBrowser(mv.data.id)"
+									>{{ $t("contextMenu.openInBrowser") }}
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				</div>
+				<div class="info">
+					{{ formatPlayCount(mv.data.playCount) }} Views ·
+					{{ mv.data.publishTime }}
+				</div>
+			</div>
+		</div>
+		<div class="more-video">
+			<div class="section-title">{{ $t("mv.moreVideo") }}</div>
+			<MvRow :mvs="simiMvs" />
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -48,6 +48,7 @@ import { isAccountLoggedIn } from "@/utils/auth";
 import NProgress from "nprogress";
 import "@/assets/css/plyr.css";
 import Plyr from "plyr";
+import { IconHeart, IconHeartSolid, IconMore } from "@/components/icon";
 
 import ButtonIcon from "@/components/ButtonIcon.vue";
 import {
@@ -169,72 +170,72 @@ function openInBrowser(id: string) {
 </script>
 <style lang="scss" scoped>
 .video {
-  --plyr-color-main: #335eea;
-  --plyr-control-radius: 8px;
+	--plyr-color-main: #335eea;
+	--plyr-control-radius: 8px;
 }
 
 .mv-page {
-  width: 100%;
-  margin-top: 32px;
+	width: 100%;
+	margin-top: 32px;
 }
 
 .current-video {
-  width: 100%;
+	width: 100%;
 }
 
 .video {
-  border-radius: 16px;
-  background: transparent;
-  overflow: hidden;
-  max-height: 100vh;
+	border-radius: 16px;
+	background: transparent;
+	overflow: hidden;
+	max-height: 100vh;
 }
 
 .video-info {
-  margin-top: 12px;
-  color: var(--color-text);
+	margin-top: 12px;
+	color: var(--color-text);
 
-  .title {
-    font-size: 24px;
-    font-weight: 600;
-  }
+	.title {
+		font-size: 24px;
+		font-weight: 600;
+	}
 
-  .artist {
-    font-size: 14px;
-    opacity: 0.88;
-    margin-top: 2px;
-    font-weight: 600;
-  }
+	.artist {
+		font-size: 14px;
+		opacity: 0.88;
+		margin-top: 2px;
+		font-weight: 600;
+	}
 
-  .info {
-    font-size: 12px;
-    opacity: 0.68;
-    margin-top: 12px;
-  }
+	.info {
+		font-size: 12px;
+		opacity: 0.68;
+		margin-top: 12px;
+	}
 }
 
 .more-video {
-  margin-top: 48px;
+	margin-top: 48px;
 
-  .section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-text);
-    opacity: 0.88;
-    margin-bottom: 12px;
-  }
+	.section-title {
+		font-size: 18px;
+		font-weight: 600;
+		color: var(--color-text);
+		opacity: 0.88;
+		margin-bottom: 12px;
+	}
 }
 
 .buttons {
-  display: inline-block;
+	display: inline-block;
 
-  .button {
-    display: inline-block;
-  }
+	.button {
+		display: inline-block;
+	}
 
-  .svg-icon {
-    height: 18px;
-    width: 18px;
-    color: var(--color-primary);
-  }
+	.svg-icon {
+		height: 18px;
+		width: 18px;
+		color: var(--color-primary);
+	}
 }
 </style>
