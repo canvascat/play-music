@@ -1,22 +1,24 @@
 <template>
-	<div class="settings-page" @click="clickOutside">
-		<div class="container">
+	<div class="flex justify-center mt-8" @click="clickOutside">
+		<div class="container mt-6">
 			<div v-if="showUserInfo" class="user">
-				<div class="left">
-					<img class="avatar" :src="data.user.avatarUrl" loading="lazy" />
-					<div class="info">
-						<div class="nickname">{{ data.user.nickname }}</div>
-						<div class="extra-info">
-							<span class="text">{{ data.user.signature }}</span>
+				<div class="flex items-center">
+					<img class="size-16 rounded-full" :src="data.user.avatarUrl" loading="lazy" />
+					<div class="ml-6">
+						<div class="mb-1 text-lg font-bold">{{ data.user.nickname }}</div>
+						<div class="text-sm">
+							<span class="opacity-68">{{ data.user.signature }}</span>
 						</div>
 					</div>
 				</div>
-				<div class="right">
-					<button @click="logout">
-						<svg-icon icon-class="logout" />
-						{{ $t("settings.logout") }}
-					</button>
-				</div>
+
+				<button
+					class="text-lg flex gap-1 items-center font-bold rounded-xl px-4 py-2 opacity-68"
+					@click="logout"
+				>
+					<IconLogout class="size-[1em]" />
+					{{ $t("settings.logout") }}
+				</button>
 			</div>
 
 			<div class="item">
@@ -672,12 +674,12 @@
 				</div>
 			</div>
 
-			<div class="footer">
-				<p class="author">
+			<div class="flex flex-col items-center mt-24 font-bold text-black">
+				<p>
 					MADE BY
-					<a href="http://github.com/qier222" target="_blank">QIER222</a>
+					<a :href="pkg.author.url" target="_blank">{{ pkg.author.name }}</a>
 				</p>
-				<p class="version">v{{ version }}</p>
+				<p class="opacity-50">v{{ pkg.version }}</p>
 			</div>
 		</div>
 	</div>
@@ -695,6 +697,7 @@ import { bytesToSize, changeAppearance } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import { isLinux } from "@/utils/platform";
 import pkg from "../../package.json";
+import { IconLogout } from "@/components/icon";
 
 const i18n = useI18n();
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
@@ -723,8 +726,6 @@ const recordedShortcut = ref<KeyboardEvent[]>([]);
 const { player, settings, data, lastfm } = useStore();
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
-
-const version = pkg.version;
 
 const {
 	updateSettings,
@@ -1325,14 +1326,7 @@ function exitRecordShortcut() {
 </script>
 
 <style lang="scss" scoped>
-.settings-page {
-	display: flex;
-	justify-content: center;
-	margin-top: 32px;
-}
-
 .container {
-	margin-top: 24px;
 	width: 720px;
 }
 
@@ -1360,80 +1354,20 @@ h3 {
 	border-radius: 16px;
 	margin-bottom: 48px;
 
-	img.avatar {
-		border-radius: 50%;
-		height: 64px;
-		width: 64px;
-	}
+	button {
+		color: var(--color-text);
+		transition: 0.2s;
 
-	img.cvip {
-		height: 13px;
-		margin-right: 4px;
-	}
-
-	.left {
-		display: flex;
-		align-items: center;
-
-		.info {
-			margin-left: 24px;
+		&:hover {
+			opacity: 1;
+			background: #eaeffd;
+			color: #335eea;
 		}
 
-		.nickname {
-			font-size: 20px;
-			font-weight: 600;
-			margin-bottom: 2px;
-		}
-
-		.extra-info {
-			font-size: 13px;
-
-			.text {
-				opacity: 0.68;
-			}
-
-			.vip {
-				display: flex;
-				align-items: center;
-			}
-		}
-	}
-
-	.right {
-		.svg-icon {
-			height: 18px;
-			width: 18px;
-			margin-right: 4px;
-		}
-
-		button {
-			display: flex;
-			align-items: center;
-			font-size: 18px;
-			font-weight: 600;
-			text-decoration: none;
-			border-radius: 10px;
-			padding: 8px 12px;
-			opacity: 0.68;
-			color: var(--color-text);
+		&:active {
+			opacity: 1;
+			transform: scale(0.92);
 			transition: 0.2s;
-
-			margin: {
-				right: 12px;
-				left: 12px;
-			}
-
-			&:hover {
-				opacity: 1;
-				background: #eaeffd;
-				color: #335eea;
-			}
-
-			&:active {
-				opacity: 1;
-				transform: scale(0.92);
-				transition: 0.2s;
-			}
 		}
 	}
 }
@@ -1513,10 +1447,6 @@ input::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 }
 
-input[type="number"] {
-	-moz-appearance: textfield;
-}
-
 #proxy-form,
 #real-ip {
 	display: flex;
@@ -1592,23 +1522,6 @@ input[type="number"] {
 
 	&:focus {
 		outline: none;
-	}
-}
-
-.footer {
-	text-align: center;
-	margin-top: 6rem;
-	color: var(--color-text);
-	font-weight: 600;
-
-	.author {
-		font-size: 0.9rem;
-	}
-
-	.version {
-		font-size: 0.88rem;
-		opacity: 0.58;
-		margin-top: -10px;
 	}
 }
 
