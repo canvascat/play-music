@@ -23,7 +23,7 @@ export default defineComponent({
 		return () => (
 			<Dialog>
 				<DialogTrigger asChild>
-					<div class="user-select-none opacity-68 line-clamp-3 mt-6 cursor-pointer text-sm   hover:opacity-88 transition-opacity">
+					<div class="select-none opacity-68 line-clamp-3 mt-6 cursor-pointer text-sm   hover:opacity-88 transition-opacity">
 						{props.description}
 					</div>
 				</DialogTrigger>

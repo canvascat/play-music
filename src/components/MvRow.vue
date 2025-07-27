@@ -1,29 +1,29 @@
 <template>
-  <div class="mv-row grid gap-x-9 gap-y-6">
-    <div v-for="mv in mvs" :key="getID(mv)" >
-      <div
-        class="cursor-pointer relative transition-transform duration-300"
-        @mouseover="hoverVideoID = getID(mv)"
-        @mouseleave="hoverVideoID = 0"
-        @click="goToMv(getID(mv))"
-      >
-        <img :src="getUrl(mv)" loading="lazy" class="rounded-2xl w-full user-select-none" />
-        <transition name="fade">
-          <div
-            v-show="hoverVideoID === getID(mv)"
-            class="absolute top-1.5 h-full w-full filter blur-16 opacity-40 scale-90 z-[-1] bg-cover rounded-2xl"
-            :style="{ background: 'url(' + getUrl(mv) + ')' }"
-          ></div>
-        </transition>
-      </div>
-      <div >
-        <div class="line-clamp-2 text-sm font-semibold opacity-88 break-all">
-          <RouterLink :to="'/mv/' + getID(mv)">{{ getTitle(mv) }}</RouterLink>
-        </div>
-        <div class="text-xs opacity-68 line-clamp-2" v-html="getSubtitle(mv)"></div>
-      </div>
-    </div>
-  </div>
+	<div class="mv-row grid gap-x-9 gap-y-6">
+		<div v-for="mv in mvs" :key="getID(mv)">
+			<div
+				class="cursor-pointer relative transition-transform duration-300"
+				@mouseover="hoverVideoID = getID(mv)"
+				@mouseleave="hoverVideoID = 0"
+				@click="goToMv(getID(mv))"
+			>
+				<img :src="getUrl(mv)" loading="lazy" class="rounded-2xl w-full select-none" />
+				<transition name="fade">
+					<div
+						v-show="hoverVideoID === getID(mv)"
+						class="absolute top-1.5 h-full w-full filter blur-16 opacity-40 scale-90 z-[-1] bg-cover rounded-2xl"
+						:style="{ background: 'url(' + getUrl(mv) + ')' }"
+					></div>
+				</transition>
+			</div>
+			<div>
+				<div class="line-clamp-2 text-sm font-semibold opacity-88 break-all">
+					<RouterLink :to="'/mv/' + getID(mv)">{{ getTitle(mv) }}</RouterLink>
+				</div>
+				<div class="text-xs opacity-68 line-clamp-2" v-html="getSubtitle(mv)"></div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -114,41 +114,39 @@ const getSubtitle = (mv: MvItem): string => {
 
 <style lang="scss" scoped>
 .mv-row {
-  --col-num: 5; 
-  grid-template-columns: repeat(var(--col-num), 1fr); 
+	--col-num: 5;
+	grid-template-columns: repeat(var(--col-num), 1fr);
 }
 
-
 @media (max-width: 900px) {
-  .mv-row {
-    --col-num: 4;
-  }
+	.mv-row {
+		--col-num: 4;
+	}
 }
 
 @media (max-width: 800px) {
-  .mv-row {
-    --col-num: 3;
-  }
+	.mv-row {
+		--col-num: 3;
+	}
 }
 
 @media (max-width: 700px) {
-  .mv-row {
-    --col-num: 2;
-  }
+	.mv-row {
+		--col-num: 2;
+	}
 }
 
 @media (max-width: 550px) {
-  .mv-row {
-    --col-num: 1;
-  }
+	.mv-row {
+		--col-num: 1;
+	}
 }
 
-  
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s;
+	transition: opacity 0.3s;
 }
 .fade-enter-from, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+	opacity: 0;
 }
 </style>
