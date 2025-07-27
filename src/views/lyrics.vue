@@ -62,11 +62,11 @@
 						</div>
 						<div class="top-right">
 							<div class="volume-control">
-								<button-icon :title="$t('player.mute')" v-on:click="mute">
-									<svg-icon v-show="volume > 0.5" icon-class="volume" />
-									<svg-icon v-show="volume === 0" icon-class="volume-mute" />
-									<svg-icon v-show="volume <= 0.5 && volume !== 0" icon-class="volume-half" />
-								</button-icon>
+								<ButtonIcon :title="$t('player.mute')" v-on:click="mute">
+									<IconVolume v-show="volume > 0.5" />
+									<IconVolumeMute v-show="volume === 0" />
+									<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
+								</ButtonIcon>
 								<div class="volume-bar">
 									<vue-slider
 										v-model="volume"
@@ -81,18 +81,20 @@
 								</div>
 							</div>
 							<div class="buttons">
-								<button-icon
+								<ButtonIcon
 									:title="$t('player.like')"
 									v-on:click="likeATrack(player.currentTrack.id)"
 								>
-									<svg-icon :icon-class="player.isCurrentTrackLiked ? 'heart-solid' : 'heart'" />
-								</button-icon>
-								<button-icon :title="$t('contextMenu.addToPlaylist')" v-on:click="addToPlaylist">
-									<svg-icon icon-class="plus" />
-								</button-icon>
-								<!-- <button-icon v-on:click="openMenu" title="Menu"
-                    ><svg-icon icon-class="more"
-                  /></button-icon> -->
+									<IconHeartSolid v-if="player.isCurrentTrackLiked" class="size-4.5" />
+									<IconHeart v-else class="size-4.5" />
+								</ButtonIcon>
+								<ButtonIcon :title="$t('contextMenu.addToPlaylist')" v-on:click="addToPlaylist">
+									<IconPlus class="size-4.5" />
+								</ButtonIcon>
+
+								<!-- <ButtonIcon>
+									<IconMore class="size-4.5" />
+								</ButtonIcon> -->
 							</div>
 						</div>
 					</div>
@@ -116,46 +118,47 @@
 						<span>{{ formatTrackTime(player.currentTrackDuration) }}</span>
 					</div>
 					<div class="media-controls">
-						<button-icon
+						<ButtonIcon
 							v-show="!player.isPersonalFM"
 							:title="player.repeatMode === 'one' ? $t('player.repeatTrack') : $t('player.repeat')"
 							:class="{ active: player.repeatMode !== 'off' }"
 							v-on:click="switchRepeatMode"
 						>
-							<svg-icon v-show="player.repeatMode !== 'one'" icon-class="repeat" />
-							<svg-icon v-show="player.repeatMode === 'one'" icon-class="repeat-1" />
-						</button-icon>
+							<IconRepeat v-show="player.repeatMode !== 'one'" />
+							<IconRepeat1 v-show="player.repeatMode === 'one'" />
+						</ButtonIcon>
 						<div class="middle">
-							<button-icon
+							<ButtonIcon
 								v-show="!player.isPersonalFM"
 								:title="$t('player.previous')"
 								v-on:click="playPrevTrack"
 							>
-								<svg-icon icon-class="previous" />
-							</button-icon>
-							<button-icon v-show="player.isPersonalFM" title="不喜欢" v-on:click="moveToFMTrash">
-								<svg-icon icon-class="thumbs-down" />
-							</button-icon>
-							<button-icon
+								<IconPrevious />
+							</ButtonIcon>
+							<ButtonIcon v-show="player.isPersonalFM" title="不喜欢" v-on:click="moveToFMTrash">
+								<IconThumbsDown />
+							</ButtonIcon>
+							<ButtonIcon
 								id="play"
 								:title="$t(player.playing ? 'player.pause' : 'player.play')"
 								v-on:click="playOrPause"
 							>
-								<svg-icon :icon-class="player.playing ? 'pause' : 'play'" />
-							</button-icon>
-							<button-icon :title="$t('player.next')" v-on:click="playNextTrack">
-								<svg-icon icon-class="next" />
-							</button-icon>
+								<IconPause v-if="player.playing" />
+								<IconPlay v-else />
+							</ButtonIcon>
+							<ButtonIcon :title="$t('player.next')" v-on:click="playNextTrack">
+								<IconNext />
+							</ButtonIcon>
 						</div>
-						<button-icon
+						<ButtonIcon
 							v-show="!player.isPersonalFM"
 							:title="$t('player.shuffle')"
 							:class="{ active: player.shuffle }"
 							v-on:click="switchShuffle"
 						>
-							<svg-icon icon-class="shuffle" />
-						</button-icon>
-						<button-icon
+							<IconShuffle />
+						</ButtonIcon>
+						<ButtonIcon
 							v-show="
 								isShowLyricTypeSwitch &&
 								settings.showLyricsTranslation &&
@@ -165,8 +168,8 @@
 							v-on:click="switchLyricType"
 						>
 							<span class="lyric-switch-icon">译</span>
-						</button-icon>
-						<button-icon
+						</ButtonIcon>
+						<ButtonIcon
 							v-show="
 								isShowLyricTypeSwitch &&
 								settings.showLyricsTranslation &&
@@ -176,7 +179,7 @@
 							v-on:click="switchLyricType"
 						>
 							<span class="lyric-switch-icon">音</span>
-						</button-icon>
+						</ButtonIcon>
 					</div>
 				</div>
 			</div>
@@ -231,13 +234,13 @@
 		</div>
 		<div class="close-button" @click="toggleLyrics">
 			<button>
-				<svg-icon icon-class="arrow-down" />
+				<IconArrowDown />
 			</button>
 		</div>
 		<div class="close-button" style="left: 24px" @click="toggleFullscreen">
 			<button>
-				<svg-icon v-if="isFullscreen" icon-class="fullscreen-exit" />
-				<svg-icon v-else icon-class="fullscreen" />
+				<IconFullscreenExit v-if="isFullscreen" />
+				<IconFullscreen v-else />
 			</button>
 		</div>
 	</div>
@@ -255,6 +258,25 @@ import { formatTrackTime, getImageColor } from "@/utils/common";
 import * as api from "@/api";
 import { lyricParser } from "@/utils/lyrics";
 import ButtonIcon from "@/components/ButtonIcon.vue";
+import {
+	IconArrowDown,
+	IconFullscreen,
+	IconFullscreenExit,
+	IconVolume,
+	IconVolumeMute,
+	IconVolumeHalf,
+	IconRepeat,
+	IconRepeat1,
+	IconPrevious,
+	IconNext,
+	IconShuffle,
+	IconHeart,
+	IconHeartSolid,
+	IconThumbsDown,
+	IconPlus,
+	IconPause,
+	IconPlay,
+} from "@/components/icon";
 
 import { isAccountLoggedIn } from "@/utils/auth";
 import { hasListSource, getListSourcePath } from "@/utils/playList";
