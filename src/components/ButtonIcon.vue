@@ -30,6 +30,7 @@ button {
 	border-radius: 25%;
 	// transition: 0.2s;
 	:deep(.svg-icon) {
+		fill: currentColor;
 		color: var(--color-text);
 		height: 16px;
 		width: 16px;
