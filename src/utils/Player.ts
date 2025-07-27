@@ -1,4 +1,4 @@
-import { shuffle } from "es-toolkit";
+import { delay, shuffle } from "es-toolkit";
 import { Howl, Howler } from "howler";
 import { isProxy } from "vue";
 import { toast } from "vue-sonner";
@@ -25,8 +25,6 @@ const UNPLAYABLE_CONDITION = {
 
 type UnplayableCondition = (typeof UNPLAYABLE_CONDITION)[keyof typeof UNPLAYABLE_CONDITION];
 
-const delay = (ms: number = 0): Promise<void> =>
-	new Promise<void>((resolve) => setTimeout(resolve, ms));
 const excludeSaveKeys = ["_playing", "_personalFMLoading", "_personalFMNextLoading"];
 
 function setTitle(track?: Track): void {
@@ -286,11 +284,11 @@ export default class Player {
 			// https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
 			// code 3: MEDIA_ERR_DECODE
 			if (errCode === 3) {
-				this._playNextTrack(this._isPersonalFM);
+				this._playNextTrack();
 			} else if (errCode === 4) {
 				// code 4: MEDIA_ERR_SRC_NOT_SUPPORTED
 				toast(`无法播放: 不支持的音频格式`);
-				this._playNextTrack(this._isPersonalFM);
+				this._playNextTrack();
 			} else {
 				const t = this.progress;
 				this._replaceCurrentTrackAudio(this.currentTrack, false, false).then((replaced) => {
@@ -465,7 +463,7 @@ export default class Player {
 				toast(`无法播放 ${track.name}`);
 				switch (ifUnplayableThen) {
 					case UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK:
-						this._playNextTrack(this.isPersonalFM);
+						this._playNextTrack();
 						break;
 					case UNPLAYABLE_CONDITION.PLAY_PREV_TRACK:
 						this.playPrevTrack();
@@ -517,7 +515,7 @@ export default class Player {
 				this.playPrevTrack();
 			});
 			navigator.mediaSession.setActionHandler("nexttrack", () => {
-				this._playNextTrack(this.isPersonalFM);
+				this._playNextTrack();
 			});
 			navigator.mediaSession.setActionHandler("stop", () => {
 				this.pause();
@@ -601,10 +599,10 @@ export default class Player {
 		}
 	}
 	private _nextTrackCallback() {
-		if (!this.isPersonalFM && this.repeatMode === "one") {
+		if (!this._isPersonalFM && this.repeatMode === "one") {
 			this._replaceCurrentTrack(this.currentTrackID);
 		} else {
-			this._playNextTrack(this.isPersonalFM);
+			this._playNextTrack();
 		}
 	}
 	private _loadPersonalFMNextTrack() {
@@ -650,8 +648,8 @@ export default class Player {
 		}
 		window.ipcRenderer?.send("pauseDiscordPresence", track);
 	}
-	private _playNextTrack(isPersonal: boolean) {
-		if (isPersonal) {
+	_playNextTrack() {
+		if (this._isPersonalFM) {
 			this.playNextFMTrack();
 		} else {
 			this.playNextTrack();
@@ -706,7 +704,6 @@ export default class Player {
 			if (retryCount < 0) {
 				const content = "获取私人FM数据时重试次数过多，请手动切换下一首";
 				toast(content);
-				console.log(content);
 				return false;
 			}
 			// 这里只能拿到一条数据
