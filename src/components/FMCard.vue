@@ -17,20 +17,21 @@
 			<div class="controls">
 				<div class="buttons">
 					<button-icon title="不喜欢" v-on:click="moveToFMTrash">
-						<svg-icon id="thumbs-down" icon-class="thumbs-down" />
+						<IconThumbsDown id="thumbs-down" />
 					</button-icon>
 					<button-icon
 						:title="$t(isPlaying ? 'player.pause' : 'player.play')"
 						class="play"
 						v-on:click="play"
 					>
-						<svg-icon :icon-class="isPlaying ? 'pause' : 'play'" />
+						<IconPause v-if="isPlaying" />
+						<IconPlay v-else />
 					</button-icon>
 					<button-icon :title="$t('player.next')" v-on:click="next">
-						<svg-icon icon-class="next" />
+						<IconNext />
 					</button-icon>
 				</div>
-				<div class="card-name"><svg-icon icon-class="fm" />私人FM</div>
+				<div class="card-name"><IconFm />私人FM</div>
 			</div>
 		</div>
 	</div>
@@ -39,7 +40,7 @@
 <script setup lang="ts">
 import ButtonIcon from "@/components/ButtonIcon.vue";
 import ArtistsInLine from "@/components/ArtistsInLine.vue";
-
+import { IconThumbsDown, IconPlay, IconPause, IconNext, IconFm } from "@/components/icon";
 import { useStore } from "@/store/pinia";
 import { resizeImage } from "@/utils/filters";
 import { ref, computed, watch } from "vue";
