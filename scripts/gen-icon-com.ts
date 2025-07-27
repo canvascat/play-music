@@ -7,13 +7,13 @@ import * as svgo from "svgo";
 
 function genIconCom(content: string, name: string) {
 	return `<template>
-  ${content}
+	${content}
 </template>
 
 <script setup lang="ts">
 defineOptions({
-  name: '${name}'
-})
+	name: "${name}",
+});
 </script>`;
 }
 
@@ -23,6 +23,7 @@ function optimize(svg: string) {
 			{
 				name: "preset-default",
 			},
+			{ name: "removeAttrs", params: { attrs: ["class"] } },
 			{
 				name: "addClassesToSVGElement",
 				params: {
@@ -36,6 +37,7 @@ function optimize(svg: string) {
 async function main() {
 	const input = path.join(process.cwd(), "src/assets/icons");
 	const output = path.join(process.cwd(), "src/components/icon");
+
 	const files = await glob("**/*.svg", { cwd: input });
 
 	const coms = Object.create(null);
