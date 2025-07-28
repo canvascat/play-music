@@ -8,7 +8,6 @@ import "@/assets/css/global.scss";
 import NProgress from "nprogress";
 import "@/assets/css/nprogress.css";
 import { createI18n } from "vue-i18n";
-import SvgIcon from "@/components/SvgIcon.vue";
 import { messages } from "./locale";
 
 function resetApp() {
