@@ -47,6 +47,7 @@ export default defineConfig([
 					ignoreRestSiblings: true,
 				},
 			],
+			"@typescript-eslint/no-explicit-any": "warn",
 		},
 	},
 ]);

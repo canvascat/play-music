@@ -1,128 +1,149 @@
 <template>
-  <div v-show="show" class="artist-page">
-    <div class="artist-info">
-      <div class="head">
-        <img :src="resizeImage(artist.img1v1Url, 1024)" loading="lazy" />
-      </div>
-      <div>
-        <div class="name">{{ artist.name }}</div>
-        <div class="artist">{{ $t('artist.artist') }}</div>
-        <div class="statistics">
-          <a @click="scrollTo('popularTracks')">{{ artist.musicSize }} {{ $t('common.songs') }}</a>
-          ·
-          <a @click="scrollTo('seeMore', 'start')">{{ artist.albumSize }} {{ $t('artist.withAlbums') }}</a>
-          ·
-          <a @click="scrollTo('mvs')">{{ artist.mvSize }} {{ $t('artist.videos') }}</a>
-        </div>
- 
-        <Description :description="artist.briefDesc" :title="$t('artist.artistDesc')" />
-        <div class="buttons">
-          <ButtonTwoTone icon-class="play" v-on:click="playPopularSongs()">
-            {{ $t('common.play') }}
-          </ButtonTwoTone>
-          <ButtonTwoTone color="grey" v-on:click="followArtist">
-            <span v-if="artist.followed">{{ $t('artist.following') }}</span>
-            <span v-else>{{ $t('artist.follow') }}</span>
-          </ButtonTwoTone>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <ButtonTwoTone icon-class="more" :icon-button="true" :horizontal-padding="0" color="grey">
-              </ButtonTwoTone>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem @click="copyUrl(artist.id)">{{
-                $t('contextMenu.copyUrl')
-                }}</DropdownMenuItem>
-              <DropdownMenuItem @click="openInBrowser(artist.id)">{{
-                $t('contextMenu.openInBrowser')
-                }}</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-    </div>
-    <div v-if="latestRelease !== undefined" class="latest-release">
-      <div class="section-title">{{ $t('artist.latestRelease') }}</div>
-      <div class="release">
-        <div class="container">
-          <Cover :id="latestRelease.id" :image-url="resizeImage(latestRelease.picUrl)" type="album" :fixed-size="128"
-            :play-button-size="30" />
-          <div class="info">
-            <div class="name">
-              <router-link :to="`/album/${latestRelease.id}`">{{
-                latestRelease.name
-                }}</router-link>
-            </div>
-            <div class="date">
-              {{ formatDate(latestRelease.publishTime) }}
-            </div>
-            <div class="type">
-              {{ formatAlbumType(latestRelease.type, latestRelease) }} ·
-              {{ latestRelease.size }} {{ $t('common.songs') }}
-            </div>
-          </div>
-        </div>
-        <div v-show="latestMV.id" class="container latest-mv">
-          <div class="cover" @mouseover="mvHover = true" @mouseleave="mvHover = false" @click="goToMv(latestMV.id)">
-            <img :src="latestMV.coverUrl" loading="lazy" />
-            <transition name="fade">
-              <div v-show="mvHover" class="shadow" :style="{
-                background: 'url(' + latestMV.coverUrl + ')',
-              }"></div>
-            </transition>
-          </div>
-          <div class="info">
-            <div class="name">
-              <router-link :to="'/mv/' + latestMV.id">{{
-                latestMV.name
-                }}</router-link>
-            </div>
-            <div class="date">
-              {{ formatDate(latestMV.publishTime) }}
-            </div>
-            <div class="type">{{ $t('artist.latestMV') }}</div>
-          </div>
-        </div>
-        <div v-show="!latestMV.id"></div>
-      </div>
-    </div>
-    <div id="popularTracks" class="popular-tracks">
-      <div class="section-title">{{ $t('artist.popularSongs') }}</div>
-      <TrackList :tracks="popularTracks.slice(0, showMorePopTracks ? 24 : 12)" :type="'tracklist'" />
+	<div v-show="show" class="artist-page">
+		<div class="artist-info">
+			<div class="head">
+				<img :src="resizeImage(artist.img1v1Url, 1024)" loading="lazy" />
+			</div>
+			<div>
+				<div class="name">{{ artist.name }}</div>
+				<div class="artist">{{ $t("artist.artist") }}</div>
+				<div class="statistics">
+					<a @click="scrollTo('popularTracks')">{{ artist.musicSize }} {{ $t("common.songs") }}</a>
+					·
+					<a @click="scrollTo('seeMore', 'start')"
+						>{{ artist.albumSize }} {{ $t("artist.withAlbums") }}</a
+					>
+					·
+					<a @click="scrollTo('mvs')">{{ artist.mvSize }} {{ $t("artist.videos") }}</a>
+				</div>
 
-      <div id="seeMore" class="show-more">
-        <button @click="showMorePopTracks = !showMorePopTracks">
-          <span v-show="!showMorePopTracks">{{ $t('artist.showMore') }}</span>
-          <span v-show="showMorePopTracks">{{ $t('artist.showLess') }}</span>
-        </button>
-      </div>
-    </div>
-    <div v-if="albums.length !== 0" id="albums" class="albums">
-      <div class="section-title">{{ $t('artist.albums') }}</div>
-      <CoverRow type="album" :items="albums" :sub-text="'releaseYear'" :show-play-button="true" />
-    </div>
-    <div v-if="mvs.length !== 0" id="mvs" class="mvs">
-      <div class="section-title">MVs
-        <router-link v-show="hasMoreMV" :to="`/artist/${artist.id}/mv`">{{
-          $t('home.seeMore')
-          }}</router-link>
-      </div>
-      <MvRow :mvs="mvs" subtitle="publishTime" :playing="player?.playing" />
-    </div>
-    <div v-if="eps.length !== 0" class="eps">
-      <div class="section-title">{{ $t('artist.EPsSingles') }}</div>
-      <CoverRow type="album" :items="eps" :sub-text="'albumType+releaseYear'" :show-play-button="true" />
-    </div>
+				<Description :description="artist.briefDesc" :title="$t('artist.artistDesc')" />
+				<div class="buttons">
+					<ButtonTwoTone :icon="IconPlay" @click="playPopularSongs()">
+						{{ $t("common.play") }}
+					</ButtonTwoTone>
+					<ButtonTwoTone color="grey" @click="followArtist">
+						<span v-if="artist.followed">{{ $t("artist.following") }}</span>
+						<span v-else>{{ $t("artist.follow") }}</span>
+					</ButtonTwoTone>
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<ButtonTwoTone :icon="IconMore" color="grey" />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<DropdownMenuItem @click="copyUrl(artist.id)">{{
+								$t("contextMenu.copyUrl")
+							}}</DropdownMenuItem>
+							<DropdownMenuItem @click="openInBrowser(artist.id)">{{
+								$t("contextMenu.openInBrowser")
+							}}</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			</div>
+		</div>
+		<div v-if="latestRelease !== undefined" class="latest-release">
+			<div class="section-title">{{ $t("artist.latestRelease") }}</div>
+			<div class="release">
+				<div class="container">
+					<Cover
+						:id="latestRelease.id"
+						:image-url="resizeImage(latestRelease.picUrl)"
+						type="album"
+						:fixed-size="128"
+						:play-button-size="30"
+					/>
+					<div class="info">
+						<div class="name">
+							<router-link :to="`/album/${latestRelease.id}`">{{ latestRelease.name }}</router-link>
+						</div>
+						<div class="date">
+							{{ formatDate(latestRelease.publishTime) }}
+						</div>
+						<div class="type">
+							{{ formatAlbumType(latestRelease.type, latestRelease) }} · {{ latestRelease.size }}
+							{{ $t("common.songs") }}
+						</div>
+					</div>
+				</div>
+				<div v-show="latestMV.id" class="container latest-mv">
+					<div
+						class="cover"
+						@mouseover="mvHover = true"
+						@mouseleave="mvHover = false"
+						@click="goToMv(latestMV.id)"
+					>
+						<img :src="latestMV.coverUrl" loading="lazy" />
+						<transition name="fade">
+							<div
+								v-show="mvHover"
+								class="shadow"
+								:style="{
+									background: 'url(' + latestMV.coverUrl + ')',
+								}"
+							></div>
+						</transition>
+					</div>
+					<div class="info">
+						<div class="name">
+							<router-link :to="'/mv/' + latestMV.id">{{ latestMV.name }}</router-link>
+						</div>
+						<div class="date">
+							{{ formatDate(latestMV.publishTime) }}
+						</div>
+						<div class="type">{{ $t("artist.latestMV") }}</div>
+					</div>
+				</div>
+				<div v-show="!latestMV.id"></div>
+			</div>
+		</div>
+		<div id="popularTracks" class="popular-tracks">
+			<div class="section-title">{{ $t("artist.popularSongs") }}</div>
+			<TrackList
+				:tracks="popularTracks.slice(0, showMorePopTracks ? 24 : 12)"
+				:type="'tracklist'"
+			/>
 
-    <div v-if="similarArtists.length !== 0" class="similar-artists">
-      <div class="section-title">{{ $t('artist.similarArtists') }}</div>
-      <CoverRow type="artist" :column-number="6" gap="36px 28px" :items="similarArtists.slice(0, 12)" />
-    </div>
+			<div id="seeMore" class="show-more">
+				<button @click="showMorePopTracks = !showMorePopTracks">
+					<span v-show="!showMorePopTracks">{{ $t("artist.showMore") }}</span>
+					<span v-show="showMorePopTracks">{{ $t("artist.showLess") }}</span>
+				</button>
+			</div>
+		</div>
+		<div v-if="albums.length !== 0" id="albums" class="albums">
+			<div class="section-title">{{ $t("artist.albums") }}</div>
+			<CoverRow type="album" :items="albums" :sub-text="'releaseYear'" :show-play-button="true" />
+		</div>
+		<div v-if="mvs.length !== 0" id="mvs" class="mvs">
+			<div class="section-title">
+				MVs
+				<router-link v-show="hasMoreMV" :to="`/artist/${artist.id}/mv`">{{
+					$t("home.seeMore")
+				}}</router-link>
+			</div>
+			<MvRow :mvs="mvs" subtitle="publishTime" :playing="player?.playing" />
+		</div>
+		<div v-if="eps.length !== 0" class="eps">
+			<div class="section-title">{{ $t("artist.EPsSingles") }}</div>
+			<CoverRow
+				type="album"
+				:items="eps"
+				:sub-text="'albumType+releaseYear'"
+				:show-play-button="true"
+			/>
+		</div>
 
-
-
-
-  </div>
+		<div v-if="similarArtists.length !== 0" class="similar-artists">
+			<div class="section-title">{{ $t("artist.similarArtists") }}</div>
+			<CoverRow
+				type="artist"
+				:column-number="6"
+				gap="36px 28px"
+				:items="similarArtists.slice(0, 12)"
+			/>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -149,6 +170,7 @@ import { toast } from "vue-sonner";
 import { ref, computed, onActivated } from "vue";
 import { useRoute, useRouter, onBeforeRouteUpdate } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { IconMore, IconPlay } from "@/components/icon";
 
 const route = useRoute();
 const router = useRouter();
@@ -284,180 +306,179 @@ function openInBrowser(id: string) {
 
 <style lang="scss" scoped>
 .artist-page {
-  margin-top: 32px;
+	margin-top: 32px;
 }
 
 .artist-info {
-  display: flex;
-  align-items: center;
-  margin-bottom: 26px;
-  color: var(--color-text);
+	display: flex;
+	align-items: center;
+	margin-bottom: 26px;
+	color: var(--color-text);
 
-  img {
-    height: 248px;
-    width: 248px;
-    border-radius: 50%;
-    margin-right: 56px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 16px -8px;
-  }
+	img {
+		height: 248px;
+		width: 248px;
+		border-radius: 50%;
+		margin-right: 56px;
+		box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 16px -8px;
+	}
 
-  .name {
-    font-size: 56px;
-    font-weight: 700;
-  }
+	.name {
+		font-size: 56px;
+		font-weight: 700;
+	}
 
-  .artist {
-    font-size: 18px;
-    opacity: 0.88;
-    margin-top: 24px;
-  }
+	.artist {
+		font-size: 18px;
+		opacity: 0.88;
+		margin-top: 24px;
+	}
 
-  .statistics {
-    font-size: 14px;
-    opacity: 0.68;
-    margin-top: 2px;
-  }
+	.statistics {
+		font-size: 14px;
+		opacity: 0.68;
+		margin-top: 2px;
+	}
 
-  .buttons {
-    margin-top: 26px;
-    display: flex;
+	.buttons {
+		margin-top: 26px;
+		display: flex;
 
-    .shuffle {
-      padding: 8px 11px;
+		.shuffle {
+			padding: 8px 11px;
 
-      .svg-icon {
-        margin: 0;
-      }
-    }
-  }
+			.svg-icon {
+				margin: 0;
+			}
+		}
+	}
 }
 
 .section-title {
-  font-weight: 600;
-  font-size: 22px;
-  opacity: 0.88;
-  color: var(--color-text);
-  margin-bottom: 16px;
-  padding-top: 46px;
+	font-weight: 600;
+	font-size: 22px;
+	opacity: 0.88;
+	color: var(--color-text);
+	margin-bottom: 16px;
+	padding-top: 46px;
 
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
 
-  a {
-    font-size: 13px;
-    font-weight: 600;
-    opacity: 0.68;
-  }
+	a {
+		font-size: 13px;
+		font-weight: 600;
+		opacity: 0.68;
+	}
 }
 
 .latest-release {
-  color: var(--color-text);
+	color: var(--color-text);
 
-  .release {
-    display: flex;
-  }
+	.release {
+		display: flex;
+	}
 
-  .container {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    border-radius: 12px;
-  }
+	.container {
+		display: flex;
+		flex: 1;
+		align-items: center;
+		border-radius: 12px;
+	}
 
-  img {
-    height: 96px;
-    border-radius: 8px;
-  }
+	img {
+		height: 96px;
+		border-radius: 8px;
+	}
 
-  .info {
-    margin-left: 24px;
-  }
+	.info {
+		margin-left: 24px;
+	}
 
-  .name {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
+	.name {
+		font-size: 18px;
+		font-weight: 600;
+		margin-bottom: 8px;
+	}
 
-  .date {
-    font-size: 14px;
-    opacity: 0.78;
-  }
+	.date {
+		font-size: 14px;
+		opacity: 0.78;
+	}
 
-  .type {
-    margin-top: 2px;
-    font-size: 12px;
-    opacity: 0.68;
-  }
+	.type {
+		margin-top: 2px;
+		font-size: 12px;
+		opacity: 0.68;
+	}
 }
 
 .popular-tracks {
-  .show-more {
-    display: flex;
+	.show-more {
+		display: flex;
 
-    button {
-      padding: 4px 8px;
-      margin-top: 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      opacity: 0.78;
-      color: var(--color-secondary);
-      font-weight: 600;
+		button {
+			padding: 4px 8px;
+			margin-top: 8px;
+			border-radius: 6px;
+			font-size: 12px;
+			opacity: 0.78;
+			color: var(--color-secondary);
+			font-weight: 600;
 
-      &:hover {
-        opacity: 1;
-      }
-    }
-  }
+			&:hover {
+				opacity: 1;
+			}
+		}
+	}
 }
 
 .similar-artists {
-  .section-title {
-    margin-bottom: 24px;
-  }
+	.section-title {
+		margin-bottom: 24px;
+	}
 }
 
 .latest-mv {
-  .cover {
-    position: relative;
-    transition: transform 0.3s;
+	.cover {
+		position: relative;
+		transition: transform 0.3s;
 
-    &:hover {
-      cursor: pointer;
-    }
-  }
+		&:hover {
+			cursor: pointer;
+		}
+	}
 
-  img {
-    border-radius: 0.75em;
-    height: 128px;
-    object-fit: cover;
-    user-select: none;
-  }
+	img {
+		border-radius: 0.75em;
+		height: 128px;
+		object-fit: cover;
+		user-select: none;
+	}
 
-  .shadow {
-    position: absolute;
-    top: 6px;
-    height: 100%;
-    width: 100%;
-    filter: blur(16px) opacity(0.4);
-    transform: scale(0.9, 0.9);
-    z-index: -1;
-    background-size: cover;
-    border-radius: 0.75em;
-  }
+	.shadow {
+		position: absolute;
+		top: 6px;
+		height: 100%;
+		width: 100%;
+		filter: blur(16px) opacity(0.4);
+		transform: scale(0.9, 0.9);
+		z-index: -1;
+		background-size: cover;
+		border-radius: 0.75em;
+	}
 
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.3s;
-  }
+	.fade-enter-active,
+	.fade-leave-active {
+		transition: opacity 0.3s;
+	}
 
-  .fade-enter-from,
+	.fade-enter-from,
   .fade-leave-to
 
-  /* .fade-leave-active below version 2.1.8 */
-    {
-    opacity: 0;
-  }
+  /* .fade-leave-active below version 2.1.8 */ {
+		opacity: 0;
+	}
 }
 </style>

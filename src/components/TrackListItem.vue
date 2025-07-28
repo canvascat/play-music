@@ -164,7 +164,7 @@ const isLiked = computed((): boolean => {
 });
 
 const isPlaying = computed((): boolean => {
-	return player.currentTrack.id === track.value?.id;
+	return player.currentTrack?.id === track.value?.id;
 });
 
 const focus = computed((): boolean => {

@@ -1,33 +1,31 @@
 <template>
-  <div v-show="show" class="search">
-    <h1>
-      <span>{{ $t('search.searchFor') }} {{ typeNameTable[type] }}</span> "{{
-        keywords
-      }}"
-    </h1>
+	<div v-show="show" class="search">
+		<h1>
+			<span>{{ $t("search.searchFor") }} {{ typeNameTable[type] }}</span> "{{ keywords }}"
+		</h1>
 
-    <div v-if="type === 'artists'">
-      <CoverRow type="artist" :items="result" :column-number="6" />
-    </div>
-    <div v-if="type === 'albums'">
-      <CoverRow type="album" :items="result" sub-text="artist" sub-text-font-size="14px" />
-    </div>
-    <div v-if="type === 'tracks'">
-      <TrackList :tracks="result" type="playlist" dbclick-track-func="playAList" />
-    </div>
-    <div v-if="type === 'musicVideos'">
-      <MvRow :mvs="result" />
-    </div>
-    <div v-if="type === 'playlists'">
-      <CoverRow type="playlist" :items="result" sub-text="title" />
-    </div>
+		<div v-if="type === 'artists'">
+			<CoverRow type="artist" :items="result" :column-number="6" />
+		</div>
+		<div v-if="type === 'albums'">
+			<CoverRow type="album" :items="result" sub-text="artist" sub-text-font-size="14px" />
+		</div>
+		<div v-if="type === 'tracks'">
+			<TrackList :tracks="result" type="playlist" dbclick-track-func="playAList" />
+		</div>
+		<div v-if="type === 'musicVideos'">
+			<MvRow :mvs="result" />
+		</div>
+		<div v-if="type === 'playlists'">
+			<CoverRow type="playlist" :items="result" sub-text="title" />
+		</div>
 
-    <div class="load-more">
-      <ButtonTwoTone v-show="hasMore" color="grey" v-on:click="fetchData">{{
-        $t('explore.loadMore')
-        }}</ButtonTwoTone>
-    </div>
-  </div>
+		<div class="load-more">
+			<ButtonTwoTone v-show="hasMore" color="grey" @click="fetchData">
+				{{ $t("explore.loadMore") }}
+			</ButtonTwoTone>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -124,25 +122,25 @@ function getTracksDetail() {
 
 <style lang="scss" scoped>
 h1 {
-  margin-top: 32px;
-  margin-bottom: 28px;
-  color: var(--color-text);
+	margin-top: 32px;
+	margin-bottom: 28px;
+	color: var(--color-text);
 
-  span {
-    opacity: 0.58;
-  }
+	span {
+		opacity: 0.58;
+	}
 }
 
 .load-more {
-  display: flex;
-  justify-content: center;
-  margin-top: 32px;
+	display: flex;
+	justify-content: center;
+	margin-top: 32px;
 }
 
 .button.more {
-  .svg-icon {
-    height: 24px;
-    width: 24px;
-  }
+	.svg-icon {
+		height: 24px;
+		width: 24px;
+	}
 }
 </style>

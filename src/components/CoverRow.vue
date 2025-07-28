@@ -1,38 +1,29 @@
 <template>
-  <div :class="cn('grid grid-cols-5 gap-x-11 gap-y-6', props.class)" :style="rowStyles">
-    <div
-      v-for="item in items"
-      :key="item.id"
-      class="item"
-      :class="{ artist: type === 'artist' }"
-    >
-      <Cover
-        :id="item.id"
-        :image-url="getImageUrl(item)"
-        :type="type"
-        :play-button-size="type === 'artist' ? 26 : playButtonSize"
-      />
-      <div class="text">
-        <div v-if="showPlayCount" class="info">
-          <span class="play-count"
-            ><svg-icon icon-class="play" />{{ formatPlayCount(item.playCount) }}
-          </span>
-        </div>
-        <div class="title" :style="{ fontSize: subTextFontSize }">
-          <span v-if="isExplicit(item)" class="explicit-symbol"
-            ><ExplicitSymbol
-          /></span>
-          <span v-if="isPrivacy(item)" class="lock-icon">
-            <svg-icon icon-class="lock"
-          /></span>
-          <router-link :to="getTitleLink(item)">{{ item.name }}</router-link>
-        </div>
-        <div v-if="type !== 'artist' && subText !== 'none'" class="info">
-          <span v-html="getSubText(item)"></span>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div :class="cn('grid grid-cols-5 gap-x-11 gap-y-6', props.class)" :style="rowStyles">
+		<div v-for="item in items" :key="item.id" class="item" :class="{ artist: type === 'artist' }">
+			<Cover
+				:id="item.id"
+				:image-url="getImageUrl(item)"
+				:type="type"
+				:play-button-size="type === 'artist' ? 26 : playButtonSize"
+			/>
+			<div class="text">
+				<div v-if="showPlayCount" class="info">
+					<span class="play-count"><IconPlay />{{ formatPlayCount(item.playCount) }} </span>
+				</div>
+				<div class="title" :style="{ fontSize: subTextFontSize }">
+					<span v-if="isExplicit(item)" class="explicit-symbol"><ExplicitSymbol /></span>
+					<span v-if="isPrivacy(item)" class="lock-icon">
+						<IconLock />
+					</span>
+					<router-link :to="getTitleLink(item)">{{ item.name }}</router-link>
+				</div>
+				<div v-if="type !== 'artist' && subText !== 'none'" class="info">
+					<span v-html="getSubText(item)"></span>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -42,6 +33,7 @@ import Cover from "@/components/Cover.vue";
 import ExplicitSymbol from "@/components/ExplicitSymbol.vue";
 import { formatPlayCount } from "@/utils/filters";
 import { cn } from "@/lib/utils";
+import { IconLock, IconPlay } from "@/components/icon";
 
 // 定义接口
 interface Artist {
@@ -159,79 +151,79 @@ const getImageUrl = (item: CoverRowItem): string => {
 
 <style lang="scss" scoped>
 .item {
-  color: var(--color-text);
-  .text {
-    margin-top: 8px;
-    .title {
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 20px;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      word-break: break-all;
-    }
-    .info {
-      font-size: 12px;
-      opacity: 0.68;
-      line-height: 18px;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      word-break: break-word;
-    }
-  }
+	color: var(--color-text);
+	.text {
+		margin-top: 8px;
+		.title {
+			font-size: 16px;
+			font-weight: 600;
+			line-height: 20px;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
+			word-break: break-all;
+		}
+		.info {
+			font-size: 12px;
+			opacity: 0.68;
+			line-height: 18px;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
+			word-break: break-word;
+		}
+	}
 }
 
 .item.artist {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  .cover {
-    display: flex;
-  }
-  .title {
-    margin-top: 4px;
-  }
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	.cover {
+		display: flex;
+	}
+	.title {
+		margin-top: 4px;
+	}
 }
 
 @media (max-width: 834px) {
-  .item .text .title {
-    font-size: 14px;
-  }
+	.item .text .title {
+		font-size: 14px;
+	}
 }
 
 .explicit-symbol {
-  opacity: 0.28;
-  color: var(--color-text);
-  float: right;
-  .svg-icon {
-    margin-bottom: -3px;
-  }
+	opacity: 0.28;
+	color: var(--color-text);
+	float: right;
+	.svg-icon {
+		margin-bottom: -3px;
+	}
 }
 
 .lock-icon {
-  opacity: 0.28;
-  color: var(--color-text);
-  margin-right: 4px;
-  // float: right;
-  .svg-icon {
-    height: 12px;
-    width: 12px;
-  }
+	opacity: 0.28;
+	color: var(--color-text);
+	margin-right: 4px;
+	// float: right;
+	.svg-icon {
+		height: 12px;
+		width: 12px;
+	}
 }
 
 .play-count {
-  font-weight: 600;
-  opacity: 0.58;
-  color: var(--color-text);
-  font-size: 12px;
-  .svg-icon {
-    margin-right: 3px;
-    height: 8px;
-    width: 8px;
-  }
+	font-weight: 600;
+	opacity: 0.58;
+	color: var(--color-text);
+	font-size: 12px;
+	.svg-icon {
+		margin-right: 3px;
+		height: 8px;
+		width: 8px;
+	}
 }
 </style>

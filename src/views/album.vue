@@ -1,99 +1,107 @@
 <template>
-  <div v-show="show" class="album-page">
-    <div class="playlist-info">
-      <Cover :id="album.id" :image-url="resizeImage(album.picUrl, 1024)" :show-play-button="true"
-        :always-show-shadow="true" :click-cover-to-play="true" :fixed-size="288" type="album" :cover-hover="false"
-        :play-button-size="18" />
-      <div class="info">
-        <div class="title"> {{ title }}</div>
-        <div v-if="subtitle !== ''" class="subtitle">{{
-          subtitle
-          }}</div>
-        <div class="artist">
-          <span v-if="album.artist.id !== 104700">
-            <span>{{ formatAlbumType(album.type, album) }} by </span><router-link :to="`/artist/${album.artist.id}`">{{
-              album.artist.name
-              }}</router-link></span>
-          <span v-else>Compilation by Various Artists</span>
-        </div>
-        <div class="date-and-count">
-          <span v-if="(album.mark & 1048576) === 1048576" class="explicit-symbol">
-            <ExplicitSymbol />
-          </span>
-          <span :title="formatDate(album.publishTime)">{{
-            new Date(album.publishTime).getFullYear()
-            }}</span>
-          <span> · {{ album.size }} {{ $t('common.songs') }}</span>,
-          {{ formatTime(albumTime, 'Human') }}
-        </div>
+	<div v-show="show" class="album-page">
+		<div class="playlist-info">
+			<Cover
+				:id="album.id"
+				:image-url="resizeImage(album.picUrl, 1024)"
+				:show-play-button="true"
+				:always-show-shadow="true"
+				:click-cover-to-play="true"
+				:fixed-size="288"
+				type="album"
+				:cover-hover="false"
+				:play-button-size="18"
+			/>
+			<div class="info">
+				<div class="title">{{ title }}</div>
+				<div v-if="subtitle !== ''" class="subtitle">{{ subtitle }}</div>
+				<div class="artist">
+					<span v-if="album.artist.id !== 104700">
+						<span>{{ formatAlbumType(album.type, album) }} by </span
+						><router-link :to="`/artist/${album.artist.id}`">{{
+							album.artist.name
+						}}</router-link></span
+					>
+					<span v-else>Compilation by Various Artists</span>
+				</div>
+				<div class="date-and-count">
+					<span v-if="(album.mark & 1048576) === 1048576" class="explicit-symbol">
+						<ExplicitSymbol />
+					</span>
+					<span :title="formatDate(album.publishTime)">{{
+						new Date(album.publishTime).getFullYear()
+					}}</span>
+					<span> · {{ album.size }} {{ $t("common.songs") }}</span
+					>,
+					{{ formatTime(albumTime, "Human") }}
+				</div>
 
-        <Description :description="album.description" :title="$t('album.albumDesc')" />
+				<Description :description="album.description" :title="$t('album.albumDesc')" />
 
-        <div class="buttons" style="margin-top: 32px">
-          <ButtonTwoTone icon-class="play" @click="playAlbumByID(album.id)">
-            {{ $t('common.play') }}
-          </ButtonTwoTone>
-          <ButtonTwoTone :icon-class="dynamicDetail.isSub ? 'heart-solid' : 'heart'" :icon-button="true"
-            :horizontal-padding="0" :color="dynamicDetail.isSub ? 'blue' : 'grey'"
-            :text-color="dynamicDetail.isSub ? '#335eea' : ''" :background-color="dynamicDetail.isSub ? 'var(--color-secondary-bg)' : ''
-              " v-on:click="likeAlbum">
-          </ButtonTwoTone>
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <ButtonTwoTone icon-class="more" :icon-button="true" :horizontal-padding="0" color="grey">
-              </ButtonTwoTone>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem @click="likeAlbum(true)">
-                {{ dynamicDetail.isSub
-                  ? $t('contextMenu.removeFromLibrary')
-                  : $t('contextMenu.saveToLibrary') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                {{ $t('contextMenu.addToPlaylist') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="copyUrl(album.id)">
-                {{ $t('contextMenu.copyUrl') }}
-              </DropdownMenuItem>
-              <DropdownMenuItem @click="openInBrowser(album.id)">
-                {{ $t('contextMenu.openInBrowser') }}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-        </div>
-      </div>
-    </div>
-    <div v-if="tracksByDisc.length > 1">
-      <div v-for="item in tracksByDisc" :key="item.disc">
-        <h2 class="disc">Disc {{ item.disc }}</h2>
-        <TrackList :id="album.id" :tracks="item.tracks" :type="'album'" :album-object="album" />
-      </div>
-    </div>
-    <div v-else>
-      <TrackList :id="album.id" :tracks="tracks" :type="'album'" :album-object="album" />
-    </div>
-    <div class="extra-info">
-      <div class="album-time"></div>
-      <div class="release-date">
-        {{ $t('album.released') }}
-        {{ formatDate(album.publishTime, 'MMMM D, YYYY') }}
-      </div>
-      <div v-if="album.company" class="copyright"> © {{ album.company }} </div>
-    </div>
-    <div v-if="filteredMoreAlbums.length !== 0" class="more-by">
-      <div class="section-title">
-        More by
-        <router-link :to="`/artist/${album.artist.id}`">{{ album.artist.name }}
-        </router-link>
-      </div>
-      <div>
-        <CoverRow type="album" :items="filteredMoreAlbums" sub-text="albumType+releaseYear" />
-      </div>
-    </div>
-
-
-  </div>
+				<div class="buttons" style="margin-top: 32px">
+					<ButtonTwoTone @click="playAlbumByID(album.id)" :icon="IconPlay">
+						{{ $t("common.play") }}
+					</ButtonTwoTone>
+					<ButtonTwoTone
+						:icon="dynamicDetail.isSub ? IconHeartSolid : IconHeart"
+						:color="dynamicDetail.isSub ? 'blue' : 'grey'"
+						:text-color="dynamicDetail.isSub ? '#335eea' : ''"
+						:background-color="dynamicDetail.isSub ? 'var(--color-secondary-bg)' : ''"
+						v-on:click="likeAlbum"
+					/>
+					<DropdownMenu>
+						<DropdownMenuTrigger as-child>
+							<ButtonTwoTone :icon="IconMore" color="grey" />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent>
+							<DropdownMenuItem @click="likeAlbum(true)">
+								{{
+									dynamicDetail.isSub
+										? $t("contextMenu.removeFromLibrary")
+										: $t("contextMenu.saveToLibrary")
+								}}
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								{{ $t("contextMenu.addToPlaylist") }}
+							</DropdownMenuItem>
+							<DropdownMenuItem @click="copyUrl(album.id)">
+								{{ $t("contextMenu.copyUrl") }}
+							</DropdownMenuItem>
+							<DropdownMenuItem @click="openInBrowser(album.id)">
+								{{ $t("contextMenu.openInBrowser") }}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+			</div>
+		</div>
+		<div v-if="tracksByDisc.length > 1">
+			<div v-for="item in tracksByDisc" :key="item.disc">
+				<h2 class="disc">Disc {{ item.disc }}</h2>
+				<TrackList :id="album.id" :tracks="item.tracks" :type="'album'" :album-object="album" />
+			</div>
+		</div>
+		<div v-else>
+			<TrackList :id="album.id" :tracks="tracks" :type="'album'" :album-object="album" />
+		</div>
+		<div class="extra-info">
+			<div class="album-time"></div>
+			<div class="release-date">
+				{{ $t("album.released") }}
+				{{ formatDate(album.publishTime, "MMMM D, YYYY") }}
+			</div>
+			<div v-if="album.company" class="copyright">© {{ album.company }}</div>
+		</div>
+		<div v-if="filteredMoreAlbums.length !== 0" class="more-by">
+			<div class="section-title">
+				More by
+				<router-link :to="`/artist/${album.artist.id}`">{{ album.artist.name }} </router-link>
+			</div>
+			<div>
+				<CoverRow type="album" :items="filteredMoreAlbums" sub-text="albumType+releaseYear" />
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -122,6 +130,7 @@ import { copyText } from "@/utils/copy.ts";
 import { toast } from "vue-sonner";
 import { computed, ref, toValue, shallowRef } from "vue";
 import { onBeforeRouteUpdate, useRouter } from "vue-router";
+import { IconHeart, IconHeartSolid, IconMore, IconPlay } from "@/components/icon";
 
 const { t } = useI18n();
 
@@ -293,123 +302,123 @@ function openInBrowser(id: number | string) {
 
 <style lang="scss" scoped>
 .album-page {
-  margin-top: 32px;
+	margin-top: 32px;
 }
 
 .playlist-info {
-  display: flex;
-  width: 78vw;
-  margin-bottom: 72px;
+	display: flex;
+	width: 78vw;
+	margin-bottom: 72px;
 
-  .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex: 1;
-    margin-left: 56px;
-    color: var(--color-text);
+	.info {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex: 1;
+		margin-left: 56px;
+		color: var(--color-text);
 
-    .title {
-      font-size: 56px;
-      font-weight: 700;
-    }
+		.title {
+			font-size: 56px;
+			font-weight: 700;
+		}
 
-    .subtitle {
-      font-size: 22px;
-      font-weight: 600;
-    }
+		.subtitle {
+			font-size: 22px;
+			font-weight: 600;
+		}
 
-    .artist {
-      font-size: 18px;
-      opacity: 0.88;
-      margin-top: 24px;
+		.artist {
+			font-size: 18px;
+			opacity: 0.88;
+			margin-top: 24px;
 
-      a {
-        font-weight: 600;
-      }
-    }
+			a {
+				font-weight: 600;
+			}
+		}
 
-    .date-and-count {
-      font-size: 14px;
-      opacity: 0.68;
-      margin-top: 2px;
-    }
+		.date-and-count {
+			font-size: 14px;
+			opacity: 0.68;
+			margin-top: 2px;
+		}
 
-    .description {
-      user-select: none;
-      font-size: 14px;
-      opacity: 0.68;
-      margin-top: 24px;
-      cursor: pointer;
-      white-space: pre-line;
+		.description {
+			user-select: none;
+			font-size: 14px;
+			opacity: 0.68;
+			margin-top: 24px;
+			cursor: pointer;
+			white-space: pre-line;
 
-      &:hover {
-        transition: opacity 0.3s;
-        opacity: 0.88;
-      }
-    }
+			&:hover {
+				transition: opacity 0.3s;
+				opacity: 0.88;
+			}
+		}
 
-    .buttons {
-      margin-top: 32px;
-      display: flex;
+		.buttons {
+			margin-top: 32px;
+			display: flex;
 
-      button {
-        margin-right: 16px;
-      }
-    }
-  }
+			button {
+				margin-right: 16px;
+			}
+		}
+	}
 }
 
 .disc {
-  color: var(--color-text);
+	color: var(--color-text);
 }
 
 .explicit-symbol {
-  opacity: 0.28;
-  color: var(--color-text);
-  margin-right: 4px;
+	opacity: 0.28;
+	color: var(--color-text);
+	margin-right: 4px;
 
-  .svg-icon {
-    margin-bottom: -3px;
-  }
+	.svg-icon {
+		margin-bottom: -3px;
+	}
 }
 
 .extra-info {
-  margin-top: 36px;
-  margin-bottom: 36px;
-  font-size: 12px;
-  opacity: 0.48;
-  color: var(--color-text);
+	margin-top: 36px;
+	margin-bottom: 36px;
+	font-size: 12px;
+	opacity: 0.48;
+	color: var(--color-text);
 
-  div {
-    margin-bottom: 4px;
-  }
+	div {
+		margin-bottom: 4px;
+	}
 
-  .album-time {
-    opacity: 0.68;
-  }
+	.album-time {
+		opacity: 0.68;
+	}
 }
 
 .more-by {
-  border-top: 1px solid rgba(128, 128, 128, 0.18);
+	border-top: 1px solid rgba(128, 128, 128, 0.18);
 
-  padding-top: 22px;
+	padding-top: 22px;
 
-  .section-title {
-    font-size: 22px;
-    font-weight: 600;
-    opacity: 0.88;
-    color: var(--color-text);
-    margin-bottom: 20px;
-  }
+	.section-title {
+		font-size: 22px;
+		font-weight: 600;
+		opacity: 0.88;
+		color: var(--color-text);
+		margin-bottom: 20px;
+	}
 }
 
 .description-fulltext {
-  font-size: 16px;
-  margin-top: 24px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: pre-line;
+	font-size: 16px;
+	margin-top: 24px;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	white-space: pre-line;
 }
 </style>

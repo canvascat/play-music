@@ -34,7 +34,6 @@ NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
 
 const app = createApp(App);
 
-app.component("svg-icon", SvgIcon);
 app.use(pinia);
 const store = useStore();
 

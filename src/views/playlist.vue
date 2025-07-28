@@ -45,29 +45,20 @@
 					title="歌单介绍"
 				/>
 				<div class="buttons">
-					<ButtonTwoTone icon-class="play" v-on:click="playPlaylistByID()">
+					<ButtonTwoTone :icon="IconPlay" v-on:click="playPlaylistByID()">
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
 					<ButtonTwoTone
 						v-if="playlist.creator.userId !== data.user.userId"
-						:icon-class="playlist.subscribed ? 'heart-solid' : 'heart'"
-						:icon-button="true"
-						:horizontal-padding="0"
+						:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
 						:color="playlist.subscribed ? 'blue' : 'grey'"
 						:text-color="playlist.subscribed ? '#335eea' : ''"
 						:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
 						v-on:click="likePlaylist"
-					>
-					</ButtonTwoTone>
+					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>
-							<ButtonTwoTone
-								icon-class="more"
-								:icon-button="true"
-								:horizontal-padding="0"
-								color="grey"
-							>
-							</ButtonTwoTone>
+							<ButtonTwoTone :icon="IconMore" color="grey" />
 						</DropdownMenuTrigger>
 						<DropdownMenuContent>
 							<DropdownMenuItem @click="likePlaylist(true)">{{
@@ -116,7 +107,7 @@
 			<div class="buttons">
 				<ButtonTwoTone
 					class="play-button"
-					icon-class="play"
+					:icon="IconPlay"
 					color="grey"
 					v-on:click="playPlaylistByID()"
 				>
@@ -124,25 +115,16 @@
 				</ButtonTwoTone>
 				<ButtonTwoTone
 					v-if="playlist.creator.userId !== data.user.userId"
-					:icon-class="playlist.subscribed ? 'heart-solid' : 'heart'"
-					:icon-button="true"
-					:horizontal-padding="0"
+					:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
 					:color="playlist.subscribed ? 'blue' : 'grey'"
 					:text-color="playlist.subscribed ? '#335eea' : ''"
 					:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
 					v-on:click="likePlaylist"
-				>
-				</ButtonTwoTone>
+				/>
 
 				<DropdownMenu>
 					<DropdownMenuTrigger as-child>
-						<ButtonTwoTone
-							icon-class="more"
-							:icon-button="true"
-							:horizontal-padding="0"
-							color="grey"
-						>
-						</ButtonTwoTone>
+						<ButtonTwoTone :icon="IconMore" color="grey" />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent>
 						<DropdownMenuItem @click="likePlaylist(true)">{{
@@ -200,13 +182,9 @@
 		/>
 
 		<div class="load-more">
-			<ButtonTwoTone
-				v-show="hasMore"
-				color="grey"
-				:loading="loadingMore"
-				v-on:click="loadMore(100)"
-				>{{ $t("explore.loadMore") }}</ButtonTwoTone
-			>
+			<ButtonTwoTone v-show="hasMore" color="grey" :loading="loadingMore" @click="loadMore(100)">
+				{{ $t("explore.loadMore") }}
+			</ButtonTwoTone>
 		</div>
 	</div>
 </template>
@@ -234,7 +212,14 @@ import type { Playlist } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { formatDate, resizeImage } from "@/utils/filters";
 import nativeAlert from "@/utils/nativeAlert";
-import { IconSearch, IconLock } from "@/components/icon";
+import {
+	IconSearch,
+	IconLock,
+	IconPlay,
+	IconHeartSolid,
+	IconHeart,
+	IconMore,
+} from "@/components/icon";
 
 const { player, data } = useStore();
 const route = useRoute();
