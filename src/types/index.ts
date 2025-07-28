@@ -277,30 +277,30 @@ export interface PlaylistSource {
 export interface Settings {
 	lang: string;
 	appearance: "auto" | "light" | "dark";
-	musicQuality: "standard" | "higher" | "exhigh" | "lossless" | "flac" | "hires";
+	musicQuality: string; // "standard" | "higher" | "exhigh" | "lossless" | "flac" | "hires";
 	lyricFontSize: number;
 	outputDevice: string;
-	showPlaylistsByAppleMusic: boolean;
-	enableUnblockNeteaseMusic: boolean;
-	unmSource: string[];
-	enableReversedMode: boolean;
-	nyancatStyle: boolean;
-	showLyricsTranslation: boolean;
-	lyricsBackground: boolean | "blur" | "dynamic";
-	closeAppOption: "ask" | "close" | "minimize";
-	enableDiscordRichPresence: boolean;
-	enableGlobalShortcut: boolean;
-	showLibraryDefault: boolean;
-	subTitleDefault: boolean;
-	linuxEnableCustomTitlebar: boolean;
-	enabledPlaylistCategories: string[];
-	proxyConfig: {
-		protocol: string;
-		server: string;
-		port: number;
+	showPlaylistsByAppleMusic?: boolean;
+	enableUnblockNeteaseMusic?: boolean;
+	unmSource?: string;
+	enableReversedMode?: boolean;
+	nyancatStyle?: boolean;
+	showLyricsTranslation?: boolean;
+	lyricsBackground?: boolean | "blur" | "dynamic";
+	closeAppOption?: "ask" | "close" | "minimize";
+	enableDiscordRichPresence?: boolean;
+	enableGlobalShortcut?: boolean;
+	showLibraryDefault?: boolean;
+	subTitleDefault?: boolean;
+	linuxEnableCustomTitlebar?: boolean;
+	enabledPlaylistCategories?: string[];
+	proxyConfig?: {
+		protocol?: string;
+		server?: string;
+		port?: number;
 	};
-	shortcuts: Record<string, string>;
-	deviceId: string;
+	shortcuts?: Record<string, string>;
+	deviceId?: string;
 	cacheLimit?: number;
 	// 新增的播放器相关设置
 	automaticallyCacheSongs?: boolean;
@@ -311,6 +311,10 @@ export interface Settings {
 	unmQQCookie?: string;
 	unmYtDlExe?: string;
 	enableOsdlyricsSupport?: boolean;
+	/** 音乐语言偏好 */
+	musicLanguage?: string;
+	enableRealIP?: boolean;
+	realIP?: string;
 }
 
 // 全局状态类型

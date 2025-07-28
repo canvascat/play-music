@@ -2,7 +2,7 @@ import { cloneDeep } from "es-toolkit";
 import { createPinia, defineStore } from "pinia";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
-import type { GlobalState } from "@/types";
+import type { GlobalState, Settings } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { changeAppearance } from "@/utils/common";
 import shortcuts from "@/utils/shortcuts";
@@ -28,7 +28,7 @@ export const useStore = defineStore("store", {
 		changeOutputDevice(deviceId: string) {
 			this.settings.outputDevice = deviceId;
 		},
-		updateSettings({ key, value }) {
+		updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
 			this.settings[key] = value;
 		},
 		updateData({ key, value }) {

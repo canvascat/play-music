@@ -113,6 +113,7 @@ import { useStore } from "@/store/pinia";
 import { setCookies } from "@/utils/auth";
 import nativeAlert from "@/utils/nativeAlert";
 import { IconMobile, IconMail, IconLock } from "@/components/icon";
+import { useTimeoutPoll } from "@vueuse/core";
 
 const route = useRoute();
 const router = useRouter();
@@ -212,61 +213,52 @@ function handleLoginResponse(data) {
 		nativeAlert(data.msg ?? data.message ?? "账号或密码错误，请检查");
 	}
 }
-function getQrCodeKey() {
-	return api.auth.loginQrCodeKey().then((result) => {
-		if (result.code === 200) {
-			qrCodeKey.value = result.data.unikey;
-			QRCode.toString(`https://music.163.com/login?codekey=${qrCodeKey.value}`, {
-				width: 192,
-				margin: 0,
-				color: {
-					dark: "#335eea",
-					light: "#00000000",
-				},
-				type: "svg",
-			})
-				.then((svg) => {
-					qrCodeSvg.value = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-				})
-				.catch((err) => {
-					console.error(err);
-				})
-				.finally(() => {
-					NProgress.done();
-				});
-		}
-		checkQrCodeLogin();
-	});
-}
-function checkQrCodeLogin() {
-	// 清除二维码检测
-	clearInterval(qrCodeCheckInterval);
-	qrCodeCheckInterval = setInterval(() => {
-		if (qrCodeKey.value === "") return;
-		api.auth.loginQrCodeCheck(qrCodeKey.value).then((result) => {
-			if (result.code === 800) {
-				getQrCodeKey(); // 重新生成QrCode
-				qrCodeInformation.value = "二维码已失效，请重新扫码";
-			} else if (result.code === 802) {
-				qrCodeInformation.value = "扫描成功，请在手机上确认登录";
-			} else if (result.code === 801) {
-				qrCodeInformation.value = "打开网易云音乐APP扫码登录";
-			} else if (result.code === 803) {
-				clearInterval(qrCodeCheckInterval);
-				qrCodeInformation.value = "登录成功，请稍等...";
-				result.code = 200;
-				result.cookie = result.cookie.replaceAll(" HTTPOnly", "");
-				handleLoginResponse(result);
-			}
+async function getQrCodeKey() {
+	const result = await api.auth.loginQrCodeKey();
+	if (result.code !== 200) return;
+	qrCodeKey.value = result.data.unikey;
+	try {
+		const svg = await QRCode.toString(`https://music.163.com/login?codekey=${qrCodeKey.value}`, {
+			width: 192,
+			margin: 0,
+			color: { dark: "#335eea", light: "#00000000" },
+			type: "svg",
 		});
-	}, 1000);
+
+		qrCodeSvg.value = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+
+		checkPoll.resume();
+	} finally {
+		NProgress.done();
+	}
 }
-function changeMode(mode) {
-	mode.value = mode;
-	if (mode === "qrCode") {
-		checkQrCodeLogin();
-	} else {
+async function checkQrCodeLogin() {
+	// 清除二维码检测
+	if (qrCodeKey.value === "") return;
+	const result = await api.auth.loginQrCodeCheck(qrCodeKey.value);
+	if (result.code === 800) {
+		// getQrCodeKey(); // 重新生成QrCode
+		qrCodeInformation.value = "二维码已失效，请重新扫码";
+	} else if (result.code === 802) {
+		qrCodeInformation.value = "扫描成功，请在手机上确认登录";
+	} else if (result.code === 801) {
+		qrCodeInformation.value = "打开网易云音乐APP扫码登录";
+	} else if (result.code === 803) {
 		clearInterval(qrCodeCheckInterval);
+		qrCodeInformation.value = "登录成功，请稍等...";
+		result.code = 200;
+		result.cookie = result.cookie.replaceAll(" HTTPOnly", "");
+		handleLoginResponse(result);
+	}
+}
+const checkPoll = useTimeoutPoll(checkQrCodeLogin, 1000, { immediate: false });
+
+function changeMode(nextMode: string) {
+	mode.value = nextMode;
+	if (nextMode === "qrCode") {
+		checkPoll.resume();
+	} else {
+		checkPoll.pause();
 	}
 }
 </script>

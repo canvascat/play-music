@@ -1,9 +1,11 @@
 /// <reference types="vite/client" />
 
-declare interface Window {
-	IS_ELECTRON: boolean;
-	ipcRenderer: any | null;
-	resetApp: () => string;
+declare global {
+	interface Window {
+		IS_ELECTRON: boolean;
+		ipcRenderer: any | null;
+		resetApp: () => string;
+	}
 }
 
 import "vue-router";

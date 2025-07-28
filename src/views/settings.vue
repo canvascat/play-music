@@ -28,7 +28,6 @@
 				<div class="right">
 					<select v-model="lang">
 						<option value="en">🇬🇧 English</option>
-						<option value="tr">🇹🇷 Türkçe</option>
 						<option value="zh-CN">🇨🇳 简体中文</option>
 						<option value="zh-TW">繁體中文</option>
 					</select>
@@ -728,7 +727,7 @@ const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
 const {
-	updateSettings,
+	updateSetting,
 	changeLang,
 	changeMusicQuality,
 	changeLyricFontSize,
@@ -798,10 +797,7 @@ const musicLanguage = computed({
 		return settings.musicLanguage ?? "all";
 	},
 	set(value) {
-		updateSettings({
-			key: "musicLanguage",
-			value,
-		});
+		updateSetting("musicLanguage", value);
 	},
 });
 
@@ -811,10 +807,7 @@ const appearance = computed({
 		return settings.appearance;
 	},
 	set(value) {
-		updateSettings({
-			key: "appearance",
-			value,
-		});
+		updateSetting("appearance", value);
 		changeAppearance(value);
 	},
 });
@@ -859,10 +852,7 @@ const enableUnblockNeteaseMusic = computed({
 		return value !== undefined ? value : true;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableUnblockNeteaseMusic",
-			value,
-		});
+		updateSetting("enableUnblockNeteaseMusic", value);
 	},
 });
 const showPlaylistsByAppleMusic = computed({
@@ -871,10 +861,7 @@ const showPlaylistsByAppleMusic = computed({
 		return settings.showPlaylistsByAppleMusic;
 	},
 	set(value) {
-		updateSettings({
-			key: "showPlaylistsByAppleMusic",
-			value,
-		});
+		updateSetting("showPlaylistsByAppleMusic", value);
 	},
 });
 const nyancatStyle = computed({
@@ -883,10 +870,7 @@ const nyancatStyle = computed({
 		return settings.nyancatStyle;
 	},
 	set(value) {
-		updateSettings({
-			key: "nyancatStyle",
-			value,
-		});
+		updateSetting("nyancatStyle", value);
 	},
 });
 const automaticallyCacheSongs = computed({
@@ -895,10 +879,7 @@ const automaticallyCacheSongs = computed({
 		return settings.automaticallyCacheSongs;
 	},
 	set(value) {
-		updateSettings({
-			key: "automaticallyCacheSongs",
-			value,
-		});
+		updateSetting("automaticallyCacheSongs", value);
 		if (value === false) {
 			clearCache();
 		}
@@ -909,10 +890,7 @@ const showLyricsTranslation = computed({
 		return settings.showLyricsTranslation;
 	},
 	set(value) {
-		updateSettings({
-			key: "showLyricsTranslation",
-			value,
-		});
+		updateSetting("showLyricsTranslation", value);
 	},
 });
 const lyricsBackground = computed({
@@ -920,10 +898,7 @@ const lyricsBackground = computed({
 		return settings.lyricsBackground || false;
 	},
 	set(value) {
-		updateSettings({
-			key: "lyricsBackground",
-			value,
-		});
+		updateSetting("lyricsBackground", value);
 	},
 });
 
@@ -932,10 +907,7 @@ const enableOsdlyricsSupport = computed({
 		return settings.enableOsdlyricsSupport;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableOsdlyricsSupport",
-			value,
-		});
+		updateSetting("enableOsdlyricsSupport", value);
 	},
 });
 const closeAppOption = computed({
@@ -943,10 +915,7 @@ const closeAppOption = computed({
 		return settings.closeAppOption;
 	},
 	set(value) {
-		updateSettings({
-			key: "closeAppOption",
-			value,
-		});
+		updateSetting("closeAppOption", value);
 	},
 });
 const enableDiscordRichPresence = computed({
@@ -954,10 +923,7 @@ const enableDiscordRichPresence = computed({
 		return settings.enableDiscordRichPresence;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableDiscordRichPresence",
-			value,
-		});
+		updateSetting("enableDiscordRichPresence", value);
 	},
 });
 const subTitleDefault = computed({
@@ -965,10 +931,7 @@ const subTitleDefault = computed({
 		return settings.subTitleDefault;
 	},
 	set(value) {
-		updateSettings({
-			key: "subTitleDefault",
-			value,
-		});
+		updateSetting("subTitleDefault", value);
 	},
 });
 const enableReversedMode = computed({
@@ -977,10 +940,7 @@ const enableReversedMode = computed({
 		return settings.enableReversedMode;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableReversedMode",
-			value,
-		});
+		updateSetting("enableReversedMode", value);
 		if (value === false) {
 			player.reversed = false;
 		}
@@ -991,10 +951,7 @@ const enableGlobalShortcut = computed({
 		return settings.enableGlobalShortcut;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableGlobalShortcut",
-			value,
-		});
+		updateSetting("enableGlobalShortcut", value);
 	},
 });
 const showLibraryDefault = computed({
@@ -1002,21 +959,15 @@ const showLibraryDefault = computed({
 		return settings.showLibraryDefault || false;
 	},
 	set(value) {
-		updateSettings({
-			key: "showLibraryDefault",
-			value,
-		});
+		updateSetting("showLibraryDefault", value);
 	},
 });
 const cacheLimit = computed({
 	get() {
-		return settings.cacheLimit || false;
+		return settings.cacheLimit;
 	},
 	set(value) {
-		updateSettings({
-			key: "cacheLimit",
-			value,
-		});
+		updateSetting("cacheLimit", value);
 	},
 });
 const proxyProtocol = computed({
@@ -1030,10 +981,7 @@ const proxyProtocol = computed({
 			window.ipcRenderer?.send("removeProxy");
 			toast("已关闭代理");
 		}
-		updateSettings({
-			key: "proxyConfig",
-			value: config,
-		});
+		updateSetting("proxyConfig", config);
 	},
 });
 const proxyServer = computed({
@@ -1043,10 +991,7 @@ const proxyServer = computed({
 	set(value) {
 		const config = settings.proxyConfig || {};
 		config.server = value;
-		updateSettings({
-			key: "proxyConfig",
-			value: config,
-		});
+		updateSetting("proxyConfig", config);
 	},
 });
 const enableRealIP = computed({
@@ -1054,10 +999,7 @@ const enableRealIP = computed({
 		return settings.enableRealIP || false;
 	},
 	set(value) {
-		updateSettings({
-			key: "enableRealIP",
-			value: value,
-		});
+		updateSetting("enableRealIP", value);
 	},
 });
 const realIP = computed({
@@ -1065,10 +1007,7 @@ const realIP = computed({
 		return settings.realIP || "";
 	},
 	set(value) {
-		updateSettings({
-			key: "realIP",
-			value: value,
-		});
+		updateSetting("realIP", value);
 	},
 });
 const proxyPort = computed({
@@ -1078,10 +1017,7 @@ const proxyPort = computed({
 	set(value) {
 		const config = settings.proxyConfig || {};
 		config.port = value;
-		updateSettings({
-			key: "proxyConfig",
-			value: config,
-		});
+		updateSetting("proxyConfig", config);
 	},
 });
 const unmSource = computed({
@@ -1090,10 +1026,7 @@ const unmSource = computed({
 	},
 	/** @param {string?} value */
 	set(value) {
-		updateSettings({
-			key: "unmSource",
-			value: value.length && value,
-		});
+		updateSetting("unmSource", value);
 	},
 });
 const unmSearchMode = computed({
@@ -1101,10 +1034,7 @@ const unmSearchMode = computed({
 		return settings.unmSearchMode || "fast-first";
 	},
 	set(value) {
-		updateSettings({
-			key: "unmSearchMode",
-			value: value,
-		});
+		updateSetting("unmSearchMode", value);
 	},
 });
 const unmEnableFlac = computed({
@@ -1112,10 +1042,7 @@ const unmEnableFlac = computed({
 		return settings.unmEnableFlac || false;
 	},
 	set(value) {
-		updateSettings({
-			key: "unmEnableFlac",
-			value: value || false,
-		});
+		updateSetting("unmEnableFlac", value || false);
 	},
 });
 const unmProxyUri = computed({
@@ -1123,10 +1050,7 @@ const unmProxyUri = computed({
 		return settings.unmProxyUri || "";
 	},
 	set(value) {
-		updateSettings({
-			key: "unmProxyUri",
-			value: value.length && value,
-		});
+		updateSetting("unmProxyUri", value);
 	},
 });
 const unmJooxCookie = computed({
@@ -1134,10 +1058,7 @@ const unmJooxCookie = computed({
 		return settings.unmJooxCookie || "";
 	},
 	set(value) {
-		updateSettings({
-			key: "unmJooxCookie",
-			value: value.length && value,
-		});
+		updateSetting("unmJooxCookie", value);
 	},
 });
 const unmQQCookie = computed({
@@ -1145,10 +1066,7 @@ const unmQQCookie = computed({
 		return settings.unmQQCookie || "";
 	},
 	set(value) {
-		updateSettings({
-			key: "unmQQCookie",
-			value: value.length && value,
-		});
+		updateSetting("unmQQCookie", value);
 	},
 });
 const unmYtDlExe = computed({
@@ -1156,10 +1074,7 @@ const unmYtDlExe = computed({
 		return settings.unmYtDlExe || "";
 	},
 	set(value) {
-		updateSettings({
-			key: "unmYtDlExe",
-			value: value.length && value,
-		});
+		updateSetting("unmYtDlExe", value);
 	},
 });
 const enableCustomTitlebar = computed({
@@ -1167,10 +1082,7 @@ const enableCustomTitlebar = computed({
 		return settings.linuxEnableCustomTitlebar;
 	},
 	set(value) {
-		updateSettings({
-			key: "linuxEnableCustomTitlebar",
-			value,
-		});
+		updateSetting("linuxEnableCustomTitlebar", value);
 	},
 });
 const isLastfmConnected = computed(() => lastfm.key !== undefined);
