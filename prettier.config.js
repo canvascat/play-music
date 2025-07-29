@@ -4,14 +4,23 @@
  */
 const config = {
 	singleQuote: false,
-	trailingComma: "all",
-	semi: true,
+	// trailingComma: "all",
+	// semi: true,
+	// tabWidth: 2,
+	// bracketSpacing: true,
+	// arrowParens: "always",
+	// endOfLine: "lf",
 	printWidth: 100,
-	tabWidth: 2,
 	useTabs: true,
-	bracketSpacing: true,
-	arrowParens: "always",
-	endOfLine: "lf",
+	overrides: [
+		{
+			files: ["**/*.{ts,mts,cts,tsx}"],
+			options: {
+				plugins: ["@prettier/plugin-oxc"],
+				parser: "oxc-ts",
+			}
+		},
+	],
 };
 
 export default config;

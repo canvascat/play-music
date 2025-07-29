@@ -15,7 +15,8 @@
 	},
 	"scripts": {
 		"dev": "vite",
-		"netease_api:run": "npx NeteaseCloudMusicApi"
+		"netease_api:run": "npx NeteaseCloudMusicApi",
+		"lint": "oxlint"
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.1.11",
@@ -28,16 +29,14 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"color": "^5.0.0",
-		"crypto-js": "^4.0.0",
+		"crypto-js": "^4.2.0",
 		"dayjs": "^1.8.36",
 		"dexie": "^4.0.11",
-		"discord-rich-presence": "^0.0.8",
 		"es-toolkit": "^1.39.7",
 		"events": "^3.3.0",
 		"howler": "^2.2.3",
 		"js-cookie": "^3.0.5",
 		"lucide-vue-next": "^0.525.0",
-		"md5": "^2.3.0",
 		"music-metadata": "^7.5.3",
 		"node-vibrant": "^4.0.3",
 		"nprogress": "^0.2.0",
@@ -59,10 +58,7 @@
 		"zod": "^4.0.5"
 	},
 	"devDependencies": {
-		"@eslint/css": "^0.10.0",
-		"@eslint/js": "^9.32.0",
-		"@eslint/json": "^0.13.1",
-		"@eslint/markdown": "^7.1.0",
+		"@prettier/plugin-oxc": "^0.0.4",
 		"@types/crypto-js": "^4.2.2",
 		"@types/howler": "^2.2.12",
 		"@types/js-cookie": "^3.0.6",
@@ -72,16 +68,12 @@
 		"@vitejs/plugin-vue": "^6.0.0",
 		"@vitejs/plugin-vue-jsx": "^5.0.1",
 		"@vue/tsconfig": "^0.7.0",
-		"eslint": "^9.32.0",
-		"eslint-plugin-vue": "^10.3.0",
 		"glob": "^11.0.3",
-		"globals": "^16.3.0",
-		"jiti": "^2.5.1",
+		"oxlint": "^1.8.0",
 		"prettier": "^3.6.2",
 		"sass": "^1.26.11",
 		"svgo": "^4.0.0",
 		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.38.0",
 		"vite": "npm:rolldown-vite@latest",
 		"vue-tsc": "^3.0.1"
 	},
@@ -90,15 +82,16 @@
 		"degenerator": "2.2.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@parcel/watcher",
-			"core-js",
-			"es5-ext",
-			"register-scheme"
-		],
 		"overrides": {
 			"vite": "npm:rolldown-vite@latest"
-		}
+		},
+		"onlyBuiltDependencies": [
+			"@parcel/watcher",
+			"@tailwindcss/oxide",
+			"core-js",
+			"es5-ext",
+			"vue-demi"
+		]
 	},
-	"packageManager": "pnpm@10.13.0+sha512.e08cbfa5d0c47e148d9d92965513af3d06a42ff99b6e0e82a7d10512858d0fb680a03c1e6772d369a2305c79306c9257989a3576b7057d6877469c9a1c7563f0"
+	"packageManager": "pnpm@10.14.0-0+sha512.2cd47a0cbf5f1d1de7693a88307a0ede5be94e0d3b34853d800ee775efbea0650cb562b77605ec80bc8d925f5cd27c4dfe8bb04d3a0b76090784c664450d32d6"
 }
