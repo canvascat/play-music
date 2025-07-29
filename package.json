@@ -1,17 +1,17 @@
 {
-	"name": "yesplaymusic",
+	"name": "play-music",
 	"version": "0.4.9",
 	"private": true,
 	"type": "module",
 	"description": "A third party music player for Netease Music",
 	"author": {
-		"name": "qier222",
-		"email": "qier222@outlook.com",
-		"url": "https://github.com/qier222"
+		"name": "canvascat",
+		"email": "canvascat@qq.com",
+		"url": "https://github.com/canvascat"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/qier222/YesPlayMusic"
+		"url": "https://github.com/canvascat/play-music"
 	},
 	"scripts": {
 		"dev": "vite",
