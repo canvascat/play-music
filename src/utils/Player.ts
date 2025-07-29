@@ -9,6 +9,7 @@ import { isAccountLoggedIn } from "@/utils/auth";
 import { decode as base642Buffer } from "@/utils/base64";
 import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
+import pkg from "../../package.json";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -28,11 +29,9 @@ type UnplayableCondition = (typeof UNPLAYABLE_CONDITION)[keyof typeof UNPLAYABLE
 const excludeSaveKeys = ["_playing", "_personalFMLoading", "_personalFMNextLoading"];
 
 function setTitle(track?: Track): void {
-	document.title = track ? `${track.name} · ${track.ar[0].name} - YesPlayMusic` : "YesPlayMusic";
+	document.title = track ? `${track.name} · ${track.ar[0].name} - ${pkg.name}` : pkg.name;
 	useStore().updateTitle(document.title);
 }
-
-// TODO: 重构 分离播放器和播放列表
 
 const _howler = Symbol.for("howler");
 
@@ -290,7 +289,7 @@ export default class Player {
 				toast(`无法播放: 不支持的音频格式`);
 				this._playNextTrack();
 			} else {
-				const t = this.progress;
+				const t = this._progress;
 				this._replaceCurrentTrackAudio(this.currentTrack, false, false).then((replaced) => {
 					// 如果 replaced 为 false，代表当前的 track 已经不是这里想要替换的track
 					// 此时则不修改当前的歌曲进度
@@ -309,30 +308,19 @@ export default class Player {
 		}
 		this.setOutputDevice();
 	}
-	private _getAudioSourceBlobURL(data) {
-		// Create a new object URL.
+	private _getAudioSourceBlobURL(data: ArrayBuffer) {
 		const source = URL.createObjectURL(new Blob([data]));
-
-		// Clean up the previous object URLs since we've created a new one.
-		// Revoke object URLs can release the memory taken by a Blob,
-		// which occupied a large proportion of memory.
-		for (const url in this.createdBlobRecords) {
-			URL.revokeObjectURL(url);
-		}
-
-		// Then, we replace the createBlobRecords with new one with
-		// our newly created object URL.
+		this.createdBlobRecords.forEach(URL.revokeObjectURL);
 		this.createdBlobRecords = [source];
-
 		return source;
 	}
-	private _getAudioSourceFromCache(id) {
+	private _getAudioSourceFromCache(id: string) {
 		return db.track.source.read(id).then((t) => {
 			if (!t) return null;
 			return this._getAudioSourceBlobURL(t.source);
 		});
 	}
-	private _getAudioSourceFromNetease(track) {
+	private _getAudioSourceFromNetease(track: Track) {
 		if (isAccountLoggedIn()) {
 			return api.track.getMP3(track.id).then((result) => {
 				if (!result.data[0]) return null;
@@ -350,7 +338,7 @@ export default class Player {
 			});
 		}
 	}
-	private async _getAudioSourceFromUnblockMusic(track) {
+	private async _getAudioSourceFromUnblockMusic(track: Track) {
 		console.debug(`[debug][Player.js] _getAudioSourceFromUnblockMusic`);
 
 		if (
@@ -361,20 +349,13 @@ export default class Player {
 		}
 
 		/**
-		 *
-		 * @param {string=} searchMode
 		 * @returns {import("@unblockneteasemusic/rust-napi").SearchMode}
 		 */
-		const determineSearchMode = (searchMode) => {
-			/**
-			 * FastFirst = 0
-			 * OrderFirst = 1
-			 */
+		const determineSearchMode = (searchMode: string) => {
 			switch (searchMode) {
-				case "fast-first":
-					return 0;
 				case "order-first":
 					return 1;
+				case "fast-first":
 				default:
 					return 0;
 			}
@@ -418,7 +399,7 @@ export default class Player {
 		const buffer = base642Buffer(retrieveSongInfo.url);
 		return this._getAudioSourceBlobURL(buffer);
 	}
-	private _getAudioSource(track) {
+	private _getAudioSource(track: Track) {
 		return this._getAudioSourceFromCache(String(track.id))
 			.then((source) => {
 				return source ?? this._getAudioSourceFromNetease(track);

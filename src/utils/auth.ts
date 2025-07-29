@@ -22,7 +22,7 @@ function removeCookie(key: string) {
 
 // 账号登录
 export function isAccountLoggedIn() {
-	return getCookie("MUSIC_U") !== undefined;
+	return !!getCookie("MUSIC_U");
 }
 
 export function doLogout() {

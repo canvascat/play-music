@@ -1,6 +1,6 @@
 import router from "@/router";
 import { doLogout, getCookie } from "@/utils/auth";
-import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import axios, { type AxiosRequestConfig, type AxiosResponse, AxiosError } from "axios";
 
 const baseURL = "/api";
 
@@ -46,21 +46,17 @@ service.interceptors.response.use(
 		const res = response.data;
 		return res;
 	},
-	async (error) => {
-		/** @type {import('axios').AxiosResponse | null} */
+	async (error: AxiosError) => {
 		let response: AxiosResponse | null = null;
 		let data: any;
-		if (error === "TypeError: baseURL is undefined") {
-			response = error;
-			data = error;
-			console.error("You must set up the baseURL in the service's config");
-		} else if (error.response) {
+		if (error.response) {
 			response = error.response;
 			data = response?.data;
 		}
 
 		if (response && typeof data === "object" && data.code === 301 && data.msg === "需要登录") {
 			console.warn("Token has expired. Logout now!");
+			console.debug(`[need login] ${error.config.method?.toUpperCase()} ${error.config.url}`);
 
 			// 登出帳戶
 			doLogout();

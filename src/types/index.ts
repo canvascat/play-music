@@ -2,7 +2,6 @@
 
 import type Player from "@/utils/Player";
 
-/** biome-ignore-all lint/suspicious/noExplicitAny: <explanation> */
 export interface Track {
 	id: number;
 	name: string;
@@ -263,7 +262,7 @@ export interface PlayerState extends Player {
 	reversed: boolean;
 	volume: number;
 	playlistSource: PlaylistSource;
-	personalFMTrack: Track;
+	personalFMTrack: Track | undefined;
 }
 
 export type RepeatMode = "off" | "on" | "one";

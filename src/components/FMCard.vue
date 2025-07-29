@@ -1,12 +1,7 @@
 <template>
 	<div class="fm" :style="{ background }" data-theme="dark">
 		<img :src="nextTrackCover" style="display: none" loading="lazy" />
-		<img
-			class="cover"
-			:src="resizeImage(track.album && track.album.picUrl, 512)"
-			loading="lazy"
-			@click="goToAlbum"
-		/>
+		<img class="cover" :src="resizeImage(track.album && track.album.picUrl, 512)" loading="lazy" @click="goToAlbum" />
 		<div class="right-part">
 			<div class="info">
 				<div class="title">{{ track.name }}</div>
@@ -19,11 +14,7 @@
 					<button-icon title="不喜欢" v-on:click="moveToFMTrash">
 						<IconThumbsDown id="thumbs-down" />
 					</button-icon>
-					<button-icon
-						:title="$t(isPlaying ? 'player.pause' : 'player.play')"
-						class="play"
-						v-on:click="play"
-					>
+					<button-icon :title="$t(isPlaying ? 'player.pause' : 'player.play')" class="play" v-on:click="play">
 						<IconPause v-if="isPlaying" />
 						<IconPlay v-else />
 					</button-icon>
@@ -31,7 +22,9 @@
 						<IconNext />
 					</button-icon>
 				</div>
-				<div class="card-name"><IconFm />私人FM</div>
+				<div class="card-name">
+					<IconFm />私人FM
+				</div>
 			</div>
 		</div>
 	</div>
@@ -54,7 +47,7 @@ const background = ref("");
 
 const track = computed(() => player.personalFMTrack);
 const isPlaying = computed(() => player.playing && player.isPersonalFM);
-const artists = computed(() => track.value.artists || track.value.ar || []);
+const artists = computed(() => track.value?.artists || track.value?.ar || []);
 const nextTrackCover = computed(
 	() =>
 		`${player._personalFMNextTrack?.album?.picUrl.replace("http://", "https://")}?param=512y512`,
@@ -78,7 +71,7 @@ const moveToFMTrash = () => {
 	player.moveToFMTrash();
 };
 const getColor = () => {
-	if (!track.value.album?.picUrl) return;
+	if (!track.value?.album?.picUrl) return;
 	const cover = `${track.value.album.picUrl.replace("http://", "https://")}?param=512y512`;
 	getImageColor(cover, "Vibrant").then((originColor) => {
 		const color = originColor.darken(0.1).rgb().string();
