@@ -205,30 +205,13 @@
 						@dblclick="clickLyricLine(line.time, true)"
 					>
 						<div class="content">
-							<span v-if="line.contents[0]" @click.right="openLyricMenu($event, line, 0)">{{
-								line.contents[0]
-							}}</span>
+							<span v-if="line.contents[0]">{{ line.contents[0] }}</span>
 							<br />
-							<span
-								v-if="line.contents[1] && settings.showLyricsTranslation"
-								class="translation"
-								@click.right="openLyricMenu($event, line, 1)"
-								>{{ line.contents[1] }}</span
-							>
+							<span v-if="line.contents[1] && settings.showLyricsTranslation" class="translation">{{
+								line.contents[1]
+							}}</span>
 						</div>
 					</div>
-					<ContextMenu v-if="!noLyric" ref="lyricMenu">
-						<div class="item" @click="copyLyric(false)">{{ $t("contextMenu.copyLyric") }}</div>
-						<div
-							v-if="
-								rightClickLyric && rightClickLyric.contents[1] && settings.showLyricsTranslation
-							"
-							class="item"
-							@click="copyLyric(true)"
-						>
-							{{ $t("contextMenu.copyLyricWithTranslation") }}
-						</div>
-					</ContextMenu>
 				</div>
 			</transition>
 		</div>
@@ -253,7 +236,6 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useStore } from "@/store/pinia";
 import VueSlider from "vue-slider-component";
-import ContextMenu from "@/components/ContextMenu.vue";
 import { formatTrackTime, getImageColor } from "@/utils/common";
 import * as api from "@/api";
 import { lyricParser } from "@/utils/lyrics";
@@ -283,7 +265,6 @@ import { hasListSource, getListSourcePath } from "@/utils/playList";
 import { toast } from "vue-sonner";
 import { useModalStore } from "@/store/modal";
 import { useI18n } from "vue-i18n";
-import { copyText } from "@/utils/copy";
 import { usePlayerProgress, useRafFnWithDep } from "@/lib/hook";
 import { useFullscreen } from "@vueuse/core";
 
@@ -306,9 +287,6 @@ interface LyricItem {
 	contents: string[];
 }
 
-interface RightClickLyric extends LyricItem {
-	idx: number;
-}
 const store = useStore();
 const { player, settings, toggleLyrics, likeATrack, fetchLikedPlaylist } = store;
 
@@ -319,9 +297,7 @@ const lyricType = ref<"translation" | "romaPronunciation">("translation");
 const highlightLyricIndex = ref(-1);
 const background = ref("");
 
-const rightClickLyric = ref<RightClickLyric | null>(null);
 const lyricsContainer = ref<HTMLElement>();
-const lyricMenu = ref<InstanceType<typeof ContextMenu>>();
 
 const progress = usePlayerProgress();
 
@@ -475,7 +451,7 @@ const playNextTrack = () => {
 };
 
 const getLyric = () => {
-	if (!currentTrack.value.id) return;
+	if (!currentTrack.value?.id) return;
 	return api.track.getLyric(currentTrack.value.id).then((data) => {
 		if (!data?.lrc?.lyric) {
 			lyric.value = [];
@@ -536,23 +512,6 @@ const clickLyricLine = (value: number, startPlay = false) => {
 	}
 	if (startPlay === true) {
 		player.play();
-	}
-};
-
-const openLyricMenu = (e: MouseEvent, lyricItem: LyricItem, idx: number) => {
-	rightClickLyric.value = { ...lyricItem, idx };
-	lyricMenu.value?.openMenu(e);
-	e.preventDefault();
-};
-
-const copyLyric = (withTranslation: boolean) => {
-	if (rightClickLyric.value) {
-		const idx = rightClickLyric.value.idx;
-		if (!withTranslation) {
-			copyText(rightClickLyric.value.contents[idx]);
-		} else {
-			copyText(rightClickLyric.value.contents.join(" "));
-		}
 	}
 };
 
