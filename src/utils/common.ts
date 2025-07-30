@@ -2,9 +2,9 @@ import { useStore } from "@/store/pinia";
 import type { Track, TrackPrivilege } from "@/types/index";
 import { isAccountLoggedIn } from "./auth";
 import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
-import type { Palette } from "@vibrant/color";
 import Color from "color";
 import PipelineWorker from "node-vibrant/worker.worker?worker";
+import pkg from "../../package.json";
 
 Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 
@@ -161,8 +161,16 @@ export function formatTrackTime(value?: number | string) {
 	return `${min}:${sec}`;
 }
 
-export async function getImageColor(src: string, type: keyof Palette) {
+export async function getImageColor(
+	src: string,
+	type: keyof Awaited<ReturnType<Vibrant["getPalette"]>>,
+) {
 	const palette = await new Vibrant(src, { colorCount: 2 }).getPalette();
 	const rgb = palette[type]?.rgb;
 	return new Color(rgb);
+}
+
+export function setTitle(track?: Track): void {
+	document.title = track ? `${track.name} · ${track.ar[0].name} - ${pkg.name}` : pkg.name;
+	useStore().updateTitle(document.title);
 }

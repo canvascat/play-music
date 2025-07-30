@@ -9,7 +9,7 @@ import { isAccountLoggedIn } from "@/utils/auth";
 import { decode as base642Buffer } from "@/utils/base64";
 import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
-import pkg from "../../package.json";
+import { setTitle } from "./common";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -27,11 +27,6 @@ const UNPLAYABLE_CONDITION = {
 type UnplayableCondition = (typeof UNPLAYABLE_CONDITION)[keyof typeof UNPLAYABLE_CONDITION];
 
 const excludeSaveKeys = ["_playing", "_personalFMLoading", "_personalFMNextLoading"];
-
-function setTitle(track?: Track): void {
-	document.title = track ? `${track.name} · ${track.ar[0].name} - ${pkg.name}` : pkg.name;
-	useStore().updateTitle(document.title);
-}
 
 const _howler = Symbol.for("howler");
 

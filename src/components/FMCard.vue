@@ -1,29 +1,42 @@
 <template>
-	<div class="fm" :style="{ background }" data-theme="dark">
-		<img :src="nextTrackCover" style="display: none" loading="lazy" />
-		<img class="cover" :src="resizeImage(track.album && track.album.picUrl, 512)" loading="lazy" @click="goToAlbum" />
-		<div class="right-part">
-			<div class="info">
-				<div class="title">{{ track.name }}</div>
-				<div class="artist">
+	<div
+		class="h-[198px] bg-secondary flex select-none rounded-2xl p-4"
+		:style="{ background }"
+		data-theme="dark"
+	>
+		<img
+			class="cover rounded-xl h-full mr-5 cursor-pointer"
+			:src="resizeImage(track?.album?.picUrl, 512)"
+			loading="lazy"
+			@click="goToAlbum"
+		/>
+		<div class="text-2xl font-semibold flex flex-col justify-between w-full text-white">
+			<div>
+				<div class="mb-2.5 line-clamp-2 break-all">{{ track.name }}</div>
+				<div class="line-clamp-2 break-all opacity-68">
 					<ArtistsInLine :artists="artists" />
 				</div>
 			</div>
-			<div class="controls">
-				<div class="buttons">
-					<button-icon title="不喜欢" v-on:click="moveToFMTrash">
-						<IconThumbsDown id="thumbs-down" />
-					</button-icon>
-					<button-icon :title="$t(isPlaying ? 'player.pause' : 'player.play')" class="play" v-on:click="play">
-						<IconPause v-if="isPlaying" />
-						<IconPlay v-else />
-					</button-icon>
-					<button-icon :title="$t('player.next')" v-on:click="next">
-						<IconNext />
-					</button-icon>
+			<div class="flex justify-between items-baseline">
+				<div class="flex gap-2">
+					<ButtonIcon title="不喜欢" v-on:click="moveToFMTrash">
+						<IconThumbsDown class="size-5.5" />
+					</ButtonIcon>
+					<ButtonIcon
+						:title="$t(isPlaying ? 'player.pause' : 'player.play')"
+						class="play"
+						v-on:click="play"
+					>
+						<IconPause v-if="isPlaying" class="size-6" />
+						<IconPlay v-else class="size-6" />
+					</ButtonIcon>
+					<ButtonIcon :title="$t('player.next')" v-on:click="next">
+						<IconNext class="size-6" />
+					</ButtonIcon>
 				</div>
-				<div class="card-name">
-					<IconFm />私人FM
+				<div class="flex items-center opacity-18">
+					<IconFm class="size-4 mr-2" />
+					<span class="font-semibold text-lg select-none">私人FM</span>
 				</div>
 			</div>
 		</div>
@@ -39,23 +52,16 @@ import { resizeImage } from "@/utils/filters";
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { getImageColor } from "@/utils/common";
+
 const { player } = useStore();
 
 const router = useRouter();
 
 const background = ref("");
 
-const track = computed(() => player.personalFMTrack);
+const track = computed(() => player.personalFMTrack || Object.create(null));
 const isPlaying = computed(() => player.playing && player.isPersonalFM);
 const artists = computed(() => track.value?.artists || track.value?.ar || []);
-const nextTrackCover = computed(
-	() =>
-		`${player._personalFMNextTrack?.album?.picUrl.replace("http://", "https://")}?param=512y512`,
-);
-
-watch(track, () => {
-	getColor();
-});
 
 const play = () => {
 	player.playPersonalFM();
@@ -70,9 +76,9 @@ const goToAlbum = () => {
 const moveToFMTrash = () => {
 	player.moveToFMTrash();
 };
-const getColor = () => {
-	if (!track.value?.album?.picUrl) return;
-	const cover = `${track.value.album.picUrl.replace("http://", "https://")}?param=512y512`;
+const getColor = (imgUrl: string) => {
+	if (!imgUrl) return;
+	const cover = `${imgUrl.replace("http://", "https://")}?param=512y512`;
 	getImageColor(cover, "Vibrant").then((originColor) => {
 		const color = originColor.darken(0.1).rgb().string();
 		const color2 = originColor.lighten(0.28).rotate(-30).rgb().string();
@@ -80,93 +86,5 @@ const getColor = () => {
 	});
 };
 
-getColor();
+watch(() => track.value?.album?.picUrl, getColor, { immediate: true });
 </script>
-
-<style lang="scss" scoped>
-.fm {
-	padding: 1rem;
-	background: var(--color-secondary-bg);
-	border-radius: 1rem;
-	display: flex;
-	height: 198px;
-	box-sizing: border-box;
-}
-
-.cover {
-	height: 100%;
-	clip-path: border-box;
-	border-radius: 0.75rem;
-	margin-right: 1.2rem;
-	cursor: pointer;
-	user-select: none;
-}
-
-.right-part {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	color: var(--color-text);
-	width: 100%;
-
-	.title {
-		font-size: 1.6rem;
-		font-weight: 600;
-		margin-bottom: 0.6rem;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-		word-break: break-all;
-	}
-
-	.artist {
-		opacity: 0.68;
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
-		word-break: break-all;
-	}
-
-	.controls {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		margin-left: -0.4rem;
-
-		.buttons {
-			display: flex;
-		}
-
-		.button-icon {
-			margin: 0 8px 0 0;
-		}
-
-		.svg-icon {
-			width: 24px;
-			height: 24px;
-		}
-
-		.svg-icon#thumbs-down {
-			width: 22px;
-			height: 22px;
-		}
-
-		.card-name {
-			font-size: 1rem;
-			opacity: 0.18;
-			display: flex;
-			align-items: center;
-			font-weight: 600;
-			user-select: none;
-
-			.svg-icon {
-				width: 18px;
-				height: 18px;
-				margin-right: 6px;
-			}
-		}
-	}
-}
-</style>

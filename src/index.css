@@ -121,4 +121,10 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	:where(.svg-icon) {
+		fill: currentColor;
+		color: var(--color-text);
+		@apply size-4;
+	}
 }
