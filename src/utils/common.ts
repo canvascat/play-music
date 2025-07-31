@@ -5,6 +5,7 @@ import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
 import Color from "color";
 import PipelineWorker from "node-vibrant/worker.worker?worker";
 import pkg from "../../package.json";
+import { randomInt } from "crypto";
 
 Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 
@@ -173,4 +174,8 @@ export async function getImageColor(
 export function setTitle(track?: Track): void {
 	document.title = track ? `${track.name} · ${track.ar[0].name} - ${pkg.name}` : pkg.name;
 	useStore().updateTitle(document.title);
+}
+
+export function randomItem<T>(array?: T[]): T | undefined {
+	return array?.[array.length && randomInt(array.length - 1)];
 }

@@ -6,10 +6,10 @@ import * as api from "@/api";
 import { pinia, useStore } from "@/store/pinia";
 import type { PersonalFMResponse, PlaylistSource, RepeatMode, Track } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
-import { decode as base642Buffer } from "@/utils/base64";
 import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
-import { setTitle } from "./common";
+import { randomItem, setTitle } from "./common";
+import { getAudioSourceFromUnblockMusic } from "./umn";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -309,99 +309,31 @@ export default class Player {
 		this.createdBlobRecords = [source];
 		return source;
 	}
-	private _getAudioSourceFromCache(id: string) {
-		return db.track.source.read(id).then((t) => {
-			if (!t) return null;
-			return this._getAudioSourceBlobURL(t.source);
-		});
+	private async _getAudioSourceFromCache(id: string) {
+		const t = await db.track.source.read(id);
+		if (!t) return null;
+		return this._getAudioSourceBlobURL(t.source);
 	}
-	private _getAudioSourceFromNetease(track: Track) {
+	private async _getAudioSourceFromNetease(track: Track) {
 		if (isAccountLoggedIn()) {
-			return api.track.getMP3(track.id).then((result) => {
-				if (!result.data[0]) return null;
-				if (!result.data[0].url) return null;
-				if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
-				const source = result.data[0].url.replace(/^http:/, "https:");
-				if (useStore(pinia).settings.automaticallyCacheSongs) {
-					db.track.source.write(track, source, result.data[0].br);
-				}
-				return source;
-			});
-		} else {
-			return new Promise((resolve) => {
-				resolve(`https://music.163.com/song/media/outer/url?id=${track.id}`);
-			});
-		}
-	}
-	private async _getAudioSourceFromUnblockMusic(track: Track) {
-		console.debug(`[debug][Player.js] _getAudioSourceFromUnblockMusic`);
-
-		if (
-			window.IS_ELECTRON !== true ||
-			useStore(pinia).settings.enableUnblockNeteaseMusic === false
-		) {
-			return null;
-		}
-
-		/**
-		 * @returns {import("@unblockneteasemusic/rust-napi").SearchMode}
-		 */
-		const determineSearchMode = (searchMode: string) => {
-			switch (searchMode) {
-				case "order-first":
-					return 1;
-				case "fast-first":
-				default:
-					return 0;
+			const result = await api.track.getMP3(track.id);
+			if (!result.data[0]?.url) return null;
+			if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
+			const source = result.data[0].url.replace(/^http:/, "https:");
+			if (useStore(pinia).settings.automaticallyCacheSongs) {
+				db.track.source.write(track, source, result.data[0].br);
 			}
-		};
-
-		const retrieveSongInfo = await window.ipcRenderer?.invoke(
-			"unblock-music",
-			useStore(pinia).settings.unmSource,
-			track,
-			{
-				enableFlac: useStore(pinia).settings.unmEnableFlac || null,
-				proxyUri: useStore(pinia).settings.unmProxyUri || null,
-				searchMode: determineSearchMode(useStore(pinia).settings.unmSearchMode),
-				config: {
-					"joox:cookie": useStore(pinia).settings.unmJooxCookie || null,
-					"qq:cookie": useStore(pinia).settings.unmQQCookie || null,
-					"ytdl:exe": useStore(pinia).settings.unmYtDlExe || null,
-				},
-			},
-		);
-
-		if (useStore(pinia).settings.automaticallyCacheSongs && retrieveSongInfo?.url) {
-			// 对于来自 bilibili 的音源
-			// retrieveSongInfo.url 是音频数据的base64编码
-			// 其他音源为实际url
-			const url =
-				retrieveSongInfo.source === "bilibili"
-					? `data:application/octet-stream;base64,${retrieveSongInfo.url}`
-					: retrieveSongInfo.url;
-			db.track.source.write(track, url, 128000, `unm:${retrieveSongInfo.source}`);
+			return source;
+		} else {
+			return `https://music.163.com/song/media/outer/url?id=${track.id}`;
 		}
-
-		if (!retrieveSongInfo) {
-			return null;
-		}
-
-		if (retrieveSongInfo.source !== "bilibili") {
-			return retrieveSongInfo.url;
-		}
-
-		const buffer = base642Buffer(retrieveSongInfo.url);
-		return this._getAudioSourceBlobURL(buffer);
 	}
-	private _getAudioSource(track: Track) {
-		return this._getAudioSourceFromCache(String(track.id))
-			.then((source) => {
-				return source ?? this._getAudioSourceFromNetease(track);
-			})
-			.then((source) => {
-				return source ?? this._getAudioSourceFromUnblockMusic(track);
-			});
+
+	private async _getAudioSource(track: Track) {
+		let source = await this._getAudioSourceFromCache(String(track.id));
+		source ??= await this._getAudioSourceFromNetease(track);
+		source ??= this._getAudioSourceBlobURL(await getAudioSourceFromUnblockMusic(track));
+		return source;
 	}
 	private _replaceCurrentTrack(
 		id: number,
@@ -808,7 +740,7 @@ export default class Player {
 			`[debug][Player.js] playPlaylistByID 👉 id:${id} trackID:${trackID} noCache:${noCache}`,
 		);
 		api.playlist.getPlaylistDetail(id, noCache).then((data) => {
-			const trackIDs = data.playlist.trackIds.map((t) => t.id);
+			const trackIDs = data.playlist.trackIds?.map((t) => t.id) ?? [];
 			this.replacePlaylist(trackIDs, id, "playlist", trackID);
 		});
 	}
@@ -824,19 +756,17 @@ export default class Player {
 		}
 		this._replaceCurrentTrack(id);
 	}
-	playIntelligenceListById(
+	async playIntelligenceListById(
 		id: number,
 		trackID: number | "first" = "first",
 		noCache: boolean = false,
 	) {
-		api.playlist.getPlaylistDetail(id, noCache).then((data) => {
-			const randomId = Math.floor(Math.random() * (data.playlist.trackIds.length + 1));
-			const songId = data.playlist.trackIds[randomId].id;
-			api.playlist.intelligencePlaylist({ id: songId, pid: id }).then((result) => {
-				const trackIDs = result.data.map((t) => t.id);
-				this.replacePlaylist(trackIDs, id, "playlist", trackID);
-			});
-		});
+		const data = await api.playlist.getPlaylistDetail(id, noCache);
+		const songId = randomItem(data.playlist.trackIds)?.id;
+		if (!songId) return;
+		const result = await api.playlist.intelligencePlaylist({ id: songId, pid: id });
+		const trackIDs = result.data.map((t) => t.id);
+		this.replacePlaylist(trackIDs, id, "playlist", trackID);
 	}
 	addTrackToPlayNext(trackID: number, playNow: boolean = false) {
 		this._playNextList.push(trackID);
