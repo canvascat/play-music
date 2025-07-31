@@ -48,7 +48,7 @@
 					<div class="like-button">
 						<ButtonIcon
 							:title="player.isCurrentTrackLiked ? $t('player.unlike') : $t('player.like')"
-							v-on:click="likeATrack(player.currentTrack.id)"
+							@click="likeATrack(player.currentTrack.id)"
 						>
 							<IconHeart v-show="!player.isCurrentTrackLiked" />
 							<IconHeartSolid v-show="player.isCurrentTrackLiked" />
@@ -63,23 +63,21 @@
 					<ButtonIcon
 						v-show="!player.isPersonalFM"
 						:title="$t('player.previous')"
-						v-on:click="playPrevTrack"
+						@click="playPrevTrack"
 						><IconPrevious
 					/></ButtonIcon>
-					<ButtonIcon v-show="player.isPersonalFM" title="不喜欢" v-on:click="moveToFMTrash"
+					<ButtonIcon v-show="player.isPersonalFM" title="不喜欢" @click="moveToFMTrash"
 						><IconThumbsDown
 					/></ButtonIcon>
 					<ButtonIcon
 						class="play"
 						:title="$t(player.playing ? 'player.pause' : 'player.play')"
-						v-on:click="playOrPause"
+						@click="playOrPause"
 					>
 						<IconPause v-if="player.playing" />
 						<IconPlay v-else />
 					</ButtonIcon>
-					<ButtonIcon :title="$t('player.next')" v-on:click="playNextTrack"
-						><IconNext
-					/></ButtonIcon>
+					<ButtonIcon :title="$t('player.next')" @click="playNextTrack"><IconNext /></ButtonIcon>
 				</div>
 				<div class="blank"></div>
 			</div>
@@ -92,7 +90,7 @@
 							active: $route.name === 'next',
 							disabled: player.isPersonalFM,
 						}"
-						v-on:click="goToNextTracksPage"
+						@click="goToNextTracksPage"
 						><IconList
 					/></ButtonIcon>
 					<ButtonIcon
@@ -101,7 +99,7 @@
 							disabled: player.isPersonalFM,
 						}"
 						:title="player.repeatMode === 'one' ? $t('player.repeatTrack') : $t('player.repeat')"
-						v-on:click="switchRepeatMode"
+						@click="switchRepeatMode"
 					>
 						<IconRepeat v-show="player.repeatMode !== 'one'" />
 						<IconRepeat1 v-show="player.repeatMode === 'one'" />
@@ -109,18 +107,18 @@
 					<ButtonIcon
 						:class="{ active: player.shuffle, disabled: player.isPersonalFM }"
 						:title="$t('player.shuffle')"
-						v-on:click="switchShuffle"
+						@click="switchShuffle"
 						><IconShuffle
 					/></ButtonIcon>
 					<ButtonIcon
 						v-if="settings.enableReversedMode"
 						:class="{ active: player.reversed, disabled: player.isPersonalFM }"
 						:title="$t('player.reversed')"
-						v-on:click="switchReversed"
+						@click="switchReversed"
 						><IconSortUp
 					/></ButtonIcon>
 					<div class="volume-control">
-						<ButtonIcon :title="$t('player.mute')" v-on:click="mute">
+						<ButtonIcon :title="$t('player.mute')" @click="mute">
 							<IconVolume v-show="volume > 0.5" />
 							<IconVolumeMute v-show="volume === 0" />
 							<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
@@ -139,7 +137,7 @@
 						</div>
 					</div>
 
-					<ButtonIcon class="lyrics-button ml-3" title="歌词" v-on:click="toggleLyrics"
+					<ButtonIcon class="lyrics-button ml-3" title="歌词" @click="toggleLyrics"
 						><IconArrowUp
 					/></ButtonIcon>
 				</div>

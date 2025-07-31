@@ -19,18 +19,18 @@
 			</div>
 			<div class="flex justify-between items-baseline">
 				<div class="flex gap-2">
-					<ButtonIcon title="不喜欢" v-on:click="moveToFMTrash">
+					<ButtonIcon title="不喜欢" @click="moveToFMTrash">
 						<IconThumbsDown class="size-5.5" />
 					</ButtonIcon>
 					<ButtonIcon
 						:title="$t(isPlaying ? 'player.pause' : 'player.play')"
 						class="play"
-						v-on:click="play"
+						@click="play"
 					>
 						<IconPause v-if="isPlaying" class="size-6" />
 						<IconPlay v-else class="size-6" />
 					</ButtonIcon>
-					<ButtonIcon :title="$t('player.next')" v-on:click="next">
+					<ButtonIcon :title="$t('player.next')" @click="next">
 						<IconNext class="size-6" />
 					</ButtonIcon>
 				</div>

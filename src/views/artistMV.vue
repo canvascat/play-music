@@ -1,19 +1,19 @@
 <template>
-  <div v-show="show">
-    <h1 class="text-4xl mt-9 mb-4.5 flex items-center">
-      <img
-        class="h-11 w-11 rounded-full mr-3"
-        :src="resizeImage(artist.img1v1Url, 1024)"
-        loading="lazy"
-      />{{ artist.name }}'s Music Videos
-    </h1>
-    <MvRow :mvs="mvs" subtitle="publishTime" />
-    <div class="flex justify-center">
-      <ButtonTwoTone v-show="hasMore" color="grey" v-on:click="loadMVs">{{
-        $t('explore.loadMore')
-      }}</ButtonTwoTone>
-    </div>
-  </div>
+	<div v-show="show">
+		<h1 class="text-4xl mt-9 mb-4.5 flex items-center">
+			<img
+				class="h-11 w-11 rounded-full mr-3"
+				:src="resizeImage(artist.img1v1Url, 1024)"
+				loading="lazy"
+			/>{{ artist.name }}'s Music Videos
+		</h1>
+		<MvRow :mvs="mvs" subtitle="publishTime" />
+		<div class="flex justify-center">
+			<ButtonTwoTone v-show="hasMore" color="grey" @click="loadMVs">{{
+				$t("explore.loadMore")
+			}}</ButtonTwoTone>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">

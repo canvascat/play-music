@@ -2,10 +2,10 @@
 	<nav :class="cn({ 'has-custom-titlebar': hasCustomTitlebar }, 'z-40')">
 		<Titlebar v-if="hasCustomTitlebar" />
 		<div class="navigation-buttons">
-			<button-icon v-on:click="go('back')">
+			<button-icon @click="go('back')">
 				<IconArrowLeft />
 			</button-icon>
-			<button-icon v-on:click="go('forward')">
+			<button-icon @click="go('forward')">
 				<IconArrowRight />
 			</button-icon>
 		</div>

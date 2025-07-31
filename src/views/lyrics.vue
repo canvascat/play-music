@@ -32,7 +32,7 @@
 					<div class="top-part">
 						<div class="track-info">
 							<div class="title line-clamp-1" :title="currentTrack.name">
-								<router-link v-if="hasList()" :to="`${getListPath()}`" v-on:click="toggleLyrics"
+								<router-link v-if="hasList()" :to="`${getListPath()}`" @click="toggleLyrics"
 									>{{ currentTrack.name }}
 								</router-link>
 								<span v-else>
@@ -43,7 +43,7 @@
 								<router-link
 									v-if="artist.id !== 0"
 									:to="`/artist/${artist.id}`"
-									v-on:click="toggleLyrics"
+									@click="toggleLyrics"
 									>{{ artist.name }}
 								</router-link>
 								<span v-else>
@@ -51,10 +51,7 @@
 								</span>
 								<span v-if="album.id !== 0">
 									-
-									<router-link
-										:to="`/album/${album.id}`"
-										:title="album.name"
-										v-on:click="toggleLyrics"
+									<router-link :to="`/album/${album.id}`" :title="album.name" @click="toggleLyrics"
 										>{{ album.name }}
 									</router-link>
 								</span>
@@ -62,7 +59,7 @@
 						</div>
 						<div class="top-right">
 							<div class="volume-control">
-								<ButtonIcon :title="$t('player.mute')" v-on:click="mute">
+								<ButtonIcon :title="$t('player.mute')" @click="mute">
 									<IconVolume v-show="volume > 0.5" />
 									<IconVolumeMute v-show="volume === 0" />
 									<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
@@ -81,14 +78,11 @@
 								</div>
 							</div>
 							<div class="buttons">
-								<ButtonIcon
-									:title="$t('player.like')"
-									v-on:click="likeATrack(player.currentTrack.id)"
-								>
+								<ButtonIcon :title="$t('player.like')" @click="likeATrack(player.currentTrack.id)">
 									<IconHeartSolid v-if="player.isCurrentTrackLiked" class="size-4.5" />
 									<IconHeart v-else class="size-4.5" />
 								</ButtonIcon>
-								<ButtonIcon :title="$t('contextMenu.addToPlaylist')" v-on:click="addToPlaylist">
+								<ButtonIcon :title="$t('contextMenu.addToPlaylist')" @click="addToPlaylist">
 									<IconPlus class="size-4.5" />
 								</ButtonIcon>
 
@@ -122,7 +116,7 @@
 							v-show="!player.isPersonalFM"
 							:title="player.repeatMode === 'one' ? $t('player.repeatTrack') : $t('player.repeat')"
 							:class="{ active: player.repeatMode !== 'off' }"
-							v-on:click="switchRepeatMode"
+							@click="switchRepeatMode"
 						>
 							<IconRepeat v-show="player.repeatMode !== 'one'" />
 							<IconRepeat1 v-show="player.repeatMode === 'one'" />
@@ -131,22 +125,22 @@
 							<ButtonIcon
 								v-show="!player.isPersonalFM"
 								:title="$t('player.previous')"
-								v-on:click="playPrevTrack"
+								@click="playPrevTrack"
 							>
 								<IconPrevious />
 							</ButtonIcon>
-							<ButtonIcon v-show="player.isPersonalFM" title="不喜欢" v-on:click="moveToFMTrash">
+							<ButtonIcon v-show="player.isPersonalFM" title="不喜欢" @click="moveToFMTrash">
 								<IconThumbsDown />
 							</ButtonIcon>
 							<ButtonIcon
 								id="play"
 								:title="$t(player.playing ? 'player.pause' : 'player.play')"
-								v-on:click="playOrPause"
+								@click="playOrPause"
 							>
 								<IconPause v-if="player.playing" />
 								<IconPlay v-else />
 							</ButtonIcon>
-							<ButtonIcon :title="$t('player.next')" v-on:click="playNextTrack">
+							<ButtonIcon :title="$t('player.next')" @click="playNextTrack">
 								<IconNext />
 							</ButtonIcon>
 						</div>
@@ -154,7 +148,7 @@
 							v-show="!player.isPersonalFM"
 							:title="$t('player.shuffle')"
 							:class="{ active: player.shuffle }"
-							v-on:click="switchShuffle"
+							@click="switchShuffle"
 						>
 							<IconShuffle />
 						</ButtonIcon>
@@ -165,7 +159,7 @@
 								lyricType === 'translation'
 							"
 							:title="$t('player.translationLyric')"
-							v-on:click="switchLyricType"
+							@click="switchLyricType"
 						>
 							<span class="lyric-switch-icon">译</span>
 						</ButtonIcon>
@@ -176,7 +170,7 @@
 								lyricType === 'romaPronunciation'
 							"
 							:title="$t('player.PronunciationLyric')"
-							v-on:click="switchLyricType"
+							@click="switchLyricType"
 						>
 							<span class="lyric-switch-icon">音</span>
 						</ButtonIcon>

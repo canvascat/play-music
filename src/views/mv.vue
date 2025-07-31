@@ -10,7 +10,7 @@
 					-
 					{{ mv.data.name }}
 					<div class="buttons">
-						<ButtonIcon class="button" v-on:click="likeMV">
+						<ButtonIcon class="button" @click="likeMV">
 							<IconHeartSolid v-if="mv.subed" />
 							<IconHeart v-else />
 						</ButtonIcon>

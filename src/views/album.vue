@@ -47,7 +47,7 @@
 						:color="dynamicDetail.isSub ? 'blue' : 'grey'"
 						:text-color="dynamicDetail.isSub ? '#335eea' : ''"
 						:background-color="dynamicDetail.isSub ? 'var(--color-secondary-bg)' : ''"
-						v-on:click="likeAlbum"
+						@click="likeAlbum"
 					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>

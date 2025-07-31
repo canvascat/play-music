@@ -45,7 +45,7 @@
 					title="歌单介绍"
 				/>
 				<div class="buttons">
-					<ButtonTwoTone :icon="IconPlay" v-on:click="playPlaylistByID()">
+					<ButtonTwoTone :icon="IconPlay" @click="playPlaylistByID()">
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
 					<ButtonTwoTone
@@ -54,7 +54,7 @@
 						:color="playlist.subscribed ? 'blue' : 'grey'"
 						:text-color="playlist.subscribed ? '#335eea' : ''"
 						:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
-						v-on:click="likePlaylist"
+						@click="likePlaylist"
 					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>
@@ -109,7 +109,7 @@
 					class="play-button"
 					:icon="IconPlay"
 					color="grey"
-					v-on:click="playPlaylistByID()"
+					@click="playPlaylistByID()"
 				>
 					{{ $t("common.play") }}
 				</ButtonTwoTone>
@@ -119,7 +119,7 @@
 					:color="playlist.subscribed ? 'blue' : 'grey'"
 					:text-color="playlist.subscribed ? '#335eea' : ''"
 					:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
-					v-on:click="likePlaylist"
+					@click="likePlaylist"
 				/>
 
 				<DropdownMenu>
