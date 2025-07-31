@@ -1,7 +1,6 @@
 <template>
 	<nav :class="cn({ 'has-custom-titlebar': hasCustomTitlebar }, 'z-40')">
-		<Win32Titlebar v-if="enableWin32Titlebar" />
-		<LinuxTitlebar v-if="enableLinuxTitlebar" />
+		<Titlebar v-if="hasCustomTitlebar" />
 		<div class="navigation-buttons">
 			<button-icon v-on:click="go('back')">
 				<IconArrowLeft />
@@ -85,7 +84,6 @@ import {
 	IconSearch,
 	IconSettings,
 } from "@/components/icon";
-import LinuxTitlebar from "@/components/LinuxTitlebar.vue";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -93,7 +91,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Win32Titlebar from "@/components/Win32Titlebar.vue";
+import Titlebar from "@/components/Titlebar.vue";
 import { cn } from "@/lib/utils";
 import { useStore } from "@/store/pinia";
 import { doLogout, isAccountLoggedIn } from "@/utils/auth";
