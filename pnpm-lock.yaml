@@ -22,18 +22,15 @@ importers:
       '@vee-validate/zod':
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.18(typescript@5.8.3))(zod@4.0.13)
-      '@vscode/codicons':
-        specifier: ^0.0.36
-        version: 0.0.36
       '@vueuse/core':
         specifier: ^13.5.0
         version: 13.6.0(vue@3.5.18(typescript@5.8.3))
       NeteaseCloudMusicApi:
-        specifier: ^4.23.3
+        specifier: ^4.27.0
         version: 4.27.0
       axios:
-        specifier: ^0.26.1
-        version: 0.26.1
+        specifier: ^1.11.0
+        version: 1.11.0
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -67,9 +64,6 @@ importers:
       lucide-vue-next:
         specifier: ^0.525.0
         version: 0.525.0(vue@3.5.18(typescript@5.8.3))
-      music-metadata:
-        specifier: ^7.5.3
-        version: 7.14.0
       node-vibrant:
         specifier: ^4.0.3
         version: 4.0.3
@@ -1027,9 +1021,6 @@ packages:
   '@volar/typescript@2.4.20':
     resolution: {integrity: sha512-Oc4DczPwQyXcVbd+5RsNEqX6ia0+w3p+klwdZQ6ZKhFjWoBP9PCPQYlKYRi/tDemWphW93P/Vv13vcE9I9D2GQ==}
 
-  '@vscode/codicons@0.0.36':
-    resolution: {integrity: sha512-wsNOvNMMJ2BY8rC2N2MNBG7yOowV3ov8KlvUE/AiVUlHKTfWsw3OgAOQduX7h0Un6GssKD3aoTVH+TF3DSQwKQ==}
-
   '@vue/babel-helper-vue-transform-on@1.4.0':
     resolution: {integrity: sha512-mCokbouEQ/ocRce/FpKCRItGo+013tHg7tixg3DUNS+6bmIchPt66012kBMm476vyEIJPafrvOf4E5OYj3shSw==}
 
@@ -1187,9 +1178,6 @@ packages:
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
-
-  axios@0.26.1:
-    resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
 
   axios@1.11.0:
     resolution: {integrity: sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==}
@@ -3420,8 +3408,6 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
-  '@vscode/codicons@0.0.36': {}
-
   '@vue/babel-helper-vue-transform-on@1.4.0': {}
 
   '@vue/babel-plugin-jsx@1.4.0(@babel/core@7.28.0)':
@@ -3635,12 +3621,6 @@ snapshots:
       tslib: 2.8.1
 
   asynckit@0.4.0: {}
-
-  axios@0.26.1:
-    dependencies:
-      follow-redirects: 1.15.9
-    transitivePeerDependencies:
-      - debug
 
   axios@1.11.0:
     dependencies:

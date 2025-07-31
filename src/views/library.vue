@@ -238,6 +238,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useModalStore } from "@/store/modal";
 import type { Playlist } from "@/types";
+import { randomItem } from "@/utils/common";
 
 /**
  * Pick the lyric part from a string formed in `[timecode] lyric`.
@@ -382,8 +383,9 @@ const goToLikedSongsList = () => {
 };
 
 const getRandomLyric = () => {
-	if (liked.songs.length === 0) return;
-	api.track.getLyric(liked.songs[randomInt(0, liked.songs.length - 1)]).then((data) => {
+	const songId = randomItem(liked.songs);
+	if (!songId) return;
+	api.track.getLyric(songId).then((data) => {
 		if (data.lrc !== undefined) {
 			const isInstrumental = data.lrc.lyric.split("\n").filter((l) => l.includes("纯音乐，请欣赏"));
 			if (isInstrumental.length === 0) {

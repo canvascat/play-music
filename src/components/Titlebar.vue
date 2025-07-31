@@ -25,7 +25,6 @@
 </template>
 
 <script setup lang="ts">
-import "@vscode/codicons/dist/codicon.css";
 import { ref, computed } from "vue";
 import { useStore } from "@/store/pinia";
 import { MaximizeIcon, MinimizeIcon, XIcon, ChevronDownIcon } from "lucide-vue-next";
