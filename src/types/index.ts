@@ -55,6 +55,25 @@ export interface Track {
 	playable?: boolean;
 }
 
+export interface CloudDiskTrack {
+	addTime: number;
+	album: string;
+	artist: string;
+	bitrate: number;
+	cover: number;
+	coverId: string;
+	fileName: string;
+	fileSize: number;
+	lyricId: string;
+	matchType: string;
+	pcId: number;
+	privateCloud: any;
+	simpleSong: Track;
+	songId: number;
+	songName: string;
+	version: number;
+}
+
 export interface Artist {
 	id: number;
 	name: string;
@@ -292,13 +311,13 @@ export interface Settings {
 	showLibraryDefault?: boolean;
 	subTitleDefault?: boolean;
 	linuxEnableCustomTitlebar?: boolean;
-	enabledPlaylistCategories?: string[];
+	enabledPlaylistCategories: string[];
 	proxyConfig?: {
 		protocol?: string;
 		server?: string;
 		port?: number;
 	};
-	shortcuts?: Record<string, string>;
+	shortcuts: Record<string, string>;
 	deviceId?: string;
 	cacheLimit?: number;
 	// 新增的播放器相关设置
@@ -324,13 +343,13 @@ export interface GlobalState {
 		songs: number[];
 		songsWithDetails: Track[];
 		playlists: Playlist[];
-		albums: number[];
-		artists: number[];
-		mvs: number[];
-		cloudDisk: Track[];
+		albums: Album[];
+		artists: Artist[];
+		mvs: MV[];
+		cloudDisk: CloudDiskTrack[];
 		playHistory: {
-			weekData: Track[];
-			allData: Track[];
+			weekData: (Track & { playCount: number })[];
+			allData: (Track & { playCount: number })[];
 		};
 	};
 	dailyTracks: Track[];

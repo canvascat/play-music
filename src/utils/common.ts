@@ -5,7 +5,7 @@ import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
 import Color from "color";
 import PipelineWorker from "node-vibrant/worker.worker?worker";
 import pkg from "../../package.json";
-import { randomInt } from "crypto";
+import { randomInt } from "es-toolkit";
 
 Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 

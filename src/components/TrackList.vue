@@ -1,50 +1,76 @@
 <template>
-  <div class="track-list">
-    <div :style="listStyles">
-      <ContextMenu v-for="(track, index) in tracks" :key="itemKey === 'id' ? track.id : `${track.id}${index}`">
-        <ContextMenuTrigger>
-          <TrackListItem :track-prop="track" :track-no="index + 1" :highlight-playing-track="highlightPlayingTrack"
-            :type="type" :album-artist-name="albumObject.artist.name"
-            @dblclick.native="playThisList(track.id || track.songId)" />
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          <ContextMenuItem  v-show="type !== 'cloudDisk'" class="pointer-events-none flex items-center gap-2">
-            <img :src="resizeImage(track.al.picUrl, 224)" loading="lazy" class="w-10 h-10 rounded-sm" />
-            <div class="pr-2">
-              <div class="line-clamp-1 font-bold text-base">{{ track.name }}</div>
-              <div class="line-clamp-1 text-xs text-muted-foreground">{{ track.ar[0].name }}</div>
-            </div> 
-          </ContextMenuItem>
-          <ContextMenuSeparator v-show="type !== 'cloudDisk'" />
+	<div class="track-list">
+		<div :style="listStyles">
+			<ContextMenu
+				v-for="(track, index) in tracks"
+				:key="itemKey === 'id' ? track.id : `${track.id}${index}`"
+			>
+				<ContextMenuTrigger>
+					<TrackListItem
+						:track-prop="track"
+						:track-no="index + 1"
+						:highlight-playing-track="highlightPlayingTrack"
+						:type="type"
+						:album-artist-name="albumObject.artist.name"
+						@dblclick.native="playThisList(track.id || track.songId)"
+					/>
+				</ContextMenuTrigger>
+				<ContextMenuContent>
+					<ContextMenuItem
+						v-show="type !== 'cloudDisk'"
+						class="pointer-events-none flex items-center gap-2"
+					>
+						<img
+							:src="resizeImage(track.al.picUrl, 224)"
+							loading="lazy"
+							class="w-10 h-10 rounded-sm"
+						/>
+						<div class="pr-2">
+							<div class="line-clamp-1 font-bold text-base">{{ track.name }}</div>
+							<div class="line-clamp-1 text-xs text-muted-foreground">{{ track.ar[0].name }}</div>
+						</div>
+					</ContextMenuItem>
+					<ContextMenuSeparator v-show="type !== 'cloudDisk'" />
 
-          <ContextMenuItem @click="play(track.id)">{{ $t('contextMenu.play') }}</ContextMenuItem>
+					<ContextMenuItem @click="play(track.id)">{{ $t("contextMenu.play") }}</ContextMenuItem>
 
-          <ContextMenuItem @click="addToQueue(track.id)">{{
-            $t('contextMenu.addToQueue')
-          }}</ContextMenuItem>
-          <ContextMenuItem v-if="extraContextMenuItem.includes('removeTrackFromQueue')"
-            @click="removeTrackFromQueue(track.id)">从队列删除</ContextMenuItem>
-          <ContextMenuSeparator v-show="type !== 'cloudDisk'" />
+					<ContextMenuItem @click="addToQueue(track.id)">{{
+						$t("contextMenu.addToQueue")
+					}}</ContextMenuItem>
+					<ContextMenuItem
+						v-if="extraContextMenuItem.includes('removeTrackFromQueue')"
+						@click="removeTrackFromQueue(track.id)"
+						>从队列删除</ContextMenuItem
+					>
+					<ContextMenuSeparator v-show="type !== 'cloudDisk'" />
 
-
-          <ContextMenuItem v-show="type !== 'cloudDisk'" @click="like(track.id)">
-            {{ liked.songs.includes(track.id) ? $t('contextMenu.removeFromMyLikedSongs') :
-              $t('contextMenu.saveToMyLikedSongs') }}
-          </ContextMenuItem>
-          <ContextMenuItem v-if="extraContextMenuItem.includes('removeTrackFromPlaylist')"
-            @click="removeTrackFromPlaylist(track)">从歌单中删除</ContextMenuItem>
-          <ContextMenuItem v-show="type !== 'cloudDisk'" @click="addTrackToPlaylist(track.id)">{{
-            $t('contextMenu.addToPlaylist') }}</ContextMenuItem>
-          <ContextMenuItem v-show="type !== 'cloudDisk'" @click="copyLink(track.id)">{{
-            $t('contextMenu.copyUrl')
-          }}</ContextMenuItem>
-          <ContextMenuItem v-if="extraContextMenuItem.includes('removeTrackFromCloudDisk')"
-            @click="removeTrackFromCloudDisk(track.id)">从云盘中删除</ContextMenuItem>
-        </ContextMenuContent>
-      </ContextMenu>
-
-    </div>
-  </div>
+					<ContextMenuItem v-show="type !== 'cloudDisk'" @click="like(track.id)">
+						{{
+							liked.songs.includes(track.id)
+								? $t("contextMenu.removeFromMyLikedSongs")
+								: $t("contextMenu.saveToMyLikedSongs")
+						}}
+					</ContextMenuItem>
+					<ContextMenuItem
+						v-if="extraContextMenuItem.includes('removeTrackFromPlaylist')"
+						@click="removeTrackFromPlaylist(track)"
+						>从歌单中删除</ContextMenuItem
+					>
+					<ContextMenuItem v-show="type !== 'cloudDisk'" @click="addTrackToPlaylist(track.id)">{{
+						$t("contextMenu.addToPlaylist")
+					}}</ContextMenuItem>
+					<ContextMenuItem v-show="type !== 'cloudDisk'" @click="copyLink(track.id)">{{
+						$t("contextMenu.copyUrl")
+					}}</ContextMenuItem>
+					<ContextMenuItem
+						v-if="extraContextMenuItem.includes('removeTrackFromCloudDisk')"
+						@click="removeTrackFromCloudDisk(track.id)"
+						>从云盘中删除</ContextMenuItem
+					>
+				</ContextMenuContent>
+			</ContextMenu>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
@@ -96,7 +122,7 @@ const props = withDefaults(defineProps<Props>(), {
 	highlightPlayingTrack: true,
 	itemKey: "id",
 });
-const { liked, player, likeATrack, updateLikedXXX } = useStore();
+const { liked, player, likeATrack, updateLiked } = useStore();
 
 const listStyles = ref({
 	// display: 'grid',
@@ -195,11 +221,10 @@ function removeTrackFromCloudDisk(track: any) {
 		let trackID = track.songId;
 		api.user.cloudDiskTrackDelete(trackID).then((data) => {
 			toast(data.code === 200 ? "已将此歌曲从云盘删除" : data.message);
-			let newCloudDisk = liked.cloudDisk.filter((t) => t.songId !== trackID);
-			updateLikedXXX({
-				name: "cloudDisk",
-				data: newCloudDisk,
-			});
+			updateLiked(
+				"cloudDisk",
+				liked.cloudDisk.filter((t) => t.songId !== trackID),
+			);
 		});
 	}
 }

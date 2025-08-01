@@ -266,7 +266,7 @@ const {
 	fetchLikedMVs,
 	fetchCloudDisk,
 	fetchPlayHistory,
-	updateLikedXXX,
+	updateLiked,
 } = useStore();
 
 // 响应式数据
@@ -419,12 +419,7 @@ const uploadSongToCloudDisk = (e: Event) => {
 
 	api.user.uploadSong(files[0]).then((result) => {
 		if (result.code === 200) {
-			let newCloudDisk = liked.cloudDisk;
-			newCloudDisk.unshift(result.privateCloud);
-			updateLikedXXX({
-				name: "cloudDisk",
-				data: newCloudDisk,
-			});
+			updateLiked("cloudDisk", [result.privateCloud, ...liked.cloudDisk]);
 		}
 	});
 };

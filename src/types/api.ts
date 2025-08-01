@@ -1,6 +1,7 @@
 import type {
 	Album,
 	Artist,
+	CloudDiskTrack,
 	Lyric,
 	MV,
 	PaginationParams,
@@ -60,9 +61,15 @@ export interface UserPlaylistResponse extends BaseApiResponse {
 	playlist: Playlist[];
 }
 
+interface UserPlayHistory {
+	playCount: number;
+	score: number;
+	song: Track;
+}
+
 export interface UserPlayHistoryResponse extends BaseApiResponse {
-	weekData?: Track[];
-	allData?: Track[];
+	weekData?: UserPlayHistory[];
+	allData?: UserPlayHistory[];
 }
 
 export interface LikedSongsResponse extends BaseApiResponse {
@@ -88,7 +95,7 @@ export interface LikedMVsResponse extends BaseApiResponse {
 }
 
 export interface CloudDiskResponse extends BaseApiResponse {
-	data: Track[];
+	data: CloudDiskTrack[];
 	count: number;
 	size: string;
 	maxSize: string;

@@ -1,4 +1,4 @@
-import { cloneDeep } from "es-toolkit";
+import { cloneDeep, isNil } from "es-toolkit";
 import { createPinia, defineStore } from "pinia";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
@@ -13,9 +13,10 @@ export const pinia = createPinia();
 export const useStore = defineStore("store", {
 	state: () => _state,
 	actions: {
-		updateLikedXXX({ name, data }: { name: keyof GlobalState["liked"]; data: any }) {
-			this.liked[name] = data;
+		updateLiked<K extends keyof GlobalState["liked"]>(key: K, payload: GlobalState["liked"][K]) {
+			this.liked[key] = payload;
 		},
+
 		changeLang(lang: string) {
 			this.settings.lang = lang;
 		},
@@ -78,17 +79,14 @@ export const useStore = defineStore("store", {
 				.likeATrack({ id, like })
 				.then(() => {
 					if (like === false) {
-						this.updateLikedXXX({
-							name: "songs",
-							data: this.liked.songs.filter((d) => d !== id),
-						});
+						this.updateLiked(
+							"songs",
+							this.liked.songs.filter((d) => d !== id),
+						);
 					} else {
 						const newLikeSongs = this.liked.songs;
 						newLikeSongs.push(id);
-						this.updateLikedXXX({
-							name: "songs",
-							data: newLikeSongs,
-						});
+						this.updateLiked("songs", newLikeSongs);
 					}
 					this.fetchLikedSongsWithDetails();
 				})
@@ -96,128 +94,70 @@ export const useStore = defineStore("store", {
 					toast("操作失败，专辑下架或版权锁定");
 				});
 		},
-		fetchLikedSongs() {
-			if (isAccountLoggedIn()) {
-				return api.user.userLikedSongsIDs(this.data.user.userId).then((result) => {
-					if (result.ids) {
-						this.updateLikedXXX({
-							name: "songs",
-							data: result.ids,
-						});
-					}
+		async fetchLikedSongs() {
+			if (!isAccountLoggedIn()) return;
+			const result = await api.user.userLikedSongsIDs(this.data.user.userId);
+
+			this.updateLiked("songs", result.ids);
+		},
+		async fetchLikedSongsWithDetails() {
+			const result = await api.playlist.getPlaylistDetail(this.data.likedSongPlaylistID, true);
+			if (!result.playlist?.trackIds?.length) return;
+			const trackIds = result.playlist.trackIds
+				.slice(0, 12)
+				.map((t) => t.id)
+				.join(",");
+			const { songs } = await api.track.getTrackDetail(trackIds);
+			this.updateLiked("songsWithDetails", songs);
+		},
+		async fetchLikedPlaylist() {
+			if (!isAccountLoggedIn()) return;
+			const result = await api.user.userPlaylist({
+				uid: this.data.user?.userId,
+				limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
+			});
+
+			if (result.playlist) {
+				this.updateLiked("playlists", result.playlist || []);
+				// 更新用户”喜欢的歌曲“歌单ID
+				this.updateData({
+					key: "likedSongPlaylistID",
+					value: result.playlist[0].id,
 				});
 			}
 		},
-		fetchLikedSongsWithDetails() {
-			return api.playlist.getPlaylistDetail(this.data.likedSongPlaylistID, true).then((result) => {
-				if (result.playlist?.trackIds?.length === 0) {
-					return Promise.resolve();
-				}
-				return api.track
-					.getTrackDetail(
-						result.playlist.trackIds
-							.slice(0, 12)
-							.map((t) => t.id)
-							.join(","),
-					)
-					.then((result) => {
-						this.updateLikedXXX({
-							name: "songsWithDetails",
-							data: result.songs,
-						});
-					});
-			});
-		},
-		async fetchLikedPlaylist() {
-			if (isAccountLoggedIn()) {
-				return api.user
-					.userPlaylist({
-						uid: this.data.user?.userId,
-						limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
-					})
-					.then((result) => {
-						if (result.playlist) {
-							this.updateLikedXXX({
-								name: "playlists",
-								data: result.playlist,
-							});
-							// 更新用户”喜欢的歌曲“歌单ID
-							this.updateData({
-								key: "likedSongPlaylistID",
-								value: result.playlist[0].id,
-							});
-						}
-					});
-			}
-		},
-		fetchLikedAlbums() {
+		async fetchLikedAlbums() {
 			if (!isAccountLoggedIn()) return;
-			return api.user.likedAlbums({ limit: 2000 }).then((result) => {
-				if (result.data) {
-					this.updateLikedXXX({
-						name: "albums",
-						data: result.data,
-					});
-				}
-			});
+			const result = await api.user.likedAlbums({ limit: 2000 });
+			this.updateLiked("albums", result.data || []);
 		},
-		fetchLikedArtists() {
+		async fetchLikedArtists() {
 			if (!isAccountLoggedIn()) return;
-			return api.user.likedArtists({ limit: 2000 }).then((result) => {
-				if (result.data) {
-					this.updateLikedXXX({
-						name: "artists",
-						data: result.data,
-					});
-				}
-			});
+			const result = await api.user.likedArtists({ limit: 2000 });
+			this.updateLiked("artists", result.data || []);
 		},
-		fetchLikedMVs() {
+		async fetchLikedMVs() {
 			if (!isAccountLoggedIn()) return;
-			return api.user.likedMVs({ limit: 1000 }).then((result) => {
-				if (result.data) {
-					this.updateLikedXXX({
-						name: "mvs",
-						data: result.data,
-					});
-				}
-			});
+			const result = await api.user.likedMVs({ limit: 1000 });
+			this.updateLiked("mvs", result.data || []);
 		},
-		fetchCloudDisk() {
+		async fetchCloudDisk() {
 			if (!isAccountLoggedIn()) return;
-			// FIXME: #1242
-			return api.user.cloudDisk({ limit: 1000 }).then((result) => {
-				if (result.data) {
-					this.updateLikedXXX({
-						name: "cloudDisk",
-						data: result.data,
-					});
-				}
-			});
+			const result = await api.user.cloudDisk({ limit: 1000 });
+			this.updateLiked("cloudDisk", result.data || []);
 		},
-		fetchPlayHistory() {
+		async fetchPlayHistory() {
 			if (!isAccountLoggedIn()) return;
-			return Promise.all([
+			const [{ allData }, { weekData }] = await Promise.all([
 				api.user.userPlayHistory({ uid: this.data.user?.userId, type: 0 }),
 				api.user.userPlayHistory({ uid: this.data.user?.userId, type: 1 }),
-			]).then((result) => {
-				const data = {};
-				const dataType = { 0: "allData", 1: "weekData" };
-				if (result[0] && result[1]) {
-					for (let i = 0; i < result.length; i++) {
-						const songData = result[i][dataType[i]].map((item) => {
-							const song = item.song;
-							song.playCount = item.playCount;
-							return song;
-						});
-						data[[dataType[i]]] = songData;
-					}
-					this.updateLikedXXX({
-						name: "playHistory",
-						data,
-					});
-				}
-			});
+			]);
+			if (allData && weekData) {
+				this.updateLiked("playHistory", {
+					allData: allData.map(({ song, playCount }) => ({ ...song, playCount })),
+					weekData: weekData.map(({ song, playCount }) => ({ ...song, playCount })),
+				});
+			}
 		},
 		async fetchUserProfile() {
 			if (!isAccountLoggedIn()) return;
@@ -232,7 +172,7 @@ export const useStore = defineStore("store", {
 
 const store = useStore(pinia);
 
-if ([undefined, null].includes(store.settings.lang)) {
+if (isNil(store.settings.lang)) {
 	const defaultLang = "en";
 	const langMapper = new Map()
 		.set("zh", "zh-CN")
