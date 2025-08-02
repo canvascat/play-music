@@ -10,6 +10,7 @@ import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
 import { randomItem, setTitle } from "./common";
 import { getAudioSourceFromUnblockMusic } from "./umn";
+import { getLastfm } from "@/api/lastfm";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -536,26 +537,7 @@ export default class Player {
 				return [false, this._personalFMNextTrack];
 			});
 	}
-	private _playDiscordPresence(track: Track, seekTime = 0) {
-		if (
-			window.IS_ELECTRON !== true ||
-			useStore(pinia).settings.enableDiscordRichPresence === false
-		) {
-			return null;
-		}
-		const copyTrack = { ...track };
-		copyTrack.dt -= seekTime * 1000;
-		window.ipcRenderer?.send("playDiscordPresence", copyTrack);
-	}
-	private _pauseDiscordPresence(track: Track) {
-		if (
-			window.IS_ELECTRON !== true ||
-			useStore(pinia).settings.enableDiscordRichPresence === false
-		) {
-			return null;
-		}
-		window.ipcRenderer?.send("pauseDiscordPresence", track);
-	}
+
 	_playNextTrack() {
 		if (this._isPersonalFM) {
 			this.playNextFMTrack();
@@ -643,7 +625,6 @@ export default class Player {
 			this[_howler]?.pause();
 			this._setPlaying(false);
 			setTitle();
-			this._pauseDiscordPresence(this._currentTrack!);
 		});
 	}
 	play() {
@@ -661,8 +642,7 @@ export default class Player {
 			this._setPlaying(true);
 			setTitle(this._currentTrack);
 			if (!this._currentTrack) return;
-			this._playDiscordPresence(this._currentTrack, this.seek());
-			if (useStore(pinia).lastfm.key !== undefined) {
+			if (getLastfm().key !== undefined) {
 				api.lastfm.trackUpdateNowPlaying({
 					artist: this._currentTrack.ar[0].name,
 					track: this._currentTrack.name,
@@ -683,9 +663,6 @@ export default class Player {
 	seek(time: number | null = null) {
 		if (time !== null) {
 			this[_howler]?.seek(time);
-			if (this._playing && this._currentTrack) {
-				this._playDiscordPresence(this._currentTrack, this.seek(null));
-			}
 		}
 		return this[_howler] === null ? 0 : this[_howler].seek();
 	}
@@ -710,7 +687,7 @@ export default class Player {
 
 	replacePlaylist(
 		trackIDs: number[],
-		playlistSourceID: number,
+		playlistSourceID: PlaylistSource["id"],
 		playlistSourceType: PlaylistSource["type"],
 		autoPlayTrackID: number | "first" = "first",
 	) {

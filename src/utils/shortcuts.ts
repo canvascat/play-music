@@ -44,4 +44,4 @@ export default [
 		shortcut: "CommandOrControl+M",
 		globalShortcut: "Alt+CommandOrControl+M",
 	},
-];
+] as const;
