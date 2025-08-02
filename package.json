@@ -13,9 +13,14 @@
 		"type": "git",
 		"url": "https://github.com/canvascat/play-music"
 	},
+	"main": ".vite/build/main.cjs",
 	"scripts": {
 		"dev": "vite",
 		"netease_api:run": "npx NeteaseCloudMusicApi",
+		"start": "electron-forge start",
+		"package": "electron-forge package",
+		"make": "electron-forge make",
+		"publish": "electron-forge publish",
 		"lint": "oxlint"
 	},
 	"dependencies": {
@@ -31,6 +36,7 @@
 		"crypto-js": "^4.2.0",
 		"dayjs": "^1.8.36",
 		"dexie": "^4.0.11",
+		"electron-squirrel-startup": "^1.0.1",
 		"es-toolkit": "^1.39.7",
 		"events": "^3.3.0",
 		"howler": "^2.2.3",
@@ -56,8 +62,18 @@
 		"zod": "^4.0.5"
 	},
 	"devDependencies": {
+		"@electron-forge/cli": "^7.8.2",
+		"@electron-forge/maker-deb": "^7.8.2",
+		"@electron-forge/maker-rpm": "^7.8.2",
+		"@electron-forge/maker-squirrel": "^7.8.2",
+		"@electron-forge/maker-zip": "^7.8.2",
+		"@electron-forge/plugin-auto-unpack-natives": "^7.8.2",
+		"@electron-forge/plugin-fuses": "^7.8.2",
+		"@electron-forge/plugin-vite": "^7.8.2",
+		"@electron/fuses": "^2.0.0",
 		"@prettier/plugin-oxc": "^0.0.4",
 		"@types/crypto-js": "^4.2.2",
+		"@types/electron-squirrel-startup": "^1.0.2",
 		"@types/howler": "^2.2.12",
 		"@types/js-cookie": "^3.0.6",
 		"@types/node": "^24.0.13",
@@ -66,6 +82,7 @@
 		"@vitejs/plugin-vue": "^6.0.0",
 		"@vitejs/plugin-vue-jsx": "^5.0.1",
 		"@vue/tsconfig": "^0.7.0",
+		"electron": "37.2.5",
 		"glob": "^11.0.3",
 		"oxlint": "^1.8.0",
 		"prettier": "^3.6.2",
@@ -73,6 +90,8 @@
 		"svgo": "^4.0.0",
 		"typescript": "^5.8.3",
 		"vite": "npm:rolldown-vite@latest",
+		"vite-plugin-electron": "^0.29.0",
+		"vite-plugin-vue-devtools": "^8.0.0",
 		"vue-tsc": "^3.0.1"
 	},
 	"resolutions": {
@@ -87,9 +106,11 @@
 			"@parcel/watcher",
 			"@tailwindcss/oxide",
 			"core-js",
+			"electron",
+			"electron-winstaller",
 			"es5-ext",
 			"vue-demi"
 		]
 	},
-	"packageManager": "pnpm@10.14.0-0+sha512.2cd47a0cbf5f1d1de7693a88307a0ede5be94e0d3b34853d800ee775efbea0650cb562b77605ec80bc8d925f5cd27c4dfe8bb04d3a0b76090784c664450d32d6"
+	"packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }
