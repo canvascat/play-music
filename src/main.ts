@@ -37,7 +37,6 @@ app.use(pinia);
 const store = useStore();
 
 store.$subscribe((_mutation, state) => {
-	localStorage.setItem("data", JSON.stringify(state.data));
 	localStorage.setItem("settings", JSON.stringify(state.settings));
 });
 

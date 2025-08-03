@@ -93,20 +93,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Titlebar from "@/components/Titlebar.vue";
 import { cn } from "@/lib/utils";
-import { useStore } from "@/store/pinia";
 import { doLogout, isAccountLoggedIn } from "@/utils/auth";
 import pkg from "../../package.json";
+import { useDataStore } from "@/store/data";
 
 const inputFocus = ref(false);
 const keywords = ref("");
 const enableWin32Titlebar = ref(false);
 const enableLinuxTitlebar = ref(false);
 
-const store = useStore();
+const dataStore = useDataStore();
+
 const isLoggedIn = computed(() => isAccountLoggedIn());
 const avatarUrl = computed(() => {
-	return store.data?.user?.avatarUrl && isLoggedIn.value
-		? `${store.data?.user?.avatarUrl}?param=512y512`
+	return dataStore.user?.avatarUrl && isLoggedIn.value
+		? `${dataStore.user?.avatarUrl}?param=512y512`
 		: "http://s4.music.126.net/style/web2/img/default/default_avatar.jpg?param=60y60";
 });
 

@@ -1,8 +1,8 @@
 <template>
 	<div v-show="show" ref="library">
 		<h1>
-			<img class="avatar" :src="resizeImage(data.user.avatarUrl)" loading="lazy" />{{
-				data.user.nickname
+			<img class="avatar" :src="resizeImage(dataStore.user?.avatarUrl)" loading="lazy" />{{
+				dataStore.user?.nickname
 			}}{{ $t("library.sLibrary") }}
 		</h1>
 		<div class="section-one">
@@ -239,6 +239,7 @@ import {
 import { useModalStore } from "@/store/modal";
 import type { Playlist } from "@/types";
 import { randomItem } from "@/utils/common";
+import { useDataStore } from "@/store/data";
 
 /**
  * Pick the lyric part from a string formed in `[timecode] lyric`.
@@ -254,10 +255,8 @@ const router = useRouter();
 const { t } = useI18n();
 const modalStore = useModalStore();
 const {
-	data,
 	liked,
 	player,
-	updateData,
 	fetchLikedSongsWithDetails,
 	fetchLikedSongs,
 	fetchLikedPlaylist,
@@ -268,6 +267,8 @@ const {
 	fetchPlayHistory,
 	updateLiked,
 } = useStore();
+
+const dataStore = useDataStore();
 
 // 响应式数据
 const show = ref(false);
@@ -301,12 +302,12 @@ const pickedLyric = computed((): string[] => {
 });
 
 const playlistFilter = computed(() => {
-	return data.libraryPlaylistFilter || "all";
+	return dataStore.libraryPlaylistFilter || "all";
 });
 
 const filterPlaylists = computed((): Playlist[] => {
 	const playlists = liked.playlists.slice(1);
-	const userId = data.user.userId;
+	const userId = dataStore.user?.userId;
 	if (playlistFilter.value === "mine") {
 		return playlists.filter((p) => p.creator.userId === userId);
 	} else if (playlistFilter.value === "liked") {
@@ -403,8 +404,8 @@ const openAddPlaylistModal = () => {
 	modalStore.showNewPlaylist();
 };
 
-const changePlaylistFilter = (type: string) => {
-	updateData({ key: "libraryPlaylistFilter", value: type });
+const changePlaylistFilter = (type: "mine" | "all" | "liked") => {
+	dataStore.update("libraryPlaylistFilter", type);
 	window.scrollTo({ top: 375, behavior: "smooth" });
 };
 

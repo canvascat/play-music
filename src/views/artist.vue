@@ -1,13 +1,16 @@
 <template>
-	<div v-show="show" class="artist-page">
-		<div class="artist-info">
-			<div class="head">
-				<img :src="resizeImage(artist.img1v1Url, 1024)" loading="lazy" />
-			</div>
+	<div v-show="show" class="mt-8">
+		<div class="flex items-center mb-6 text-text">
+			<img
+				:src="resizeImage(artist.img1v1Url, 1024)"
+				class="flex-shrink-0 rounded-full size-62 mr-14 shadow-lg"
+				loading="lazy"
+			/>
+
 			<div>
-				<div class="name">{{ artist.name }}</div>
-				<div class="artist">{{ $t("artist.artist") }}</div>
-				<div class="statistics">
+				<div class="text-5xl font-bold">{{ artist.name }}</div>
+				<div class="text-xl opacity-88 mt-6">{{ $t("artist.artist") }}</div>
+				<div class="text-sm opacity-68 mt-1">
 					<a @click="scrollTo('popularTracks')">{{ artist.musicSize }} {{ $t("common.songs") }}</a>
 					·
 					<a @click="scrollTo('seeMore', 'start')"
@@ -18,7 +21,7 @@
 				</div>
 
 				<Description :description="artist.briefDesc" :title="$t('artist.artistDesc')" />
-				<div class="buttons">
+				<div class="mt-6 flex gap-2">
 					<ButtonTwoTone :icon="IconPlay" @click="playPopularSongs()">
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
@@ -43,8 +46,10 @@
 			</div>
 		</div>
 		<div v-if="latestRelease !== undefined" class="latest-release">
-			<div class="section-title">{{ $t("artist.latestRelease") }}</div>
-			<div class="release">
+			<div class="section-title">
+				{{ $t("artist.latestRelease") }}
+			</div>
+			<div class="flex">
 				<div class="container">
 					<Cover
 						:id="latestRelease.id"
@@ -73,7 +78,7 @@
 						@mouseleave="mvHover = false"
 						@click="goToMv(latestMV.id)"
 					>
-						<img :src="latestMV.coverUrl" loading="lazy" />
+						<img :src="latestMV.coverUrl" loading="lazy" class="rounded-lg size-24" />
 						<transition name="fade">
 							<div
 								v-show="mvHover"
@@ -134,8 +139,8 @@
 			/>
 		</div>
 
-		<div v-if="similarArtists.length !== 0" class="similar-artists">
-			<div class="section-title">{{ $t("artist.similarArtists") }}</div>
+		<div v-if="similarArtists.length !== 0">
+			<div class="section-title mt-6">{{ $t("artist.similarArtists") }}</div>
 			<CoverRow
 				type="artist"
 				:column-number="6"
@@ -305,66 +310,17 @@ function openInBrowser(id: string) {
 </script>
 
 <style lang="scss" scoped>
-.artist-page {
-	margin-top: 32px;
-}
-
-.artist-info {
-	display: flex;
-	align-items: center;
-	margin-bottom: 26px;
-	color: var(--color-text);
-
-	img {
-		height: 248px;
-		width: 248px;
-		border-radius: 50%;
-		margin-right: 56px;
-		box-shadow: rgba(0, 0, 0, 0.2) 0px 12px 16px -8px;
-	}
-
-	.name {
-		font-size: 56px;
-		font-weight: 700;
-	}
-
-	.artist {
-		font-size: 18px;
-		opacity: 0.88;
-		margin-top: 24px;
-	}
-
-	.statistics {
-		font-size: 14px;
-		opacity: 0.68;
-		margin-top: 2px;
-	}
-
-	.buttons {
-		margin-top: 26px;
-		display: flex;
-
-		.shuffle {
-			padding: 8px 11px;
-
-			.svg-icon {
-				margin: 0;
-			}
-		}
-	}
-}
-
 .section-title {
 	font-weight: 600;
 	font-size: 22px;
-	opacity: 0.88;
 	color: var(--color-text);
-	margin-bottom: 16px;
-	padding-top: 46px;
 
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-end;
+	padding-top: 46px;
+	margin-bottom: 16px;
+	opacity: 0.88;
 
 	a {
 		font-size: 13px;
@@ -376,20 +332,11 @@ function openInBrowser(id: string) {
 .latest-release {
 	color: var(--color-text);
 
-	.release {
-		display: flex;
-	}
-
 	.container {
 		display: flex;
 		flex: 1;
 		align-items: center;
 		border-radius: 12px;
-	}
-
-	img {
-		height: 96px;
-		border-radius: 8px;
 	}
 
 	.info {
@@ -431,12 +378,6 @@ function openInBrowser(id: string) {
 				opacity: 1;
 			}
 		}
-	}
-}
-
-.similar-artists {
-	.section-title {
-		margin-bottom: 24px;
 	}
 }
 

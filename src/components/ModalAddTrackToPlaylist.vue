@@ -39,18 +39,21 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useModalStore } from "@/store/modal";
 import { IconPlus } from "@/components/icon";
+import { useDataStore } from "@/store/data";
 
 const modalStore = useModalStore();
 
 const { t } = useI18n();
 
-const { liked, data } = useStore();
+const dataStore = useDataStore();
+
+const { liked } = useStore();
 
 const show = computed(() => modalStore.show.addTrackToPlaylist);
 
 const ownPlaylists = computed(() => {
 	return liked.playlists.filter(
-		(p) => p.creator.userId === data.user.userId && p.id !== data.likedSongPlaylistID,
+		(p) => p.creator.userId === dataStore.user?.userId && p.id !== dataStore.likedSongPlaylistID,
 	);
 });
 

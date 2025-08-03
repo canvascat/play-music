@@ -49,7 +49,7 @@
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
 					<ButtonTwoTone
-						v-if="playlist.creator.userId !== data.user.userId"
+						v-if="playlist.creator.userId !== dataStore.user?.userId"
 						:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
 						:color="playlist.subscribed ? 'blue' : 'grey'"
 						:text-color="playlist.subscribed ? '#335eea' : ''"
@@ -70,12 +70,12 @@
 								$t("contextMenu.searchInPlaylist")
 							}}</DropdownMenuItem>
 							<DropdownMenuItem
-								v-if="playlist.creator.userId === data.user.userId"
+								v-if="playlist.creator.userId === dataStore.user?.userId"
 								@click="editPlaylist"
 								>编辑歌单信息
 							</DropdownMenuItem>
 							<DropdownMenuItem
-								v-if="playlist.creator.userId === data.user.userId"
+								v-if="playlist.creator.userId === dataStore.user?.userId"
 								@click="deletePlaylist"
 								>删除歌单
 							</DropdownMenuItem>
@@ -114,7 +114,7 @@
 					{{ $t("common.play") }}
 				</ButtonTwoTone>
 				<ButtonTwoTone
-					v-if="playlist.creator.userId !== data.user.userId"
+					v-if="playlist.creator.userId !== dataStore.user?.userId"
 					:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
 					:color="playlist.subscribed ? 'blue' : 'grey'"
 					:text-color="playlist.subscribed ? '#335eea' : ''"
@@ -136,12 +136,12 @@
 							$t("contextMenu.searchInPlaylist")
 						}}</DropdownMenuItem>
 						<DropdownMenuItem
-							v-if="playlist.creator.userId === data.user.userId"
+							v-if="playlist.creator.userId === dataStore.user?.userId"
 							@click="editPlaylist"
 							>编辑歌单信息
 						</DropdownMenuItem>
 						<DropdownMenuItem
-							v-if="playlist.creator.userId === data.user.userId"
+							v-if="playlist.creator.userId === dataStore.user?.userId"
 							@click="deletePlaylist"
 							>删除歌单
 						</DropdownMenuItem>
@@ -152,8 +152,8 @@
 
 		<div v-if="isLikeSongsPage" class="user-info">
 			<h1>
-				<img class="avatar" :src="resizeImage(data.user.avatarUrl)" loading="lazy" />
-				{{ data.user.nickname }}{{ $t("library.sLikedSongs") }}
+				<img class="avatar" :src="resizeImage(dataStore.user?.avatarUrl)" loading="lazy" />
+				{{ dataStore.user?.nickname }}{{ $t("library.sLikedSongs") }}
 			</h1>
 			<div class="search-box-likepage" @click="searchInPlaylist()">
 				<div class="container" :class="{ active: inputFocus }">
@@ -220,8 +220,12 @@ import {
 	IconHeart,
 	IconMore,
 } from "@/components/icon";
+import { useDataStore } from "@/store/data";
 
-const { player, data } = useStore();
+const { player } = useStore();
+
+const dataStore = useDataStore();
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
@@ -254,8 +258,8 @@ const specialPlaylistInfo = computed(() => {
 });
 const isUserOwnPlaylist = computed(() => {
 	return (
-		playlist.value.creator.userId === data.user.userId &&
-		playlist.value.id !== data.likedSongPlaylistID
+		playlist.value.creator.userId === dataStore.user?.userId &&
+		playlist.value.id !== dataStore.likedSongPlaylistID
 	);
 });
 const filteredTracks = computed(() => {
@@ -272,7 +276,7 @@ const filteredTracks = computed(() => {
 
 onMounted(() => {
 	if (route.name === "likedSongs") {
-		loadData(data.likedSongPlaylistID);
+		loadData(dataStore.likedSongPlaylistID);
 	} else {
 		loadData(route.params.id);
 	}

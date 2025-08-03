@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import * as api from "@/api";
-import { useStore } from "@/store/pinia";
+import { useDataStore } from "@/store/data";
 
 export function setCookies(string: string) {
 	const cookies = string.split(";;");
@@ -29,9 +29,9 @@ export function doLogout() {
 	api.auth.logout();
 	removeCookie("MUSIC_U");
 	removeCookie("__csrf");
-	const store = useStore();
+	const dataStore = useDataStore();
 	// 更新状态仓库中的用户信息
-	store.updateData({ key: "user", value: {} });
+	dataStore.update("user", undefined);
 	// 更新状态仓库中的喜欢列表
-	store.updateData({ key: "likedSongPlaylistID", value: undefined });
+	dataStore.update("likedSongPlaylistID", undefined);
 }

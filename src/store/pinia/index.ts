@@ -7,6 +7,7 @@ import { isAccountLoggedIn } from "@/utils/auth";
 import { changeAppearance } from "@/utils/common";
 import shortcuts from "@/utils/shortcuts";
 import _state from "../state";
+import { useDataStore } from "../data";
 
 export const pinia = createPinia();
 
@@ -31,9 +32,6 @@ export const useStore = defineStore("store", {
 		},
 		updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
 			this.settings[key] = value;
-		},
-		updateData({ key, value }) {
-			this.data[key] = value;
 		},
 		togglePlaylistCategory(name: string) {
 			const index = this.settings.enabledPlaylistCategories.findIndex((c) => c === name);
@@ -95,13 +93,16 @@ export const useStore = defineStore("store", {
 				});
 		},
 		async fetchLikedSongs() {
-			if (!isAccountLoggedIn()) return;
-			const result = await api.user.userLikedSongsIDs(this.data.user.userId);
+			const user = useDataStore().user;
+			if (!user) return;
+			const result = await api.user.userLikedSongsIDs(user.userId);
 
 			this.updateLiked("songs", result.ids);
 		},
 		async fetchLikedSongsWithDetails() {
-			const result = await api.playlist.getPlaylistDetail(this.data.likedSongPlaylistID, true);
+			const { likedSongPlaylistID } = useDataStore();
+			if (!likedSongPlaylistID) return;
+			const result = await api.playlist.getPlaylistDetail(likedSongPlaylistID, true);
 			if (!result.playlist?.trackIds?.length) return;
 			const trackIds = result.playlist.trackIds
 				.slice(0, 12)
@@ -111,19 +112,17 @@ export const useStore = defineStore("store", {
 			this.updateLiked("songsWithDetails", songs);
 		},
 		async fetchLikedPlaylist() {
-			if (!isAccountLoggedIn()) return;
+			const user = useDataStore().user;
+			if (!user) return;
 			const result = await api.user.userPlaylist({
-				uid: this.data.user?.userId,
+				uid: user.userId,
 				limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
 			});
 
 			if (result.playlist) {
 				this.updateLiked("playlists", result.playlist || []);
 				// 更新用户”喜欢的歌曲“歌单ID
-				this.updateData({
-					key: "likedSongPlaylistID",
-					value: result.playlist[0].id,
-				});
+				useDataStore().update("likedSongPlaylistID", result.playlist[0].id);
 			}
 		},
 		async fetchLikedAlbums() {
@@ -147,10 +146,11 @@ export const useStore = defineStore("store", {
 			this.updateLiked("cloudDisk", result.data || []);
 		},
 		async fetchPlayHistory() {
-			if (!isAccountLoggedIn()) return;
+			const user = useDataStore().user;
+			if (!user) return;
 			const [{ allData }, { weekData }] = await Promise.all([
-				api.user.userPlayHistory({ uid: this.data.user?.userId, type: 0 }),
-				api.user.userPlayHistory({ uid: this.data.user?.userId, type: 1 }),
+				api.user.userPlayHistory({ uid: user.userId, type: 0 }),
+				api.user.userPlayHistory({ uid: user.userId, type: 1 }),
 			]);
 			if (allData && weekData) {
 				this.updateLiked("playHistory", {
@@ -161,11 +161,9 @@ export const useStore = defineStore("store", {
 		},
 		async fetchUserProfile() {
 			if (!isAccountLoggedIn()) return;
-			return api.user.userAccount().then((result) => {
-				if (result.code === 200) {
-					this.updateData({ key: "user", value: result.profile });
-				}
-			});
+			const result = await api.user.userAccount();
+			if (result.code !== 200) return;
+			useDataStore().update("user", result.profile);
 		},
 	},
 });

@@ -3,11 +3,11 @@
 		<div class="container mt-6">
 			<div v-if="showUserInfo" class="user">
 				<div class="flex items-center">
-					<img class="size-16 rounded-full" :src="data.user.avatarUrl" loading="lazy" />
+					<img class="size-16 rounded-full" :src="dataStore.user?.avatarUrl" loading="lazy" />
 					<div class="ml-6">
-						<div class="mb-1 text-lg font-bold">{{ data.user.nickname }}</div>
+						<div class="mb-1 text-lg font-bold">{{ dataStore.user?.nickname }}</div>
 						<div class="text-sm">
-							<span class="opacity-68">{{ data.user.signature }}</span>
+							<span class="opacity-68">{{ dataStore.user?.signature }}</span>
 						</div>
 					</div>
 				</div>
@@ -697,6 +697,7 @@ import * as db from "@/utils/db/index";
 import { isLinux } from "@/utils/platform";
 import pkg from "../../package.json";
 import { IconLogout } from "@/components/icon";
+import { useDataStore } from "@/store/data";
 
 const i18n = useI18n();
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
@@ -722,7 +723,10 @@ const shortcutInput = ref({
 
 const recordedShortcut = ref<KeyboardEvent[]>([]);
 
-const { player, settings, data, lastfm } = useStore();
+const { player, settings, lastfm } = useStore();
+
+const dataStore = useDataStore();
+
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
@@ -737,7 +741,7 @@ const {
 	restoreDefaultShortcuts,
 } = useStore();
 
-const showUserInfo = computed(() => isAccountLoggedIn() && data.user.nickname);
+const showUserInfo = computed(() => isAccountLoggedIn() && dataStore.user?.nickname);
 
 const recordedShortcutComputed = computed(() => {
 	let shortcut: string[] = [];

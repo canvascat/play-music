@@ -356,10 +356,6 @@ export interface GlobalState {
 	lastfm: Record<string, any>;
 	player: PlayerState;
 	settings: Settings;
-	data: {
-		user: User;
-		likedSongPlaylistID: number;
-	};
 }
 
 // 搜索相关类型
