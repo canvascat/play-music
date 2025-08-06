@@ -29,18 +29,22 @@ const buttonStyle = computed(() => {
 </script>
 
 <template>
-	<button :style="buttonStyle" :class="cn(
-		color,
-		'flex items-center justify-center select-none py-2 mr-3 font-semibold hover:scale-106 active:scale-94',
-		slots.default ? 'px-4' : '',
-	)
-		">
+	<button
+		:style="buttonStyle"
+		:class="
+			cn(
+				color,
+				'flex items-center justify-center select-none py-2 mr-3 font-semibold hover:scale-106 active:scale-94',
+				slots.default ? 'px-4' : '',
+			)
+		"
+	>
 		<component :is="props.icon" :class="cn('size-4', slots.default ? 'mr-2' : '')" />
 		<slot></slot>
 	</button>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 button {
 	height: 40px;
 	min-width: 40px;
