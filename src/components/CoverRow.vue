@@ -7,18 +7,26 @@
 				:type="type"
 				:play-button-size="type === 'artist' ? 26 : playButtonSize"
 			/>
-			<div class="text">
+			<div class="mt-2">
 				<div v-if="showPlayCount" class="info">
-					<span class="play-count"><IconPlay />{{ formatPlayCount(item.playCount) }} </span>
+					<span class="play-count opacity-58 font-semibold text-xs"
+						><IconPlay class="size-2 mr-1" />{{ formatPlayCount(item.playCount) }}
+					</span>
 				</div>
-				<div class="title" :style="{ fontSize: subTextFontSize }">
+				<div
+					class="title text-base font-semibold line-clamp-2 break-all"
+					:style="{ fontSize: subTextFontSize }"
+				>
 					<span v-if="isExplicit(item)" class="explicit-symbol"><ExplicitSymbol /></span>
-					<span v-if="isPrivacy(item)" class="lock-icon">
-						<IconLock />
+					<span v-if="isPrivacy(item)" class="lock-icon opacity-28 mr-1">
+						<IconLock class="size-3" />
 					</span>
 					<router-link :to="getTitleLink(item)">{{ item.name }}</router-link>
 				</div>
-				<div v-if="type !== 'artist' && subText !== 'none'" class="info">
+				<div
+					v-if="type !== 'artist' && subText !== 'none'"
+					class="info opacity-68 line-clamp-2 break-all text-xs"
+				>
 					<span v-html="getSubText(item)"></span>
 				</div>
 			</div>
@@ -152,29 +160,6 @@ const getImageUrl = (item: CoverRowItem): string => {
 <style lang="scss" scoped>
 .item {
 	color: var(--color-text);
-	.text {
-		margin-top: 8px;
-		.title {
-			font-size: 16px;
-			font-weight: 600;
-			line-height: 20px;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			overflow: hidden;
-			word-break: break-all;
-		}
-		.info {
-			font-size: 12px;
-			opacity: 0.68;
-			line-height: 18px;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			overflow: hidden;
-			word-break: break-word;
-		}
-	}
 }
 
 .item.artist {
@@ -199,31 +184,13 @@ const getImageUrl = (item: CoverRowItem): string => {
 	opacity: 0.28;
 	color: var(--color-text);
 	float: right;
-	.svg-icon {
-		margin-bottom: -3px;
-	}
 }
 
 .lock-icon {
-	opacity: 0.28;
 	color: var(--color-text);
-	margin-right: 4px;
-	// float: right;
-	.svg-icon {
-		height: 12px;
-		width: 12px;
-	}
 }
 
 .play-count {
-	font-weight: 600;
-	opacity: 0.58;
 	color: var(--color-text);
-	font-size: 12px;
-	.svg-icon {
-		margin-right: 3px;
-		height: 8px;
-		width: 8px;
-	}
 }
 </style>
