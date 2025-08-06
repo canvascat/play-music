@@ -16,7 +16,9 @@ const zodSchema = z.object({
 const formSchema = toTypedSchema(zodSchema);
 
 function onSubmit(values: any) {
-	document.cookie = values.cookie;
+	for (const cookie of values.cookie.split(";")) {
+		document.cookie = cookie;
+	}
 	emits("success");
 }
 </script>
@@ -41,7 +43,7 @@ function onSubmit(values: any) {
 									placeholder="Cookie"
 									v-bind="componentField"
 									rows="6"
-									class="max-h-[300px]"
+									class="max-h-[300px] font-mono"
 								/>
 							</FormControl>
 							<FormMessage />
