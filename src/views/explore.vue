@@ -1,7 +1,7 @@
 <template>
 	<div class="explore-page">
-		<h1>{{ $t("explore.explore") }}</h1>
-		<div class="buttons">
+		<h1 class="text-black text-6xl">{{ $t("explore.explore") }}</h1>
+		<div class="flex flex-wrap">
 			<div
 				v-for="category in settings.enabledPlaylistCategories"
 				:key="category"
@@ -184,16 +184,6 @@ function toggleCat(name) {
 </script>
 
 <style lang="scss" scoped>
-h1 {
-	color: var(--color-text);
-	font-size: 56px;
-}
-
-.buttons {
-	display: flex;
-	flex-wrap: wrap;
-}
-
 .button {
 	user-select: none;
 	cursor: pointer;
