@@ -19,13 +19,8 @@ defineSlots<{
 }>();
 </script>
 
-<style lang="scss" scoped>
-button {
-	&:hover {
-		background: var(--color-secondary-bg-for-transparent);
-	}
-	// &:active {
-	//   transform: scale(0.92);
-	// }
+<style scoped>
+button:hover {
+	background: var(--color-secondary-bg-for-transparent);
 }
 </style>
