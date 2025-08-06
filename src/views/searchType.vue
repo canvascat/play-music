@@ -1,7 +1,9 @@
 <template>
 	<div v-show="show" class="search">
-		<h1>
-			<span>{{ $t("search.searchFor") }} {{ typeNameTable[type] }}</span> "{{ keywords }}"
+		<h1 class="mt-8 mb-7 text-black">
+			<span class="opacity-58">{{ $t("search.searchFor") }} {{ typeNameTable[type] }}</span> "{{
+				keywords
+			}}"
 		</h1>
 
 		<div v-if="type === 'artists'">
@@ -20,7 +22,7 @@
 			<CoverRow type="playlist" :items="result" sub-text="title" />
 		</div>
 
-		<div class="load-more">
+		<div class="flex justify-center mt-8">
 			<ButtonTwoTone v-show="hasMore" color="grey" @click="fetchData">
 				{{ $t("explore.loadMore") }}
 			</ButtonTwoTone>
@@ -119,28 +121,3 @@ function getTracksDetail() {
 	});
 }
 </script>
-
-<style lang="scss" scoped>
-h1 {
-	margin-top: 32px;
-	margin-bottom: 28px;
-	color: var(--color-text);
-
-	span {
-		opacity: 0.58;
-	}
-}
-
-.load-more {
-	display: flex;
-	justify-content: center;
-	margin-top: 32px;
-}
-
-.button.more {
-	.svg-icon {
-		height: 24px;
-		width: 24px;
-	}
-}
-</style>
