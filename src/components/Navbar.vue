@@ -1,15 +1,22 @@
 <template>
-	<nav :class="cn({ 'has-custom-titlebar': hasCustomTitlebar }, 'z-40')">
+	<nav
+		:class="
+			cn(
+				{ 'has-custom-titlebar': hasCustomTitlebar },
+				'z-40 fixed top-0 right-0 left-0 flex justify-between items-center h-16',
+			)
+		"
+	>
 		<Titlebar v-if="hasCustomTitlebar" />
-		<div class="navigation-buttons">
+		<div class="navigation-buttons flex items-center flex-1">
 			<button-icon @click="go('back')">
-				<IconArrowLeft />
+				<IconArrowLeft class="size-6" />
 			</button-icon>
 			<button-icon @click="go('forward')">
-				<IconArrowRight />
+				<IconArrowRight class="size-6" />
 			</button-icon>
 		</div>
-		<div class="navigation-links">
+		<div class="navigation-links flex items-center flex-1 select-none uppercase mx-3">
 			<router-link to="/" :class="{ active: $route.name === 'home' }">{{
 				$t("nav.home")
 			}}</router-link>
@@ -20,12 +27,16 @@
 				$t("nav.library")
 			}}</router-link>
 		</div>
-		<div class="right-part">
-			<div class="search-box">
-				<div class="container" :class="{ active: inputFocus }">
-					<IconSearch />
+		<div class="right-part flex items-center justify-end flex-1">
+			<div class="search-box flex justify-end">
+				<div
+					class="container flex items-center h-8 rounded-lg w-50"
+					:class="{ active: inputFocus }"
+				>
+					<IconSearch class="size-4" />
 					<div class="input">
 						<input
+							class="text-base border-0 bg-transparent font-semibold"
 							ref="searchInput"
 							v-model="keywords"
 							type="search"
@@ -39,7 +50,12 @@
 			</div>
 			<DropdownMenu>
 				<DropdownMenuTrigger>
-					<img class="avatar" :src="avatarUrl" loading="lazy" />
+					<img
+						draggable="false"
+						class="avatar select-none size-8 rounded-full cursor-pointer hover:brightness-80 ml-3"
+						:src="avatarUrl"
+						loading="lazy"
+					/>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuItem as-child>
@@ -156,15 +172,6 @@ const logout = () => {
 
 <style lang="scss" scoped>
 nav {
-	position: fixed;
-	top: 0;
-	right: 0;
-	left: 0;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	height: 64px;
-
 	padding: {
 		right: 10vw;
 		left: 10vw;
@@ -195,15 +202,6 @@ nav.has-custom-titlebar {
 }
 
 .navigation-buttons {
-	flex: 1;
-	display: flex;
-	align-items: center;
-
-	.svg-icon {
-		height: 24px;
-		width: 24px;
-	}
-
 	button {
 		-webkit-app-region: no-drag;
 	}
@@ -216,12 +214,6 @@ nav.has-custom-titlebar {
 }
 
 .navigation-links {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-	text-transform: uppercase;
-	user-select: none;
-
 	a {
 		-webkit-app-region: no-drag;
 		font-size: 18px;
@@ -232,11 +224,6 @@ nav.has-custom-titlebar {
 		color: var(--color-text);
 		transition: 0.2s;
 		-webkit-user-drag: none;
-
-		margin: {
-			right: 12px;
-			left: 12px;
-		}
 
 		&:hover {
 			background: var(--color-secondary-bg-for-transparent);
@@ -253,25 +240,11 @@ nav.has-custom-titlebar {
 	}
 }
 
-.search {
-	.svg-icon {
-		height: 18px;
-		width: 18px;
-	}
-}
-
 .search-box {
-	display: flex;
-	justify-content: flex-end;
 	-webkit-app-region: no-drag;
 
 	.container {
-		display: flex;
-		align-items: center;
-		height: 32px;
 		background: var(--color-secondary-bg-for-transparent);
-		border-radius: 8px;
-		width: 200px;
 	}
 
 	.svg-icon {
@@ -287,11 +260,7 @@ nav.has-custom-titlebar {
 	}
 
 	input {
-		font-size: 16px;
-		border: none;
-		background: transparent;
 		width: 96%;
-		font-weight: 600;
 		margin-top: -1px;
 		color: var(--color-text);
 	}
@@ -318,30 +287,7 @@ nav.has-custom-titlebar {
 	}
 }
 
-.right-part {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-
-	.avatar {
-		user-select: none;
-		height: 30px;
-		margin-left: 12px;
-		vertical-align: -7px;
-		border-radius: 50%;
-		cursor: pointer;
-		-webkit-app-region: no-drag;
-		-webkit-user-drag: none;
-
-		&:hover {
-			filter: brightness(80%);
-		}
-	}
-
-	.search-button {
-		display: none;
-		-webkit-app-region: no-drag;
-	}
+.right-part .avatar {
+	-webkit-app-region: no-drag;
 }
 </style>
