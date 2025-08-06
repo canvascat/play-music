@@ -8,11 +8,21 @@
 	>
 		<div class="relative">
 			<div class="shade">
-				<button v-show="focus" class="play-button" :style="playButtonStyles" @click.stop="play()">
-					<IconPlay />
+				<button
+					v-show="focus"
+					class="play-button hover:bg-white/28 active:scale-94"
+					:style="playButtonStyles"
+					@click.stop="play()"
+				>
+					<IconPlay class="w-[50%] ml-1" />
 				</button>
 			</div>
-			<img :src="imageUrl" :style="imageStyles" loading="lazy" class="select-none" />
+			<img
+				:src="imageUrl"
+				:style="imageStyles"
+				loading="lazy"
+				class="select-none size-full rounded-xl border border-white/4 aspect-square"
+			/>
 			<transition v-if="coverHover || alwaysShowShadow" name="fade">
 				<div v-show="focus || alwaysShowShadow" class="shadow" :style="shadowStyles"></div>
 			</transition>
@@ -95,19 +105,10 @@ const goTo = () => {
 };
 </script>
 
-<style lang="scss" scoped>
-img {
-	border-radius: 0.75em;
-	width: 100%;
-	aspect-ratio: 1 / 1;
-	border: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.cover-hover {
-	&:hover {
-		cursor: pointer;
-		/* transform: scale(1.02); */
-	}
+<style scoped>
+.cover-hover:hover {
+	cursor: pointer;
+	/* transform: scale(1.02); */
 }
 
 .shade {
@@ -134,22 +135,6 @@ img {
 	border-radius: 50%;
 	cursor: default;
 	transition: 0.2s;
-
-	.svg-icon {
-		width: 50%;
-
-		margin: {
-			left: 4px;
-		}
-	}
-
-	&:hover {
-		background: rgba(255, 255, 255, 0.28);
-	}
-
-	&:active {
-		transform: scale(0.94);
-	}
 }
 
 .shadow {
