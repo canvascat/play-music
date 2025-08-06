@@ -1,5 +1,3 @@
-
-
 <script setup lang="ts">
 import * as api from "@/api";
 import NProgress from "nprogress";
@@ -24,19 +22,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="newAlbum">
-    <h1>{{ $t('home.newAlbum') }}</h1>
-    <div class="playlist-row">
-      <div class="playlists">
-        <CoverRow type="album" :items="albums" sub-text="artist" :show-play-button="true" />
-      </div>
-    </div>
-  </div>
+	<div class="text-black text-6xl">
+		<h1>{{ $t("home.newAlbum") }}</h1>
+		<div class="playlist-row">
+			<div class="playlists">
+				<CoverRow type="album" :items="albums" sub-text="artist" :show-play-button="true" />
+			</div>
+		</div>
+	</div>
 </template>
-
-<style lang="scss" scoped>
-h1 {
-  color: var(--color-text);
-  font-size: 56px;
-}
-</style>
