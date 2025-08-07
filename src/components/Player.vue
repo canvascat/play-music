@@ -31,10 +31,13 @@
 						@click="goToAlbum"
 					/>
 					<div class="track-info" :title="audioSource">
-						<div :class="['name', { 'has-list': hasList() }]" @click="hasList() && goToList()">
+						<div
+							:class="['name line-clamp-1 break-all mb-1', { 'has-list': hasList() }]"
+							@click="hasList() && goToList()"
+						>
 							{{ currentTrack.name }}
 						</div>
-						<div class="artist">
+						<div class="artist line-clamp-1 break-all">
 							<span
 								v-for="(ar, index) in currentTrack.ar"
 								:key="ar.id"
@@ -362,12 +365,6 @@ function handleKeydown(event: KeyboardEvent) {
 			font-size: 16px;
 			opacity: 0.88;
 			color: var(--color-text);
-			margin-bottom: 4px;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 1;
-			overflow: hidden;
-			word-break: break-all;
 		}
 
 		.has-list {
@@ -382,11 +379,6 @@ function handleKeydown(event: KeyboardEvent) {
 			font-size: 12px;
 			opacity: 0.58;
 			color: var(--color-text);
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 1;
-			overflow: hidden;
-			word-break: break-all;
 
 			span.ar {
 				cursor: pointer;

@@ -26,7 +26,7 @@
 		</div>
 		<div class="title-and-artist">
 			<div class="container">
-				<div class="title">
+				<div class="title line-clamp-1 break-all">
 					{{ track.name }}
 					<span v-if="isSubTitle" :title="subTitle" class="sub-title"> ({{ subTitle }}) </span>
 					<span v-if="isAlbum" class="featured">
@@ -36,7 +36,7 @@
 						><ExplicitSymbol
 					/></span>
 				</div>
-				<div v-if="!isAlbum" class="artist">
+				<div v-if="!isAlbum" class="artist line-clamp-1">
 					<span v-if="(track.mark & 1048576) === 1048576" class="explicit-symbol before-artist"
 						><ExplicitSymbol :size="15"
 					/></span>
@@ -46,7 +46,7 @@
 			<div></div>
 		</div>
 
-		<div v-if="showAlbumName" class="album">
+		<div v-if="showAlbumName" class="album line-clamp-2">
 			<router-link v-if="album && album.id" :to="`/album/${album.id}`">{{
 				album.name
 			}}</router-link>
@@ -300,11 +300,6 @@ button {
 			color: var(--color-text);
 			cursor: default;
 			padding-right: 16px;
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 1;
-			overflow: hidden;
-			word-break: break-all;
 			.featured {
 				margin-right: 2px;
 				font-weight: 500;
@@ -322,10 +317,6 @@ button {
 			font-size: 13px;
 			opacity: 0.68;
 			color: var(--color-text);
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 1;
-			overflow: hidden;
 			a {
 				span {
 					margin-right: 3px;
@@ -344,10 +335,6 @@ button {
 		font-size: 16px;
 		opacity: 0.88;
 		color: var(--color-text);
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		overflow: hidden;
 	}
 	.time,
 	.count {
@@ -407,7 +394,7 @@ button {
 }
 
 .track.album {
-	height: 32px;
+	height: 48px;
 }
 
 .actions {
