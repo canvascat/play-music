@@ -2,6 +2,7 @@ import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
 import router from "../router";
 import state from "../store/state";
+import { useDataStore } from "@/store/data";
 
 export function hasListSource() {
 	return !state.player.isPersonalFM && state.player.playlistSource.id !== 0;
@@ -12,7 +13,8 @@ export function goToListSource() {
 }
 
 export function getListSourcePath() {
-	if (state.player.playlistSource.id === state.data.likedSongPlaylistID) {
+	const dataStore = useDataStore();
+	if (state.player.playlistSource.id === dataStore.likedSongPlaylistID) {
 		return "/library/liked-songs";
 	} else if (state.player.playlistSource.type === "url") {
 		return state.player.playlistSource.id;

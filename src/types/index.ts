@@ -1,6 +1,7 @@
 // 核心音乐数据类型定义
 
 import type Player from "@/utils/Player";
+import type { Shortcut } from "@/utils/shortcuts";
 
 export interface Track {
 	id: number;
@@ -317,7 +318,7 @@ export interface Settings {
 		server?: string;
 		port?: number;
 	};
-	shortcuts: Record<string, string>;
+	shortcuts: Shortcut[];
 	deviceId?: string;
 	cacheLimit?: number;
 	// 新增的播放器相关设置
@@ -355,7 +356,6 @@ export interface GlobalState {
 	dailyTracks: Track[];
 	lastfm: Record<string, any>;
 	player: PlayerState;
-	settings: Settings;
 }
 
 // 搜索相关类型

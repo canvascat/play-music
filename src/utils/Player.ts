@@ -11,6 +11,7 @@ import { isCreateMpris } from "@/utils/platform";
 import { randomItem, setTitle } from "./common";
 import { getAudioSourceFromUnblockMusic } from "./umn";
 import { getLastfm } from "@/api/lastfm";
+import { useSettingsStore } from "@/store/settings";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -321,7 +322,7 @@ export default class Player {
 			if (!result.data[0]?.url) return null;
 			if (result.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
 			const source = result.data[0].url.replace(/^http:/, "https:");
-			if (useStore(pinia).settings.automaticallyCacheSongs) {
+			if (useSettingsStore().settings.automaticallyCacheSongs) {
 				db.track.source.write(track, source, result.data[0].br);
 			}
 			return source;
@@ -476,7 +477,7 @@ export default class Player {
 	}
 	// OSDLyrics 会检测 Mpris 状态并寻找对应歌词文件，所以要在更新 Mpris 状态之前保证歌词下载完成
 	private async _updateMprisState(track: Track, metadata: MediaMetadata) {
-		if (!useStore(pinia).settings.enableOsdlyricsSupport) {
+		if (!useSettingsStore().settings.enableOsdlyricsSupport) {
 			return window.ipcRenderer?.send("metadata", metadata);
 		}
 
@@ -681,8 +682,8 @@ export default class Player {
 		//   return;
 		// }
 		// const audio: HTMLAudioElement = (this[_howler] as any)?._sounds[0]._node
-		// audio.setSinkId(useStore(pinia).settings.outputDevice);
-		// this[_howler]?._sounds[0]._node.setSinkId(useStore(pinia).settings.outputDevice);
+		// audio.setSinkId(useSettingsStore().settings.outputDevice);
+		// this[_howler]?._sounds[0]._node.setSinkId(useSettingsStore().settings.outputDevice);
 	}
 
 	replacePlaylist(

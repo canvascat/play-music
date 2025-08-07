@@ -81,6 +81,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Track, Artist, Album } from "@/types";
 import { IconPlay, IconHeart, IconHeartSolid, IconVolume } from "@/components/icon";
+import { useSettingsStore } from "@/store/settings";
 
 defineOptions({ name: "TrackListItem" });
 
@@ -99,7 +100,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 const store = useStore();
-const { settings, player } = store;
+const { player } = store;
+const { settings } = useSettingsStore();
 
 const hover = ref(false);
 const trackStyle = ref({});

@@ -179,8 +179,10 @@ import {
 	IconThumbsDown,
 } from "@/components/icon";
 import { usePlayerProgress } from "@/lib/hook";
+import { useSettingsStore } from "@/store/settings";
 
-const { player, settings, toggleLyrics, likeATrack } = useStore();
+const { player, toggleLyrics, likeATrack } = useStore();
+const { settings } = useSettingsStore();
 
 const currentTrack = computed(() => player.currentTrack);
 const volume = computed({

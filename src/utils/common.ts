@@ -6,6 +6,9 @@ import Color from "color";
 import PipelineWorker from "node-vibrant/worker.worker?worker";
 import pkg from "../../package.json";
 import { randomInt } from "es-toolkit";
+import { useDataStore } from "@/store/data";
+import { useSettingsStore } from "@/store/settings";
+import { pinia } from "@/store/pinia";
 
 Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 
@@ -43,7 +46,7 @@ function isTrackPlayable(track: Track, vipType?: number) {
 
 export function mapTrackPlayableStatus(tracks: Track[], privileges: TrackPrivilege[] = []) {
 	if (tracks?.length === undefined) return tracks;
-	const vipType = useStore().data.user?.vipType;
+	const vipType = useDataStore().user?.vipType;
 	return tracks.map((t) => {
 		const privilege = privileges.find((item) => item.id === t.id);
 		if (t.privilege) {
@@ -146,7 +149,7 @@ export function bytesToSize(bytes: number) {
 	const megaBytes = marker * marker;
 	const gigaBytes = marker * marker * marker;
 
-	const lang = useStore().settings.lang;
+	const lang = useSettingsStore(pinia).settings.lang;
 
 	if (bytes < kiloBytes) return bytes + (lang === "en" ? " Bytes" : "字节");
 	else if (bytes < megaBytes) return `${(bytes / kiloBytes).toFixed(decimal)} KB`;

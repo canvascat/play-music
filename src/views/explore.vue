@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
 import NProgress from "nprogress";
 import * as api from "@/api";
 import { playlistCategories } from "@/utils/staticData";
@@ -73,8 +72,9 @@ import CoverRow from "@/components/CoverRow.vue";
 import { IconMore } from "@/components/icon";
 import { ref, computed, onActivated } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { useSettingsStore } from "@/store/settings";
 
-const { settings, togglePlaylistCategory } = useStore();
+const { settings, togglePlaylistCategory } = useSettingsStore();
 const show = ref(false);
 const playlists = ref([]);
 const activeCategory = ref("全部");

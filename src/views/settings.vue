@@ -698,6 +698,7 @@ import { isLinux } from "@/utils/platform";
 import pkg from "../../package.json";
 import { IconLogout } from "@/components/icon";
 import { useDataStore } from "@/store/data";
+import { useSettingsStore } from "@/store/settings";
 
 const i18n = useI18n();
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
@@ -723,23 +724,20 @@ const shortcutInput = ref({
 
 const recordedShortcut = ref<KeyboardEvent[]>([]);
 
-const { player, settings, lastfm } = useStore();
+const { player, lastfm } = useStore();
+const {
+	settings,
+	update: updateSetting,
+	updateShortcut,
+	restoreDefaultShortcuts,
+} = useSettingsStore();
 
 const dataStore = useDataStore();
 
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
-const {
-	updateSetting,
-	changeLang,
-	changeMusicQuality,
-	changeLyricFontSize,
-	changeOutputDevice,
-	updateLastfm,
-	updateShortcut,
-	restoreDefaultShortcuts,
-} = useStore();
+const { updateLastfm } = useStore();
 
 const showUserInfo = computed(() => isAccountLoggedIn() && dataStore.user?.nickname);
 
@@ -792,7 +790,7 @@ const lang = computed({
 	},
 	set(lang) {
 		i18n.locale.value = lang;
-		changeLang(lang);
+		updateSetting("lang", lang);
 	},
 });
 
@@ -822,7 +820,7 @@ const musicQuality = computed({
 	},
 	set(value) {
 		if (value === settings.musicQuality) return;
-		changeMusicQuality(value);
+		updateSetting("musicQuality", value);
 		clearCache();
 	},
 });
@@ -833,7 +831,7 @@ const lyricFontSize = computed({
 		return settings.lyricFontSize;
 	},
 	set(value) {
-		changeLyricFontSize(value);
+		updateSetting("lyricFontSize", value);
 	},
 });
 const outputDevice = computed({
@@ -846,7 +844,8 @@ const outputDevice = computed({
 	},
 	set(deviceId) {
 		if (deviceId === settings.outputDevice || deviceId === undefined) return;
-		changeOutputDevice(deviceId);
+
+		updateSetting("outputDevice", deviceId);
 		player.setOutputDevice();
 	},
 });
@@ -1219,13 +1218,9 @@ function handleShortcutKeydown(e: KeyboardEvent) {
 // }
 function saveShortcut() {
 	const { id, type } = shortcutInput.value;
-	const payload = {
-		id,
-		type,
-		shortcut: recordedShortcutComputed.value,
-	};
-	updateShortcut(payload);
-	window.ipcRenderer?.send("updateShortcut", payload);
+	const shortcut = recordedShortcut.value;
+	updateShortcut(id, type, shortcut);
+	window.ipcRenderer?.send("updateShortcut", { id, type, shortcut });
 	toast("快捷键已保存");
 	recordedShortcut.value = [];
 }

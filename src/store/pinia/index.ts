@@ -1,11 +1,9 @@
-import { cloneDeep, isNil } from "es-toolkit";
 import { createPinia, defineStore } from "pinia";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
-import type { GlobalState, Settings } from "@/types";
+import type { GlobalState } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
-import { changeAppearance } from "@/utils/common";
-import shortcuts from "@/utils/shortcuts";
+
 import _state from "../state";
 import { useDataStore } from "../data";
 
@@ -18,31 +16,6 @@ export const useStore = defineStore("store", {
 			this.liked[key] = payload;
 		},
 
-		changeLang(lang: string) {
-			this.settings.lang = lang;
-		},
-		changeMusicQuality(value: string) {
-			this.settings.musicQuality = value;
-		},
-		changeLyricFontSize(value: number) {
-			this.settings.lyricFontSize = value;
-		},
-		changeOutputDevice(deviceId: string) {
-			this.settings.outputDevice = deviceId;
-		},
-		updateSetting<K extends keyof Settings>(key: K, value: Settings[K]) {
-			this.settings[key] = value;
-		},
-		togglePlaylistCategory(name: string) {
-			const index = this.settings.enabledPlaylistCategories.findIndex((c) => c === name);
-			if (index !== -1) {
-				this.settings.enabledPlaylistCategories = this.settings.enabledPlaylistCategories.filter(
-					(c) => c !== name,
-				);
-			} else {
-				this.settings.enabledPlaylistCategories.push(name);
-			}
-		},
 		toggleLyrics() {
 			this.showLyrics = !this.showLyrics;
 		},
@@ -52,17 +25,7 @@ export const useStore = defineStore("store", {
 		updateLastfm(session) {
 			this.lastfm = session;
 		},
-		updateShortcut({ id, type, shortcut }) {
-			const newShortcut = this.settings.shortcuts.find((s) => s.id === id);
-			newShortcut[type] = shortcut;
-			this.settings.shortcuts = this.settings.shortcuts.map((s) => {
-				if (s.id !== id) return s;
-				return newShortcut;
-			});
-		},
-		restoreDefaultShortcuts() {
-			this.settings.shortcuts = cloneDeep(shortcuts);
-		},
+
 		updateTitle(title: string) {
 			this.title = title;
 		},
@@ -166,28 +129,4 @@ export const useStore = defineStore("store", {
 			useDataStore().update("user", result.profile);
 		},
 	},
-});
-
-const store = useStore(pinia);
-
-if (isNil(store.settings.lang)) {
-	const defaultLang = "en";
-	const langMapper = new Map()
-		.set("zh", "zh-CN")
-		.set("zh-TW", "zh-TW")
-		.set("en", "en")
-		.set("tr", "tr");
-	store.settings.lang =
-		langMapper.get(
-			langMapper.has(navigator.language) ? navigator.language : navigator.language.slice(0, 2),
-		) || defaultLang;
-	localStorage.setItem("settings", JSON.stringify(store.settings));
-}
-
-changeAppearance(store.settings.appearance);
-
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-	if (store.settings.appearance === "auto") {
-		changeAppearance(store.settings.appearance);
-	}
 });

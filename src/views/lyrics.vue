@@ -261,6 +261,7 @@ import { useModalStore } from "@/store/modal";
 import { useI18n } from "vue-i18n";
 import { usePlayerProgress, useRafFnWithDep } from "@/lib/hook";
 import { useFullscreen } from "@vueuse/core";
+import { useSettingsStore } from "@/store/settings";
 
 const { t } = useI18n();
 
@@ -282,7 +283,8 @@ interface LyricItem {
 }
 
 const store = useStore();
-const { player, settings, toggleLyrics, likeATrack, fetchLikedPlaylist } = store;
+const { player, toggleLyrics, likeATrack, fetchLikedPlaylist } = store;
+const { settings } = useSettingsStore();
 
 const lyric = ref<LyricLine[]>([]);
 const tlyric = ref<LyricLine[]>([]);

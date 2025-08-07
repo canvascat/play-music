@@ -45,7 +45,6 @@ const state: GlobalState = {
 	dailyTracks: [],
 	lastfm: JSON.parse(localStorage.getItem("lastfm")) || {},
 	player: player,
-	settings: JSON.parse(localStorage.getItem("settings")),
 };
 
 export default state;

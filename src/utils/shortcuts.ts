@@ -1,6 +1,13 @@
 // default shortcuts
 // for more info, check https://www.electronjs.org/docs/api/accelerator
 
+export interface Shortcut {
+	id: string;
+	name: string;
+	shortcut: string;
+	globalShortcut: string;
+}
+
 export default [
 	{
 		id: "play",
@@ -44,4 +51,4 @@ export default [
 		shortcut: "CommandOrControl+M",
 		globalShortcut: "Alt+CommandOrControl+M",
 	},
-] as const;
+] satisfies Shortcut[];

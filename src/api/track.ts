@@ -1,9 +1,10 @@
-import { useStore } from "@/store/pinia";
 import type { TrackDetailResponse, TrackLyricResponse } from "@/types/api";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";
 import type * as NCMAPI from "./NCMAPI";
+import { useSettingsStore } from "@/store/settings";
+import { pinia } from "@/store/pinia";
 
 /**
  * 获取音乐 url
@@ -14,7 +15,7 @@ import type * as NCMAPI from "./NCMAPI";
 export function getMP3(id: NCMAPI.song_url[0]["id"]) {
 	const getBr = () => {
 		// 当返回的 quality >= 400000时，就会优先返回 hi-res
-		const quality = useStore().settings?.musicQuality ?? "320000";
+		const quality = useSettingsStore(pinia).settings?.musicQuality ?? "320000";
 		return quality === "flac" ? "350000" : quality;
 	};
 

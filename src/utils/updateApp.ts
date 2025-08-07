@@ -1,6 +1,7 @@
 import initLocalStorage from "@/store/initLocalStorage";
 import pkg from "../../package.json";
 
+/** @deprecated */
 const updateSetting = () => {
 	const parsedSettings = JSON.parse(localStorage.getItem("settings") ?? "{}");
 	const settings = {
@@ -26,14 +27,6 @@ const updateSetting = () => {
 	localStorage.setItem("settings", JSON.stringify(settings));
 };
 
-const updateData = () => {
-	const parsedData = JSON.parse(localStorage.getItem("data"));
-	const data = {
-		...parsedData,
-	};
-	localStorage.setItem("data", JSON.stringify(data));
-};
-
 const updatePlayer = () => {
 	let parsedData = JSON.parse(localStorage.getItem("player"));
 	const data = {
@@ -49,7 +42,7 @@ const removeOldStuff = () => {
 
 export default function () {
 	updateSetting();
-	updateData();
+
 	updatePlayer();
 	removeOldStuff();
 	localStorage.setItem("appVersion", JSON.stringify(pkg.version));

@@ -59,7 +59,7 @@ export function formatAlbumType(type: string, album: Album) {
 	}
 }
 
-export function resizeImage(imgUrl: string, size = 512) {
+export function resizeImage(imgUrl?: string, size = 512) {
 	if (!imgUrl) return "";
 	let httpsImgUrl = imgUrl;
 	if (imgUrl.slice(0, 5) !== "https") {
