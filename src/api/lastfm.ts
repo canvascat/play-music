@@ -1,8 +1,8 @@
 // Last.fm API documents 👉 https://www.last.fm/api
 
-import { useLocalStorage } from "@vueuse/core";
 import axios, { type AxiosResponse } from "axios";
 import md5 from "crypto-js/md5";
+import { useLastfmStore } from "@/store/lastfm";
 
 const apiKey: string = import.meta.env.VUE_APP_LASTFM_API_KEY;
 const apiSharedSecret: string = import.meta.env.VUE_APP_LASTFM_API_SHARED_SECRET;
@@ -83,7 +83,7 @@ export function trackUpdateNowPlaying(
 	const requestParams: any = { ...params };
 	requestParams.api_key = apiKey;
 	requestParams.method = "track.updateNowPlaying";
-	requestParams.sk = getLastfm().key;
+	requestParams.sk = useLastfmStore().value.key;
 	const signature = sign(requestParams);
 
 	return axios({
@@ -104,7 +104,7 @@ export function trackScrobble(params: TrackScrobbleParams): Promise<AxiosRespons
 	const requestParams: any = { ...params };
 	requestParams.api_key = apiKey;
 	requestParams.method = "track.scrobble";
-	requestParams.sk = getLastfm().key;
+	requestParams.sk = useLastfmStore().value.key;
 	const signature = sign(requestParams);
 
 	return axios({
@@ -117,9 +117,3 @@ export function trackScrobble(params: TrackScrobbleParams): Promise<AxiosRespons
 		},
 	});
 }
-
-export function getLastfm(): { key?: string } {
-	return JSON.parse(localStorage.getItem("lastfm") || "{}");
-}
-
-export const useLastfmKey = () => useLocalStorage("lastfm", { key: undefined });

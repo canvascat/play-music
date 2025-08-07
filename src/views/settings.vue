@@ -699,6 +699,7 @@ import pkg from "../../package.json";
 import { IconLogout } from "@/components/icon";
 import { useDataStore } from "@/store/data";
 import { useSettingsStore } from "@/store/settings";
+import { useLastfmStore } from "@/store/lastfm";
 
 const i18n = useI18n();
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
@@ -725,6 +726,7 @@ const shortcutInput = ref({
 const recordedShortcut = ref<KeyboardEvent[]>([]);
 
 const { player, lastfm } = useStore();
+
 const {
 	settings,
 	update: updateSetting,
@@ -737,7 +739,7 @@ const dataStore = useDataStore();
 const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
-const { updateLastfm } = useStore();
+const lastfmStore = useLastfmStore();
 
 const showUserInfo = computed(() => isAccountLoggedIn() && dataStore.user?.nickname);
 
@@ -1088,7 +1090,7 @@ const enableCustomTitlebar = computed({
 		updateSetting("linuxEnableCustomTitlebar", value);
 	},
 });
-const isLastfmConnected = computed(() => lastfm.key !== undefined);
+const isLastfmConnected = computed(() => lastfmStore.value.key !== undefined);
 
 countDBSize();
 if (window.IS_ELECTRON) getAllOutputDevices();
@@ -1142,14 +1144,13 @@ function lastfmConnect() {
 	const lastfmChecker = setInterval(() => {
 		const session = localStorage.getItem("lastfm");
 		if (session) {
-			updateLastfm(JSON.parse(session));
+			lastfmStore.update(JSON.parse(session));
 			clearInterval(lastfmChecker);
 		}
 	}, 1000);
 }
 function lastfmDisconnect() {
-	localStorage.removeItem("lastfm");
-	updateLastfm({});
+	lastfmStore.update({});
 }
 function sendProxyConfig() {
 	if (proxyProtocol.value === "noProxy") return;

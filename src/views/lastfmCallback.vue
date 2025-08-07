@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import * as api from "@/api";
-import { useStore } from "@/store/pinia";
 import { ref, onMounted } from "vue";
 import { IconX } from "@/components/icon";
+import { useLastfmStore } from "@/store/lastfm";
 
 const message = ref("请稍等...");
 const done = ref(false);
-const { updateLastfm } = useStore();
+const { update } = useLastfmStore();
 
 onMounted(() => {
 	const token = new URLSearchParams(window.location.search).get("token");
@@ -22,7 +22,7 @@ onMounted(() => {
 			return;
 		}
 		localStorage.setItem("lastfm", JSON.stringify(result.data.session));
-		updateLastfm(result.data.session);
+		update(result.data.session);
 		message.value = "已成功连接到 Last.fm";
 		done.value = true;
 	});

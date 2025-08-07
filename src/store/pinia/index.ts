@@ -22,9 +22,6 @@ export const useStore = defineStore("store", {
 		updateDailyTracks(dailyTracks) {
 			this.dailyTracks = dailyTracks;
 		},
-		updateLastfm(session) {
-			this.lastfm = session;
-		},
 
 		updateTitle(title: string) {
 			this.title = title;

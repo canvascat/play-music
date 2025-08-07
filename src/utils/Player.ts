@@ -10,8 +10,8 @@ import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
 import { randomItem, setTitle } from "./common";
 import { getAudioSourceFromUnblockMusic } from "./umn";
-import { getLastfm } from "@/api/lastfm";
 import { useSettingsStore } from "@/store/settings";
+import { useLastfmStore } from "@/store/lastfm";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -643,7 +643,7 @@ export default class Player {
 			this._setPlaying(true);
 			setTitle(this._currentTrack);
 			if (!this._currentTrack) return;
-			if (getLastfm().key !== undefined) {
+			if (useLastfmStore().value.key !== undefined) {
 				api.lastfm.trackUpdateNowPlaying({
 					artist: this._currentTrack.ar[0].name,
 					track: this._currentTrack.name,

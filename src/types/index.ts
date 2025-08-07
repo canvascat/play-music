@@ -354,7 +354,6 @@ export interface GlobalState {
 		};
 	};
 	dailyTracks: Track[];
-	lastfm: Record<string, any>;
 	player: PlayerState;
 }
 

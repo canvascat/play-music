@@ -43,7 +43,6 @@ const state: GlobalState = {
 		},
 	},
 	dailyTracks: [],
-	lastfm: JSON.parse(localStorage.getItem("lastfm")) || {},
 	player: player,
 };
 
