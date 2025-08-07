@@ -859,10 +859,7 @@ const mute = () => {
 			}
 		}
 	}
-
-	::-webkit-scrollbar {
-		display: none;
-	}
+	scrollbar-width: none;
 
 	.lyrics-container .line:first-child {
 		margin-top: 50vh;
