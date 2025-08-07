@@ -16,6 +16,7 @@ export interface Track {
 	fee: number;
 	v: number;
 	crbt?: string;
+	cd: string;
 	cf: string;
 	alia: string[];
 	ftype: number;
@@ -102,14 +103,14 @@ export interface Album {
 	pic_str?: string;
 	alia?: string[];
 	transNames?: string[];
-	artist?: Artist;
+	artist: Artist;
 	artists?: Artist[];
-	publishTime?: number;
+	publishTime: number;
 	size?: number;
 	copyrightId?: number;
 	status?: number;
 	picId?: number;
-	mark?: number;
+	mark: number;
 	tags?: string;
 	company?: string;
 	briefDesc?: string;
@@ -117,10 +118,11 @@ export interface Album {
 	blurPicUrl?: string;
 	companyId?: number;
 	subType?: string;
-	description?: string;
+	description: string;
 	alias?: string[];
 	artists_credits?: any;
 	songs?: Track[];
+	type: string;
 }
 
 export interface Playlist {

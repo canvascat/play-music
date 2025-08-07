@@ -39,7 +39,7 @@
 				<Description :description="album.description" :title="$t('album.albumDesc')" />
 
 				<div class="buttons" style="margin-top: 32px">
-					<ButtonTwoTone @click="playAlbumByID(album.id)" :icon="IconPlay">
+					<ButtonTwoTone @click="player.playAlbumByID(album.id)" :icon="IconPlay">
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
 					<ButtonTwoTone
@@ -110,7 +110,7 @@ import * as api from "@/api";
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from "@/utils/common";
 import NProgress from "nprogress";
 import { isAccountLoggedIn } from "@/utils/auth";
-import { cloneDeep, groupBy, sortBy } from "es-toolkit";
+import { groupBy, sortBy } from "es-toolkit";
 import { toPairs } from "es-toolkit/compat";
 import { resizeImage, formatDate, formatTime, formatAlbumType } from "@/utils/filters";
 import { useI18n } from "vue-i18n";
@@ -131,34 +131,9 @@ import { toast } from "vue-sonner";
 import { computed, ref, toValue, shallowRef } from "vue";
 import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { IconHeart, IconHeartSolid, IconMore, IconPlay } from "@/components/icon";
+import type { Album, AlbumDetailDynamicResponse, Track } from "@/types";
 
 const { t } = useI18n();
-
-interface Track {
-	id: number;
-	dt: number;
-	cd: number;
-}
-
-interface AlbumDynamicDetail {
-	isSub: boolean;
-}
-
-interface Album {
-	id: number;
-	picUrl: string;
-	name: string;
-	artist: {
-		id: number;
-		name: string;
-	};
-	type: string;
-	mark: number;
-	publishTime: number;
-	size: number;
-	description: string;
-	company: string;
-}
 
 const show = ref(false);
 const album = ref<Album>({
@@ -175,17 +150,17 @@ const album = ref<Album>({
 	size: 0,
 	description: "default description",
 	company: "",
-});
+} as Album);
 
 const tracks = shallowRef<Track[]>([]);
 const moreAlbums = ref<Album[]>([]);
-const dynamicDetail = ref<AlbumDynamicDetail>({ isSub: false });
+const dynamicDetail = ref<Pick<AlbumDetailDynamicResponse, "isSub">>({ isSub: false });
 const subtitle = ref("");
 const title = ref("");
 
 onBeforeRouteUpdate((to, _from, next) => {
 	show.value = false;
-	loadData(to.params.id as string);
+	loadData(+to.params.id);
 	next();
 });
 
@@ -193,10 +168,12 @@ const albumTime = computed(() => {
 	return tracks.value.reduce((acc, track) => acc + track.dt, 0);
 });
 
-const filteredMoreAlbums = computed(() => {
+const filteredMoreAlbums = computed<Album[]>(() => {
 	let _moreAlbums = moreAlbums.value.filter((a) => a.id !== album.value.id);
 	let realAlbums = _moreAlbums.filter((a) => a.type === "专辑");
-	let eps = _moreAlbums.filter((a) => a.type === "EP" || (a.type === "EP/Single" && a.size > 1));
+	let eps = _moreAlbums.filter(
+		(a) => a.type === "EP" || (a.type === "EP/Single" && a.size && a.size > 1),
+	);
 	let restItems = _moreAlbums.filter(
 		(a) =>
 			realAlbums.find((a1) => a1.id === a.id) === undefined &&
@@ -213,19 +190,15 @@ const tracksByDisc = computed(() => {
 	if (tracks.value.length <= 1) return [];
 
 	const pairs = toPairs(groupBy(toValue(tracks), (item) => item.cd));
-	return sortBy(pairs, (p) => p[0]).map((items) => ({
+	return sortBy(pairs, [(p) => +p[0]]).map((items) => ({
 		disc: items[0],
 		tracks: items[1],
 	}));
 });
 const router = useRouter();
-loadData(router.currentRoute.value.params.id as string);
+loadData(+router.currentRoute.value.params.id);
 
 const { player } = useStore();
-
-const playAlbumByID = (id: number, trackID: string = "first") => {
-	player.playAlbumByID(id, trackID);
-};
 
 function likeAlbum(showToast = false) {
 	if (!isAccountLoggedIn()) {
@@ -257,12 +230,11 @@ function formatTitle() {
 		subtitle.value = splitTitle.subtitle === "" ? splitTitle2.subtitle : splitTitle.subtitle;
 	}
 }
-function loadData(id: string) {
+function loadData(id: number) {
 	setTimeout(() => {
 		if (!show.value) NProgress.start();
 	}, 1000);
 	api.album.getAlbum(id).then((data) => {
-		console.debug(cloneDeep(data));
 		album.value = data.album;
 		tracks.value = data.songs;
 		formatTitle();
