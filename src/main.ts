@@ -2,13 +2,14 @@ import "@/index.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import { pinia, useStore } from "./store/pinia";
+import { pinia } from "./store/pinia";
 import "@/utils/filters";
 import "@/assets/css/global.scss";
 import NProgress from "nprogress";
 import "@/assets/css/nprogress.css";
 import { createI18n } from "vue-i18n";
 import { messages } from "./locale";
+import { useSettingsStore } from "./store/settings";
 
 function resetApp() {
 	localStorage.clear();
@@ -34,15 +35,11 @@ NProgress.configure({ showSpinner: false, trickleSpeed: 100 });
 const app = createApp(App);
 
 app.use(pinia);
-const store = useStore();
-
-store.$subscribe((_mutation, state) => {
-	localStorage.setItem("settings", JSON.stringify(state.settings));
-});
+const { settings } = useSettingsStore();
 
 app.use(
 	createI18n({
-		locale: store.settings.lang,
+		locale: settings.lang,
 		messages,
 		silentTranslationWarn: true,
 	}),
