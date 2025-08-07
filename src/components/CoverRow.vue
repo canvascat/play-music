@@ -64,7 +64,7 @@ interface CoverRowItem {
 	description?: string;
 	updateFrequency?: string;
 	creator?: Creator;
-	publishTime?: string;
+	publishTime?: number;
 	artist?: Artist;
 	artists?: Artist[];
 	type?: string | string[];
