@@ -1,4 +1,9 @@
-import type { AlbumDetailResponse, LikedAlbumsResponse, NewAlbumResponse } from "@/types/api";
+import type {
+	AlbumDetailDynamicResponse,
+	AlbumDetailResponse,
+	LikedAlbumsResponse,
+	NewAlbumResponse,
+} from "@/types/api";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";
@@ -45,7 +50,7 @@ export function newAlbums(params: NCMAPI.album_new[0]): Promise<NewAlbumResponse
  */
 export function albumDynamicDetail(
 	id: NCMAPI.album_detail_dynamic[0]["id"],
-): Promise<AlbumDetailResponse> {
+): Promise<AlbumDetailDynamicResponse> {
 	return request({
 		url: "/album/detail/dynamic",
 		method: "get",
