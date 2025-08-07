@@ -125,7 +125,7 @@ import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
 import TrackList from "@/components/TrackList.vue";
 import CoverRow from "@/components/CoverRow.vue";
 import Cover from "@/components/Cover.vue";
-import Description from "@/components/Description.tsx";
+import Description from "@/components/Description.vue";
 import { copyText } from "@/utils/copy.ts";
 import { toast } from "vue-sonner";
 import { computed, ref, toValue, shallowRef } from "vue";

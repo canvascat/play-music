@@ -169,7 +169,7 @@ import TrackList from "@/components/TrackList.vue";
 import CoverRow from "@/components/CoverRow.vue";
 import Cover from "@/components/Cover.vue";
 import MvRow from "@/components/MvRow.vue";
-import Description from "@/components/Description.tsx";
+import Description from "@/components/Description.vue";
 import { copyText } from "@/utils/copy";
 import { toast } from "vue-sonner";
 import { ref, computed, onActivated } from "vue";

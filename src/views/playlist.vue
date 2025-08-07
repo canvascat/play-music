@@ -198,7 +198,7 @@ import { toast } from "vue-sonner";
 import * as api from "@/api";
 import ButtonTwoTone from "@/components/ButtonTwoTone.vue";
 import Cover from "@/components/Cover.vue";
-import Description from "@/components/Description.tsx";
+import Description from "@/components/Description.vue";
 import TrackList from "@/components/TrackList.vue";
 import {
 	DropdownMenu,
