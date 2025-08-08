@@ -34,6 +34,9 @@ export default defineConfig(() => {
 		dev: {
 			sourcemap: true,
 		},
+		css: {
+			devSourcemap: true,
+		},
 		optimizeDeps: {
 			rollupOptions: {
 				// https://github.com/vitejs/rolldown-vite/issues/304
