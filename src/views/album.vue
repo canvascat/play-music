@@ -288,7 +288,6 @@ function openInBrowser(id: number | string) {
 		justify-content: center;
 		flex: 1;
 		margin-left: 56px;
-		color: var(--color-text);
 
 		.title {
 			font-size: 56px;
@@ -341,13 +340,9 @@ function openInBrowser(id: number | string) {
 	}
 }
 
-.disc {
-	color: var(--color-text);
-}
-
 .explicit-symbol {
 	opacity: 0.28;
-	color: var(--color-text);
+
 	margin-right: 4px;
 
 	.svg-icon {
@@ -360,7 +355,6 @@ function openInBrowser(id: number | string) {
 	margin-bottom: 36px;
 	font-size: 12px;
 	opacity: 0.48;
-	color: var(--color-text);
 
 	div {
 		margin-bottom: 4px;
@@ -380,7 +374,7 @@ function openInBrowser(id: number | string) {
 		font-size: 22px;
 		font-weight: 600;
 		opacity: 0.88;
-		color: var(--color-text);
+
 		margin-bottom: 20px;
 	}
 }
