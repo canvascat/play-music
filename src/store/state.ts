@@ -29,19 +29,7 @@ const player = new Player();
 const state: GlobalState = {
 	showLyrics: false,
 	title: pkg.name,
-	liked: {
-		songs: [],
-		songsWithDetails: [], // 只有前12首
-		playlists: [],
-		albums: [],
-		artists: [],
-		mvs: [],
-		cloudDisk: [],
-		playHistory: {
-			weekData: [],
-			allData: [],
-		},
-	},
+
 	dailyTracks: [],
 	player: player,
 };

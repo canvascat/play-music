@@ -339,22 +339,24 @@ export interface Settings {
 }
 
 // 全局状态类型
+export interface LikedState {
+	songs: number[];
+	songsWithDetails: Track[];
+	playlists: Playlist[];
+	albums: Album[];
+	artists: Artist[];
+	mvs: MV[];
+	cloudDisk: CloudDiskTrack[];
+	playHistory: {
+		weekData: (Track & { playCount: number })[];
+		allData: (Track & { playCount: number })[];
+	};
+}
+
 export interface GlobalState {
 	showLyrics: boolean;
 	title: string;
-	liked: {
-		songs: number[];
-		songsWithDetails: Track[];
-		playlists: Playlist[];
-		albums: Album[];
-		artists: Artist[];
-		mvs: MV[];
-		cloudDisk: CloudDiskTrack[];
-		playHistory: {
-			weekData: (Track & { playCount: number })[];
-			allData: (Track & { playCount: number })[];
-		};
-	};
+
 	dailyTracks: Track[];
 	player: PlayerState;
 }
