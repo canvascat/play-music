@@ -55,7 +55,7 @@
 /* volume style */
 .volume-control .vue-slider-process {
 	opacity: 0.8;
-	background-color: var(--color-text);
+	background-color: var(--color-foreground);
 	border-radius: 15px;
 }
 
