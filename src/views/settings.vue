@@ -673,7 +673,7 @@
 				</div>
 			</div>
 
-			<div class="flex flex-col items-center mt-24 font-bold text-black">
+			<div class="flex flex-col items-center mt-24 font-bold text-foreground">
 				<p>
 					MADE BY
 					<a :href="pkg.author.url" target="_blank">{{ pkg.author.name }}</a>
@@ -690,7 +690,7 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { doLogout, isAccountLoggedIn } from "@/utils/auth";
 import { bytesToSize, changeAppearance } from "@/utils/common";
 import * as db from "@/utils/db/index";
@@ -725,7 +725,7 @@ const shortcutInput = ref({
 
 const recordedShortcut = ref<KeyboardEvent[]>([]);
 
-const { player, lastfm } = useStore();
+const { player } = useGlobalStore();
 
 const {
 	settings,
@@ -740,6 +740,7 @@ const isElectron = window.IS_ELECTRON;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
 const lastfmStore = useLastfmStore();
+const lastfm = lastfmStore.value;
 
 const showUserInfo = computed(() => isAccountLoggedIn() && dataStore.user?.nickname);
 
@@ -1245,14 +1246,13 @@ function exitRecordShortcut() {
 h2 {
 	margin-top: 48px;
 	font-size: 36px;
-	color: var(--color-text);
 }
 
 h3 {
 	margin-top: 48px;
 	padding-bottom: 12px;
 	font-size: 26px;
-	color: var(--color-text);
+
 	border-bottom: 1px solid rgba(128, 128, 128, 0.18);
 }
 
@@ -1261,13 +1261,12 @@ h3 {
 	align-items: center;
 	justify-content: space-between;
 	background: var(--color-secondary-bg);
-	color: var(--color-text);
+
 	padding: 16px 20px;
 	border-radius: 16px;
 	margin-bottom: 48px;
 
 	button {
-		color: var(--color-text);
 		transition: 0.2s;
 
 		&:hover {
@@ -1289,7 +1288,6 @@ h3 {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	color: var(--color-text);
 
 	.title {
 		font-size: 16px;
@@ -1311,7 +1309,7 @@ select {
 	border: none;
 	padding: 8px 12px 8px 12px;
 	border-radius: 8px;
-	color: var(--color-text);
+
 	background: var(--color-secondary-bg);
 	appearance: none;
 
@@ -1323,7 +1321,6 @@ select {
 }
 
 button {
-	color: var(--color-text);
 	background: var(--color-secondary-bg);
 	padding: 8px 12px 8px 12px;
 	font-weight: 600;
@@ -1349,7 +1346,7 @@ input.text-input {
 	margin-right: 22px;
 	padding: 8px 12px 8px 12px;
 	border-radius: 8px;
-	color: var(--color-text);
+
 	font-weight: 600;
 	font-size: 16px;
 }
@@ -1378,7 +1375,6 @@ input::-webkit-inner-spin-button {
 	font-size: 14px;
 	/* border: 1px solid black; */
 	user-select: none;
-	color: var(--color-text);
 
 	.row {
 		display: flex;
