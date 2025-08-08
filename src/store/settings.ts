@@ -4,6 +4,7 @@ import type { Settings } from "@/types";
 import shortcuts, { type Shortcut } from "@/utils/shortcuts";
 import { cloneDeep } from "es-toolkit";
 import { changeAppearance } from "@/utils/common";
+import { playlistCategories } from "@/utils/staticData";
 
 // {
 //   "lang": "zh-CN",
@@ -115,8 +116,9 @@ export const useSettingsStore = defineStore("settings", () => {
 		musicQuality: "standard",
 		lyricFontSize: 16,
 		outputDevice: "default",
-		enabledPlaylistCategories: [],
+		enabledPlaylistCategories: playlistCategories.filter((c) => c.enable).map((c) => c.name),
 		shortcuts: [],
+		automaticallyCacheSongs: window.IS_ELECTRON === true,
 	});
 
 	changeAppearance(settings.value.appearance);
