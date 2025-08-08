@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="lyrics-page fixed inset-0 flex z-200"
+		class="lyrics-page fixed inset-0 flex z-200 bg-background"
 		:class="{ 'no-lyric': noLyric }"
 		:data-theme="theme"
 	>
@@ -566,7 +566,6 @@ const mute = () => {
 
 <style lang="scss" scoped>
 .lyrics-page {
-	background: var(--color-body-bg);
 	clip: rect(auto, auto, auto, auto);
 }
 
