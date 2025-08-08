@@ -1,5 +1,5 @@
 <template>
-	<div class="player" @click="toggleLyrics">
+	<div class="player bg-background/68" @click="toggleLyrics">
 		<div
 			class="progress-bar"
 			:class="{
@@ -8,19 +8,7 @@
 			}"
 			@click.stop
 		>
-			<VueSlider
-				v-model="progress"
-				:min="0"
-				:max="player.currentTrackDuration"
-				:interval="1"
-				:drag-on-click="true"
-				:duration="0"
-				:dot-size="12"
-				:height="2"
-				:tooltip-formatter="formatTrackTime"
-				:lazy="true"
-				:silent="true"
-			></VueSlider>
+			<ProgressSilder v-model="progress" :min="0" :max="player.currentTrackDuration" :step="1" />
 		</div>
 		<div class="controls">
 			<div class="playing">
@@ -32,12 +20,15 @@
 					/>
 					<div class="track-info" :title="audioSource">
 						<div
-							:class="['name line-clamp-1 break-all mb-1', { 'has-list': hasList() }]"
+							:class="[
+								'line-clamp-1 break-all mb-1 text-foreground font-semibold text-base opacity-88',
+								{ 'has-list': hasList() },
+							]"
 							@click="hasList() && goToList()"
 						>
 							{{ currentTrack.name }}
 						</div>
-						<div class="artist line-clamp-1 break-all">
+						<div class="artist line-clamp-1 break-all text-foreground opacity-58 text-xs">
 							<span
 								v-for="(ar, index) in currentTrack.ar"
 								:key="ar.id"
@@ -127,16 +118,7 @@
 							<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
 						</ButtonIcon>
 						<div class="volume-bar">
-							<VueSlider
-								v-model="volume"
-								:min="0"
-								:max="1"
-								:interval="0.01"
-								:drag-on-click="true"
-								:duration="0"
-								tooltip="none"
-								:dot-size="12"
-							></VueSlider>
+							<VolumeSlider v-model="volume" :min="0" :max="1" :step="0.01" />
 						</div>
 					</div>
 
@@ -151,12 +133,11 @@
 
 <script setup lang="ts">
 import { useStore } from "@/store/pinia";
-import "@/assets/css/slider.css";
+// import "@/assets/css/slider.css";
 
 import ButtonIcon from "@/components/ButtonIcon.vue";
-import VueSlider from "vue-slider-component";
+import ProgressSilder from "@/components/ProgressSilder.vue";
 import { goToListSource, hasListSource } from "@/utils/playList";
-import { formatTrackTime } from "@/utils/common";
 import { resizeImage } from "@/utils/filters";
 import { computed, onMounted, onBeforeMount } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -180,6 +161,7 @@ import {
 } from "@/components/icon";
 import { usePlayerProgress } from "@/lib/hook";
 import { useSettingsStore } from "@/store/settings";
+import VolumeSlider from "./VolumeSlider.vue";
 
 const { player, toggleLyrics, likeATrack } = useStore();
 const { settings } = useSettingsStore();
@@ -301,15 +283,7 @@ function handleKeydown(event: KeyboardEvent) {
 	justify-content: space-around;
 	height: 64px;
 	backdrop-filter: saturate(180%) blur(30px);
-	// background-color: rgba(255, 255, 255, 0.86);
-	background-color: var(--color-navbar-bg);
 	z-index: 100;
-}
-
-@supports (-moz-appearance: none) {
-	.player {
-		background-color: var(--color-body-bg);
-	}
 }
 
 .progress-bar {
@@ -362,13 +336,6 @@ function handleKeydown(event: KeyboardEvent) {
 		flex-direction: column;
 		justify-content: center;
 
-		.name {
-			font-weight: 600;
-			font-size: 16px;
-			opacity: 0.88;
-			color: var(--color-text);
-		}
-
 		.has-list {
 			cursor: pointer;
 
@@ -378,10 +345,6 @@ function handleKeydown(event: KeyboardEvent) {
 		}
 
 		.artist {
-			font-size: 12px;
-			opacity: 0.58;
-			color: var(--color-text);
-
 			span.ar {
 				cursor: pointer;
 
