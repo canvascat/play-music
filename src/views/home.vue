@@ -204,7 +204,7 @@ const loadData = () => {
 	margin-bottom: 20px;
 	font-size: 28px;
 	font-weight: 700;
-	color: var(--color-text);
+
 	a {
 		font-size: 13px;
 		font-weight: 600;

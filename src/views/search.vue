@@ -195,7 +195,7 @@ function getTracksDetail() {
 	font-weight: 600;
 	font-size: 22px;
 	opacity: 0.88;
-	color: var(--color-text);
+
 	margin-bottom: 16px;
 
 	display: flex;
@@ -237,7 +237,7 @@ function getTracksDetail() {
 	left: 0;
 	bottom: 64px;
 	font-size: 24px;
-	color: var(--color-text);
+
 	opacity: 0.38;
 	display: flex;
 	justify-content: center;

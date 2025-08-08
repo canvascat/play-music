@@ -22,7 +22,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="text-black text-6xl">
+	<div class="text-foreground text-6xl">
 		<h1>{{ $t("home.newAlbum") }}</h1>
 		<div class="playlist-row">
 			<div class="playlists">

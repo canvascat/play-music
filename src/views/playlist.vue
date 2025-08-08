@@ -414,11 +414,10 @@ function inputDebounce() {
 		.title {
 			font-size: 36px;
 			font-weight: 700;
-			color: var(--color-text);
 
 			.lock-icon {
 				opacity: 0.28;
-				color: var(--color-text);
+
 				margin-right: 8px;
 			}
 		}
@@ -426,14 +425,14 @@ function inputDebounce() {
 		.artist {
 			font-size: 18px;
 			opacity: 0.88;
-			color: var(--color-text);
+
 			margin-top: 24px;
 		}
 
 		.date-and-count {
 			font-size: 14px;
 			opacity: 0.68;
-			color: var(--color-text);
+
 			margin-top: 2px;
 		}
 
@@ -505,7 +504,6 @@ function inputDebounce() {
 		animation-duration: 0.8s;
 		animation-name: letterSpacing1;
 		text-transform: uppercase;
-		color: var(--color-text);
 	}
 
 	.buttons {
@@ -619,7 +617,6 @@ function inputDebounce() {
 	h1 {
 		font-size: 42px;
 		position: relative;
-		color: var(--color-text);
 
 		.avatar {
 			height: 44px;
@@ -651,7 +648,7 @@ function inputDebounce() {
 	.svg-icon {
 		height: 15px;
 		width: 15px;
-		color: var(--color-text);
+
 		opacity: 0.28;
 
 		margin: {
@@ -667,7 +664,6 @@ function inputDebounce() {
 		width: 96%;
 		font-weight: 600;
 		margin-top: -1px;
-		color: var(--color-text);
 	}
 
 	.active {
@@ -686,7 +682,6 @@ function inputDebounce() {
 		.active {
 			input,
 			.svg-icon {
-				color: var(--color-text);
 			}
 		}
 	}
@@ -715,7 +710,7 @@ function inputDebounce() {
 	.svg-icon {
 		height: 15px;
 		width: 15px;
-		color: var(--color-text);
+
 		opacity: 0.28;
 
 		margin: {
@@ -731,7 +726,6 @@ function inputDebounce() {
 		width: 96%;
 		font-weight: 600;
 		margin-top: -1px;
-		color: var(--color-text);
 	}
 
 	.active {
@@ -750,7 +744,6 @@ function inputDebounce() {
 		.active {
 			input,
 			.svg-icon {
-				color: var(--color-text);
 			}
 		}
 	}

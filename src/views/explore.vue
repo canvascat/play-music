@@ -1,6 +1,6 @@
 <template>
 	<div class="explore-page">
-		<h1 class="text-black text-6xl">{{ $t("explore.explore") }}</h1>
+		<h1 class="text-foreground text-6xl">{{ $t("explore.explore") }}</h1>
 		<div class="flex flex-wrap">
 			<div
 				v-for="category in settings.enabledPlaylistCategories"
@@ -215,7 +215,6 @@ function toggleCat(name) {
 	background: var(--color-secondary-bg);
 	border-radius: 10px;
 	padding: 8px;
-	color: var(--color-text);
 
 	.big-cat {
 		display: flex;

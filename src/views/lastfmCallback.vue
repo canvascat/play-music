@@ -72,7 +72,6 @@ function close() {
 .message {
 	font-size: 1.4rem;
 	font-weight: 500;
-	color: var(--color-text);
 }
 
 button {

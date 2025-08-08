@@ -313,7 +313,6 @@ function openInBrowser(id: string) {
 .section-title {
 	font-weight: 600;
 	font-size: 22px;
-	color: var(--color-text);
 
 	display: flex;
 	justify-content: space-between;
@@ -330,8 +329,6 @@ function openInBrowser(id: string) {
 }
 
 .latest-release {
-	color: var(--color-text);
-
 	.container {
 		display: flex;
 		flex: 1;
