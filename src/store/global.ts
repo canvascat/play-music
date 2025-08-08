@@ -2,13 +2,7 @@ import type { GlobalState } from "@/types";
 import Player from "@/utils/Player";
 import updateApp from "@/utils/updateApp";
 import pkg from "../../package.json";
-import initLocalStorage from "./initLocalStorage";
-
-if (localStorage.getItem("appVersion") === null) {
-	localStorage.setItem("settings", JSON.stringify(initLocalStorage.settings));
-	localStorage.setItem("data", JSON.stringify(initLocalStorage.data));
-	localStorage.setItem("appVersion", pkg.version);
-}
+import { defineStore } from "pinia";
 
 updateApp();
 
@@ -26,12 +20,24 @@ const player = new Player();
 
 // Object.assign(player, JSON.parse(localStorage.getItem('player')));
 
-const state: GlobalState = {
-	showLyrics: false,
-	title: pkg.name,
+export const useGlobalStore = defineStore("global", {
+	state: (): GlobalState => ({
+		showLyrics: false,
+		title: pkg.name,
 
-	dailyTracks: [],
-	player: player,
-};
+		dailyTracks: [],
+		player: player,
+	}),
+	actions: {
+		toggleLyrics() {
+			this.showLyrics = !this.showLyrics;
+		},
+		updateDailyTracks(dailyTracks) {
+			this.dailyTracks = dailyTracks;
+		},
 
-export default state;
+		updateTitle(title: string) {
+			this.title = title;
+		},
+	},
+});
