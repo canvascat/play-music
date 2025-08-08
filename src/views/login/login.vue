@@ -3,10 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginCookie from "./loginCookie.vue";
 import LoginQRCode from "./loginQRCode.vue";
 import { useRouter } from "vue-router";
-import { useStore } from "@/store/pinia";
+import { useLikedStore } from "@/store/liked";
+import { useDataStore } from "@/store/data";
 
 const router = useRouter();
-const { fetchUserProfile, fetchLikedPlaylist } = useStore();
+
+const { fetchLikedPlaylist } = useLikedStore();
+const { fetchUserProfile } = useDataStore();
 
 async function handleLoginSuccess() {
 	await fetchUserProfile();
