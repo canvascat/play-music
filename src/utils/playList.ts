@@ -1,11 +1,13 @@
 import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
 import router from "../router";
-import state from "../store/state";
+
 import { useDataStore } from "@/store/data";
+import { useGlobalStore } from "@/store/global";
 
 export function hasListSource() {
-	return !state.player.isPersonalFM && state.player.playlistSource.id !== 0;
+	const { player } = useGlobalStore();
+	return !player.isPersonalFM && player.playlistSource.id !== 0;
 }
 
 export function goToListSource() {
@@ -14,14 +16,15 @@ export function goToListSource() {
 
 export function getListSourcePath() {
 	const dataStore = useDataStore();
-	if (state.player.playlistSource.id === dataStore.likedSongPlaylistID) {
+	const { player } = useGlobalStore();
+	if (player.playlistSource.id === dataStore.likedSongPlaylistID) {
 		return "/library/liked-songs";
-	} else if (state.player.playlistSource.type === "url") {
-		return state.player.playlistSource.id;
-	} else if (state.player.playlistSource.type === "cloudDisk") {
+	} else if (player.playlistSource.type === "url") {
+		return player.playlistSource.id;
+	} else if (player.playlistSource.type === "cloudDisk") {
 		return "/library";
 	} else {
-		return `/${state.player.playlistSource.type}/${state.player.playlistSource.id}`;
+		return `/${player.playlistSource.type}/${player.playlistSource.id}`;
 	}
 }
 

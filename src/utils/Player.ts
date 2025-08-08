@@ -3,7 +3,7 @@ import { Howl, Howler } from "howler";
 import { isProxy } from "vue";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
-import { pinia, useStore } from "@/store/pinia";
+import { pinia } from "@/store/pinia";
 import type { PersonalFMResponse, PlaylistSource, RepeatMode, Track } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
 import * as db from "@/utils/db/index";
@@ -12,6 +12,7 @@ import { randomItem, setTitle } from "./common";
 import { getAudioSourceFromUnblockMusic } from "./umn";
 import { useSettingsStore } from "@/store/settings";
 import { useLastfmStore } from "@/store/lastfm";
+import { useLikedStore } from "@/store/liked";
 
 const PLAY_PAUSE_FADE_DURATION = 200;
 
@@ -176,7 +177,7 @@ export default class Player {
 		this[_howler]?.seek(value);
 	}
 	get isCurrentTrackLiked() {
-		return this.currentTrack && useStore(pinia).liked.songs.includes(this.currentTrack.id);
+		return this.currentTrack && useLikedStore(pinia).liked.songs.includes(this.currentTrack.id);
 	}
 
 	get audioSource() {

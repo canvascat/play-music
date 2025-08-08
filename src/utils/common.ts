@@ -1,4 +1,4 @@
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import type { Track, TrackPrivilege } from "@/types/index";
 import { isAccountLoggedIn } from "./auth";
 import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
@@ -176,7 +176,7 @@ export async function getImageColor(
 
 export function setTitle(track?: Track): void {
 	document.title = track ? `${track.name} · ${track.ar[0].name} - ${pkg.name}` : pkg.name;
-	useStore().updateTitle(document.title);
+	useGlobalStore().updateTitle(document.title);
 }
 
 export function randomItem<T>(array?: T[]): T | undefined {
