@@ -1,4 +1,4 @@
-module.exports = [
+export default [
 	{
 		identifier: "user_update",
 		route: "/user/update",
