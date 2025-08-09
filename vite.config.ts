@@ -1,23 +1,24 @@
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
-import process from "node:process";
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
+import { rmSync } from "node:fs";
+import electron from "vite-plugin-electron";
+import pkg from "./package.json" with { type: "json" };
+import process from "node:process";
 
 // https://vite.dev/config/
-export default defineConfig(() => {
-	return {
+export default defineConfig(({ mode, command }) => {
+	const alias = {
+		"@electron": fileURLToPath(new URL("./electron", import.meta.url)),
+		"@": fileURLToPath(new URL("./src", import.meta.url)),
+	};
+	const config = {
+		mode: "development",
 		plugins: [vue(), tailwindcss(), vueDevTools()],
 		resolve: {
-			// https://vitejs.dev/config/shared-options.html#resolve-alias
-			alias: {
-				"@": fileURLToPath(new URL("./src", import.meta.url)),
-			},
-			extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
-		},
-		define: {
-			"process.env.IS_ELECTRON": JSON.stringify(process.env),
+			alias,
 		},
 
 		server: {
@@ -42,5 +43,86 @@ export default defineConfig(() => {
 				jsx: "preserve",
 			},
 		},
-	};
+	} satisfies UserConfig;
+
+	if (mode === "electron") {
+		rmSync("dist-electron", { recursive: true, force: true });
+
+		const isServe = command === "serve";
+		const isBuild = command === "build";
+		const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
+		const external = Object.keys(
+			"dependencies" in pkg ? (pkg.dependencies as Record<string, string>) : {},
+		);
+		config.plugins.push(
+			electron([
+				{
+					entry: "electron/main/index.ts",
+					onstart(args) {
+						if (process.env.VSCODE_DEBUG) {
+							console.log(/* For `.vscode/.debug.script.mjs` */ "[startup] Electron App");
+						} else {
+							args.startup();
+						}
+					},
+					vite: {
+						resolve: {
+							alias,
+						},
+						build: {
+							sourcemap,
+							minify: isBuild,
+							outDir: "dist-electron/main",
+							rollupOptions: {
+								external,
+								platform: "node",
+							},
+						},
+					},
+				},
+				{
+					onstart(args) {
+						if (process.env.VSCODE_DEBUG) {
+							console.log(/* For `.vscode/.debug.script.mjs` */ "[startup] Electron App");
+						} else {
+							args.startup();
+						}
+					},
+					vite: {
+						resolve: {
+							alias,
+						},
+						build: {
+							sourcemap: sourcemap ? "inline" : undefined, // #332
+							minify: isBuild,
+							outDir: "dist-electron/preload",
+							rollupOptions: {
+								external,
+								input: "electron/preload/index.ts",
+								output: {
+									format: "cjs",
+									inlineDynamicImports: true,
+									entryFileNames: `[name].mjs`,
+									chunkFileNames: `[name].mjs`,
+									assetFileNames: "[name].[ext]",
+								},
+							},
+						},
+					},
+				},
+			]),
+		);
+
+		if (process.env.VSCODE_DEBUG) {
+			const url = new URL(pkg.debug.env.VITE_DEV_SERVER_URL);
+
+			Object.assign(config.server, {
+				host: url.hostname,
+				port: +url.port,
+			});
+		}
+		config.clearScreen = false;
+	}
+
+	return config;
 });
