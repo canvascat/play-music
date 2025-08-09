@@ -1,9 +1,9 @@
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { useRafFn } from "@vueuse/core";
 import { computed, ref } from "vue";
 
 export function usePlayerProgress() {
-	const { player } = useStore();
+	const { player } = useGlobalStore();
 	const progress = ref(player.progress);
 
 	useRafFn(() => {
