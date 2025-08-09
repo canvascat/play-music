@@ -39,8 +39,6 @@ import Player from "./components/Player.vue";
 import Lyrics from "./views/lyrics.vue";
 import { useLikedStore } from "@/store/liked";
 
-defineOptions({ name: "App" });
-
 const store = useGlobalStore();
 const router = useRouter();
 const { fetchLikedData } = useLikedStore();
