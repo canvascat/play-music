@@ -1,12 +1,3 @@
-<template>
-	<button
-		class="button-icon flex items-center justify-center p-2 m-1 transition-all duration-200 active:scale-95 rounded-[25%]"
-		:title="title"
-	>
-		<slot></slot>
-	</button>
-</template>
-
 <script setup lang="ts">
 import type { VNode } from "vue";
 
@@ -19,8 +10,11 @@ defineSlots<{
 }>();
 </script>
 
-<style scoped>
-button:hover {
-	background: var(--color-secondary-bg-for-transparent);
-}
-</style>
+<template>
+	<button
+		class="button-icon flex items-center justify-center p-2 m-1 transition-all duration-200 active:scale-95 rounded-[25%] hover:bg-secondary-foreground/8"
+		:title="title"
+	>
+		<slot></slot>
+	</button>
+</template>
