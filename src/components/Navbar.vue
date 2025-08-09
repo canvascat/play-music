@@ -3,7 +3,7 @@
 		:class="
 			cn(
 				{ 'has-custom-titlebar': hasCustomTitlebar },
-				'z-40 fixed top-0 right-0 left-0 flex justify-between items-center h-16',
+				'z-40 fixed top-0 right-0 left-0 flex justify-between items-center h-16 bg-background/68',
 			)
 		"
 	>
@@ -16,7 +16,9 @@
 				<IconArrowRight class="size-6" />
 			</button-icon>
 		</div>
-		<div class="navigation-links flex items-center flex-1 select-none uppercase mx-3">
+		<div
+			class="navigation-links flex items-center justify-center flex-1 select-none uppercase mx-3"
+		>
 			<router-link to="/" :class="{ active: $route.name === 'home' }">{{
 				$t("nav.home")
 			}}</router-link>
@@ -178,21 +180,12 @@ nav {
 	}
 
 	backdrop-filter: saturate(180%) blur(20px);
-
-	background-color: var(--color-navbar-bg);
-
 	-webkit-app-region: drag;
 }
 
 @media (max-width: 1336px) {
 	nav {
 		padding: 0 max(5vw, 90px);
-	}
-}
-
-@supports (-moz-appearance: none) {
-	nav {
-		background-color: var(--color-body-bg);
 	}
 }
 
@@ -221,7 +214,7 @@ nav.has-custom-titlebar {
 		text-decoration: none;
 		border-radius: 6px;
 		padding: 6px 10px;
-		color: var(--color-text);
+
 		transition: 0.2s;
 		-webkit-user-drag: none;
 
@@ -250,7 +243,7 @@ nav.has-custom-titlebar {
 	.svg-icon {
 		height: 15px;
 		width: 15px;
-		color: var(--color-text);
+
 		opacity: 0.28;
 
 		margin: {
@@ -262,7 +255,6 @@ nav.has-custom-titlebar {
 	input {
 		width: 96%;
 		margin-top: -1px;
-		color: var(--color-text);
 	}
 
 	.active {
@@ -281,7 +273,6 @@ nav.has-custom-titlebar {
 		.active {
 			input,
 			.svg-icon {
-				color: var(--color-text);
 			}
 		}
 	}
