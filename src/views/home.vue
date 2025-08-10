@@ -9,7 +9,7 @@
 				{{ $t("home.recommendPlaylist") }}
 				<router-link to="/explore?category=推荐歌单">{{ $t("home.seeMore") }}</router-link>
 			</div>
-			<CoverRow type="playlist" :items="recommendPlaylist.items" sub-text="copywriter" />
+			<CoverRow type="playlist" :items="recommendPlaylist" sub-text="copywriter" />
 		</div>
 		<div class="index-row">
 			<div class="title">For You</div>
@@ -20,26 +20,21 @@
 		</div>
 		<div class="index-row">
 			<div class="title">{{ $t("home.recommendArtist") }}</div>
-			<CoverRow type="artist" :column-number="6" :items="recommendArtists.items" />
+			<CoverRow type="artist" :column-number="6" :items="recommendArtists" />
 		</div>
 		<div class="index-row">
 			<div class="title">
 				{{ $t("home.newAlbum") }}
 				<router-link to="/new-album">{{ $t("home.seeMore") }}</router-link>
 			</div>
-			<CoverRow type="album" :items="newReleasesAlbum.items" sub-text="artist" />
+			<CoverRow type="album" :items="newReleasesAlbum" sub-text="artist" />
 		</div>
 		<div class="index-row">
 			<div class="title">
 				{{ $t("home.charts") }}
 				<router-link to="/explore?category=排行榜">{{ $t("home.seeMore") }}</router-link>
 			</div>
-			<CoverRow
-				type="playlist"
-				:items="topList.items"
-				sub-text="updateFrequency"
-				:image-size="1024"
-			/>
+			<CoverRow type="playlist" :items="topList" sub-text="updateFrequency" :image-size="1024" />
 		</div>
 	</div>
 </template>
@@ -55,67 +50,18 @@ import CoverRow from "@/components/CoverRow.vue";
 import FMCard from "@/components/FMCard.vue";
 import DailyTracksCard from "@/components/DailyTracksCard.vue";
 import { useSettingsStore } from "@/store/settings";
-
-// 定义接口
-interface PlaylistItem {
-	id: number;
-	name: string;
-	coverImgUrl: string;
-	copywriter?: string;
-	updateFrequency?: string;
-	[key: string]: any;
-}
-
-interface AlbumItem {
-	id: number;
-	name: string;
-	picUrl: string;
-	artist: {
-		id: number;
-		name: string;
-	};
-	[key: string]: any;
-}
-
-interface ArtistItem {
-	id: number;
-	name: string;
-	img1v1Url: string;
-	[key: string]: any;
-}
-
-interface RecommendPlaylist {
-	items: PlaylistItem[];
-}
-
-interface NewReleasesAlbum {
-	items: AlbumItem[];
-}
-
-interface TopList {
-	items: PlaylistItem[];
-	ids: number[];
-}
-
-interface RecommendArtists {
-	items: ArtistItem[];
-	indexs: number[];
-}
+import { AlbumListArea, ToplistArtistType } from "@/api/NCMAPI";
+import { shuffle } from "es-toolkit";
+import type { Album, Artist, Playlist } from "@/types";
 
 const { settings } = useSettingsStore();
 
 // 响应式数据
 const show = ref(false);
-const recommendPlaylist = ref<RecommendPlaylist>({ items: [] });
-const newReleasesAlbum = ref<NewReleasesAlbum>({ items: [] });
-const topList = ref<TopList>({
-	items: [],
-	ids: [19723756, 180106, 60198, 3812895, 60131],
-});
-const recommendArtists = ref<RecommendArtists>({
-	items: [],
-	indexs: [],
-});
+const recommendPlaylist = ref<Playlist[]>([]);
+const newReleasesAlbum = ref<Album[]>([]);
+const topList = ref<Playlist[]>([]);
+const recommendArtists = ref<Artist[]>([]);
 
 // 模板引用
 const dailyTracksCardRef = ref<InstanceType<typeof DailyTracksCard>>();
@@ -133,45 +79,37 @@ const loadData = () => {
 	}, 1000);
 
 	getRecommendPlayList(10, false).then((items) => {
-		recommendPlaylist.value.items = items;
+		recommendPlaylist.value = items;
 		NProgress.done();
 		show.value = true;
 	});
 
 	api.album
 		.newAlbums({
-			area: settings.musicLanguage ?? "ALL",
+			area: settings.musicLanguage ?? AlbumListArea.all,
 			limit: 10,
 		})
 		.then((data) => {
-			newReleasesAlbum.value.items = data.albums;
+			newReleasesAlbum.value = data.albums;
 		});
 
-	const toplistOfArtistsAreaTable: Record<string, number | null> = {
-		all: null,
-		zh: 1,
-		ea: 2,
-		jp: 4,
-		kr: 3,
+	// 获取歌手榜
+	const toplistOfArtistsAreaTable = {
+		[AlbumListArea.all]: ToplistArtistType.zh,
+		[AlbumListArea.zh]: ToplistArtistType.zh,
+		[AlbumListArea.ea]: ToplistArtistType.ea,
+		[AlbumListArea.jp]: ToplistArtistType.ja,
+		[AlbumListArea.kr]: ToplistArtistType.kr,
 	};
+	const area = toplistOfArtistsAreaTable[settings.musicLanguage ?? AlbumListArea.all];
+	api.artist.toplistOfArtists(area).then((data) => {
+		recommendArtists.value = shuffle(data.list.artists).slice(0, 6);
+	});
 
-	const area = toplistOfArtistsAreaTable[settings.musicLanguage ?? "all"];
-	if (area !== null) {
-		api.artist.toplistOfArtists(area).then((data) => {
-			const indexs: number[] = [];
-			while (indexs.length < 6) {
-				const tmp = ~~(Math.random() * 100);
-				if (!indexs.includes(tmp)) indexs.push(tmp);
-			}
-			recommendArtists.value.indexs = indexs;
-			recommendArtists.value.items = data.list.artists.filter((l: ArtistItem, index: number) =>
-				indexs.includes(index),
-			);
-		});
-	}
-
+	// 获取排行榜歌单
 	api.playlist.toplists().then((data) => {
-		topList.value.items = data.list.filter((l: PlaylistItem) => topList.value.ids.includes(l.id));
+		const ids = [19723756, 180106, 60198, 3812895, 60131];
+		topList.value = data.list.filter((l) => ids.includes(l.id));
 	});
 
 	dailyTracksCardRef.value?.loadDailyTracks();
