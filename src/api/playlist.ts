@@ -1,4 +1,9 @@
-import type { PlaylistDetailResponse } from "@/types";
+import type {
+	PlaylistDetailResponse,
+	RecommendPlaylistResponse,
+	RecommendResourceResponse,
+	ToplistResponse,
+} from "@/types";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import request, { noCacheParams } from "@/utils/request";
 import type * as NCMAPI from "./NCMAPI";
@@ -11,7 +16,9 @@ import type * as NCMAPI from "./NCMAPI";
  * @param {Object} params
  * @param {number=} params.limit
  */
-export function recommendPlaylist(params?: NCMAPI.personalized[0]) {
+export function recommendPlaylist(
+	params?: NCMAPI.personalized[0],
+): Promise<RecommendPlaylistResponse> {
 	return request({ url: "/personalized", method: "get", params });
 }
 
@@ -21,7 +28,9 @@ export function recommendPlaylist(params?: NCMAPI.personalized[0]) {
  * @param {Object} params
  * @param {number=} params.limit
  */
-export function dailyRecommendPlaylist(params?: NCMAPI.recommend_resource[0]) {
+export function dailyRecommendPlaylist(
+	params?: NCMAPI.recommend_resource[0],
+): Promise<RecommendResourceResponse> {
 	return request({
 		url: "/recommend/resource",
 		method: "get",
@@ -102,7 +111,7 @@ export function playlistCatlist() {
  * 所有榜单
  * 说明 : 调用此接口,可获取所有榜单 接口地址 : /toplist
  */
-export function toplists() {
+export function toplists(): Promise<ToplistResponse> {
 	return request({
 		url: "/toplist",
 		method: "get",
