@@ -24,14 +24,14 @@ defineProps<{
 			</div>
 		</DialogTrigger>
 		<DialogContent
-			class="sm:max-w-[50vw] grid-rows-[auto_minmax(0,1fr)_auto] p-0 bg-white/78 backdrop-blur-sm max-h-[90dvh]"
-			overlayClass="bg-white/58"
+			class="sm:max-w-[50vw] grid-rows-[auto_minmax(0,1fr)_auto] p-0 bg-background/78 backdrop-blur-sm max-h-[80dvh]"
+			overlayClass="bg-background/58"
 		>
 			<DialogHeader class="p-6 pb-0">
 				<DialogTitle>{{ title }}</DialogTitle>
 			</DialogHeader>
 			<div class="grid gap-4 py-4 overflow-y-auto px-6">
-				<div class="flex flex-col justify-between h-[300dvh]">
+				<div class="flex flex-col justify-between">
 					<DialogDescription class="text-base mt-4 whitespace-pre-line">
 						{{ description }}
 					</DialogDescription>
