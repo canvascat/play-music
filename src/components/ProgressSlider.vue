@@ -9,14 +9,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/t
 import { formatTrackTime } from "@/utils/common";
 
 const props = defineProps<
-	Omit<SliderRootProps, "orientation" | "modelValue" | "defaultValue"> & {
+	Omit<SliderRootProps, "orientation" | "modelValue" | "defaultValue" | "min" | "step"> & {
 		class?: HTMLAttributes["class"];
+		white?: boolean;
+		tooltip?: boolean;
 	}
 >();
 
 const modelValue = defineModel<number>();
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, "class", "white", "tooltip");
 
 const forwarded = useForwardProps(delegatedProps);
 
@@ -32,7 +34,7 @@ const value = computed({
 </script>
 
 <template>
-	<TooltipProvider>
+	<TooltipProvider :disabled="!tooltip">
 		<SliderRoot
 			data-slot="slider"
 			:class="
@@ -41,21 +43,36 @@ const value = computed({
 					props.class,
 				)
 			"
+			:min="0"
+			:step="1"
 			v-bind="forwarded"
 			v-model="value"
 		>
 			<SliderTrack
 				data-slot="slider-track"
-				class="bg-muted relative grow overflow-hidden rounded-full h-0.5 w-full"
+				:class="
+					cn(
+						'bg-muted relative grow overflow-hidden rounded-full h-0.5 w-full',
+						white && 'bg-white/18',
+					)
+				"
 			>
-				<SliderRange data-slot="slider-range" class="bg-primary absolute h-full" />
+				<SliderRange
+					data-slot="slider-range"
+					:class="cn('bg-primary absolute h-full', white && 'bg-white')"
+				/>
 			</SliderTrack>
 
 			<Tooltip disable-closing-trigger>
 				<TooltipTrigger as-child>
 					<SliderThumb
 						data-slot="slider-thumb"
-						class="bg-white invisible group-hover:visible ring-ring/50 block size-3 shrink-0 rounded-full shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 cursor-pointer"
+						:class="
+							cn(
+								'bg-white invisible group-hover:visible ring-ring/50 block size-3 shrink-0 rounded-full shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50 cursor-pointer',
+								white && 'ring-white/50',
+							)
+						"
 					/>
 				</TooltipTrigger>
 
