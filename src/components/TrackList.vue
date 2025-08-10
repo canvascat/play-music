@@ -21,7 +21,7 @@
 						class="pointer-events-none flex items-center gap-2"
 					>
 						<img
-							:src="resizeImage(track.al.picUrl, 224)"
+							:src="resizeImage(track.al?.picUrl, 224)"
 							loading="lazy"
 							class="w-10 h-10 rounded-sm"
 						/>
@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { resizeImage } from "@/utils/filters";
@@ -91,12 +91,14 @@ import {
 } from "@/components/ui/context-menu";
 import { copyText } from "@/utils/copy";
 import { useModalStore } from "@/store/modal";
+import type { CloudDiskTrack } from "@/types";
+import { useLikedStore } from "@/store/liked";
 
 const { t } = useI18n();
 const modalStore = useModalStore();
 const emits = defineEmits(["removeTrack"]);
 interface Props {
-	tracks?: any[];
+	tracks?: CloudDiskTrack[];
 	type?: "tracklist" | "album" | "playlist" | "cloudDisk";
 	id?: number;
 	dbclickTrackFunc?: string;
@@ -122,7 +124,9 @@ const props = withDefaults(defineProps<Props>(), {
 	highlightPlayingTrack: true,
 	itemKey: "id",
 });
-const { liked, player, likeATrack, updateLiked } = useStore();
+
+const { player } = useGlobalStore();
+const { liked, removeTrackFromCloudDisk, likeATrack } = useLikedStore();
 
 const listStyles = ref({
 	// display: 'grid',
@@ -214,18 +218,5 @@ function copyLink(trackID: string) {
 }
 function removeTrackFromQueue(trackID: string) {
 	player.removeTrackFromQueue(trackID);
-}
-function removeTrackFromCloudDisk(track: any) {
-	if (confirm(`确定要从云盘删除 ${track.songName}？`)) {
-		// ?? 这里track.songId 和 track.id 不一样
-		let trackID = track.songId;
-		api.user.cloudDiskTrackDelete(trackID).then((data) => {
-			toast(data.code === 200 ? "已将此歌曲从云盘删除" : data.message);
-			updateLiked(
-				"cloudDisk",
-				liked.cloudDisk.filter((t) => t.songId !== trackID),
-			);
-		});
-	}
 }
 </script>

@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { noop, sample } from "es-toolkit";
@@ -34,7 +34,7 @@ const defaultCovers = [
 	"https://p1.music.126.net/AhYP9TET8l-VSGOpWAKZXw==/109951165134386387.jpg",
 ];
 
-const { dailyTracks, updateDailyTracks, player } = useStore();
+const { dailyTracks, updateDailyTracks, player } = useGlobalStore();
 const router = useRouter();
 const { t } = useI18n();
 

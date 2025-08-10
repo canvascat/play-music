@@ -15,20 +15,20 @@
 
 <script setup lang="ts">
 import Modal from "@/components/Modal.vue";
-import { useStore } from "@/store/pinia";
 import * as api from "@/api";
 import { toast } from "vue-sonner";
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useModalStore } from "@/store/modal";
 import { useDataStore } from "@/store/data";
+import { useLikedStore } from "@/store/liked";
 
 const { t } = useI18n();
 const modalStore = useModalStore();
 const title = ref("");
 const privatePlaylist = ref(false);
 const dataStore = useDataStore();
-const { fetchLikedPlaylist } = useStore();
+const { fetchLikedPlaylist } = useLikedStore();
 
 const show = computed(() => modalStore.show.newPlaylist);
 
@@ -87,7 +87,6 @@ function _createPlaylist() {
 			padding: 8px 12px;
 			border-radius: 8px;
 			margin-top: -1px;
-			color: var(--color-text);
 
 			&:focus {
 				background: var(--color-primary-bg-for-transparent);

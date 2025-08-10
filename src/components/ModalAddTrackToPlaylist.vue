@@ -8,7 +8,12 @@
 		width="25vw"
 	>
 		<template v-slot:default>
-			<div class="new-playlist-button" @click="newPlaylist"><IconPlus />新建歌单</div>
+			<div
+				class="new-playlist-button text-foreground flex items-center justify-center text-base font-medium rounded-lg mb-4 mx-1.5 cursor-pointer"
+				@click="newPlaylist"
+			>
+				<IconPlus class="size-4 mr-2" />新建歌单
+			</div>
 			<div
 				v-for="playlist in ownPlaylists"
 				:key="playlist.id"
@@ -30,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
 import Modal from "@/components/Modal.vue";
 import * as api from "@/api";
 import { resizeImage } from "@/utils/filters";
@@ -40,6 +44,7 @@ import { useI18n } from "vue-i18n";
 import { useModalStore } from "@/store/modal";
 import { IconPlus } from "@/components/icon";
 import { useDataStore } from "@/store/data";
+import { useLikedStore } from "@/store/liked";
 
 const modalStore = useModalStore();
 
@@ -47,7 +52,7 @@ const { t } = useI18n();
 
 const dataStore = useDataStore();
 
-const { liked } = useStore();
+const { liked } = useLikedStore();
 
 const show = computed(() => modalStore.show.addTrackToPlaylist);
 
@@ -82,26 +87,11 @@ function newPlaylist() {
 
 <style lang="scss" scoped>
 .new-playlist-button {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 16px;
-	font-weight: 500;
-	color: var(--color-text);
 	background: var(--color-secondary-bg-for-transparent);
-	border-radius: 8px;
-	height: 48px;
-	margin-bottom: 16px;
-	margin-right: 6px;
-	margin-left: 6px;
-	cursor: pointer;
-	transition: 0.2s;
 
-	.svg-icon {
-		width: 16px;
-		height: 16px;
-		margin-right: 8px;
-	}
+	height: 48px;
+
+	transition: 0.2s;
 
 	&:hover {
 		color: var(--color-primary);

@@ -83,12 +83,6 @@ function clickOutside() {
 	max-height: calc(100vh - 128px - 64px);
 }
 
-@supports (-moz-appearance: none) {
-	.modal {
-		background: var(--color-body-bg) !important;
-	}
-}
-
 .content {
 	overflow: auto;
 	overflow-x: hidden;
@@ -107,7 +101,6 @@ function clickOutside() {
 	}
 
 	button {
-		color: var(--color-text);
 		border-radius: 50%;
 		height: 32px;
 		width: 32px;
@@ -138,7 +131,6 @@ function clickOutside() {
 	margin-bottom: -8px;
 
 	button {
-		color: var(--color-text);
 		background: var(--color-secondary-bg-for-transparent);
 		border-radius: 8px;
 		padding: 6px 16px;
@@ -170,7 +162,6 @@ function clickOutside() {
 [data-theme="dark"] {
 	.shade {
 		background: rgba(0, 0, 0, 0.38);
-		color: var(--color-text);
 	}
 
 	.modal {

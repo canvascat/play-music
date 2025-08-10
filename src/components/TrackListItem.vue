@@ -74,7 +74,7 @@
 <script setup lang="ts">
 import ArtistsInLine from "@/components/ArtistsInLine.vue";
 import ExplicitSymbol from "@/components/ExplicitSymbol.vue";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { isNil } from "es-toolkit";
 import { formatTime } from "@/utils/filters";
 import { computed, ref } from "vue";
@@ -82,8 +82,6 @@ import { useRouter } from "vue-router";
 import type { Track, Artist, Album } from "@/types";
 import { IconPlay, IconHeart, IconHeartSolid, IconVolume } from "@/components/icon";
 import { useSettingsStore } from "@/store/settings";
-
-defineOptions({ name: "TrackListItem" });
 
 interface Props {
 	trackProp: Track | any;
@@ -99,7 +97,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
-const store = useStore();
+const store = useGlobalStore();
 const { player } = store;
 const { settings } = useSettingsStore();
 
@@ -109,8 +107,8 @@ const trackStyle = ref({});
 const track = computed((): Track => {
 	return props.type === "cloudDisk" ? props.trackProp.simpleSong : props.trackProp;
 });
-const playable = computed((): boolean => {
-	return track.value?.privilege?.pl > 0 || track.value?.playable;
+const playable = computed(() => {
+	return track.value && ((track.value.privilege?.pl ?? 0) > 0 || track.value.playable);
 });
 
 const imgUrl = computed((): string => {
@@ -156,7 +154,7 @@ const isSubTitle = computed((): boolean => {
 	);
 });
 
-const isPlaylist = computed((): boolean => {
+const isPlaylist = computed(() => {
 	return props.type === "playlist";
 });
 
@@ -189,32 +187,32 @@ const trackClass = computed((): string[] => {
 //   return this.$parent.rightClickedTrack.id === this.track.id ? true : false;
 // },
 
-const showLikeButton = computed((): boolean => {
+const showLikeButton = computed(() => {
 	return props.type !== "tracklist" && props.type !== "cloudDisk";
 });
 
-const showOrderNumber = computed((): boolean => {
+const showOrderNumber = computed(() => {
 	return props.type === "album";
 });
 
-const showAlbumName = computed((): boolean => {
+const showAlbumName = computed(() => {
 	return props.type !== "album" && props.type !== "tracklist";
 });
 
-const showTrackTime = computed((): boolean => {
+const showTrackTime = computed(() => {
 	return props.type !== "tracklist";
 });
 
-const goToAlbum = (): void => {
+const goToAlbum = () => {
 	if (track.value.al.id === 0) return;
 	router.push({ path: "/album/" + track.value.al.id });
 };
 
-const playTrack = (): void => {
+const playTrack = () => {
 	// this.$parent.playThisList(this.track.id);
 };
 
-const likeThisSong = (): void => {
+const likeThisSong = () => {
 	// this.$parent.likeATrack(this.track.id);
 };
 </script>
@@ -255,7 +253,7 @@ button {
 		border-radius: 8px;
 		margin: 0 20px 0 10px;
 		width: 12px;
-		color: var(--color-text);
+
 		cursor: default;
 		span {
 			opacity: 0.58;
@@ -264,7 +262,7 @@ button {
 
 	.explicit-symbol {
 		opacity: 0.28;
-		color: var(--color-text);
+
 		.svg-icon {
 			margin-bottom: -3px;
 		}
@@ -299,7 +297,7 @@ button {
 		.title {
 			font-size: 18px;
 			font-weight: 600;
-			color: var(--color-text);
+
 			cursor: default;
 			padding-right: 16px;
 			.featured {
@@ -318,7 +316,7 @@ button {
 			margin-top: 2px;
 			font-size: 13px;
 			opacity: 0.68;
-			color: var(--color-text);
+
 			a {
 				span {
 					margin-right: 3px;
@@ -336,7 +334,6 @@ button {
 		display: flex;
 		font-size: 16px;
 		opacity: 0.88;
-		color: var(--color-text);
 	}
 	.time,
 	.count {
@@ -348,7 +345,6 @@ button {
 		margin-right: 10px;
 		font-variant-numeric: tabular-nums;
 		opacity: 0.88;
-		color: var(--color-text);
 	}
 	.count {
 		font-weight: bold;

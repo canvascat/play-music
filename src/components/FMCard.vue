@@ -47,13 +47,13 @@
 import ButtonIcon from "@/components/ButtonIcon.vue";
 import ArtistsInLine from "@/components/ArtistsInLine.vue";
 import { IconThumbsDown, IconPlay, IconPause, IconNext, IconFm } from "@/components/icon";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { resizeImage } from "@/utils/filters";
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { getImageColor } from "@/utils/common";
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 
 const router = useRouter();
 

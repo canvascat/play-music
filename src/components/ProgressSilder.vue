@@ -60,7 +60,7 @@ const value = computed({
 				</TooltipTrigger>
 
 				<TooltipContent :side-offset="6">
-					{{ formatTrackTime(modelValue) }}
+					{{ formatTrackTime(modelValue) || "00:00" }}
 				</TooltipContent>
 			</Tooltip>
 		</SliderRoot>

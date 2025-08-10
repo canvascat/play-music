@@ -10,7 +10,7 @@
 		>
 			<ProgressSilder v-model="progress" :min="0" :max="player.currentTrackDuration" :step="1" />
 		</div>
-		<div class="controls">
+		<div class="grid grid-cols-3 h-full px-[10vw] md:max-xl:px-[5vw]">
 			<div class="playing">
 				<div class="container" @click.stop>
 					<img
@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 // import "@/assets/css/slider.css";
 
 import ButtonIcon from "@/components/ButtonIcon.vue";
@@ -162,8 +162,10 @@ import {
 import { usePlayerProgress } from "@/lib/hook";
 import { useSettingsStore } from "@/store/settings";
 import VolumeSlider from "./VolumeSlider.vue";
+import { useLikedStore } from "@/store/liked";
 
-const { player, toggleLyrics, likeATrack } = useStore();
+const { player, toggleLyrics } = useGlobalStore();
+const { likeATrack } = useLikedStore();
 const { settings } = useSettingsStore();
 
 const currentTrack = computed(() => player.currentTrack);
@@ -290,23 +292,6 @@ function handleKeydown(event: KeyboardEvent) {
 	margin-top: -6px;
 	margin-bottom: -6px;
 	width: 100%;
-}
-
-.controls {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	height: 100%;
-
-	padding: {
-		right: 10vw;
-		left: 10vw;
-	}
-}
-
-@media (max-width: 1336px) {
-	.controls {
-		padding: 0 5vw;
-	}
 }
 
 .blank {
