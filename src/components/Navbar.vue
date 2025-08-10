@@ -2,22 +2,22 @@
 	<nav
 		:class="
 			cn(
-				{ 'has-custom-titlebar': hasCustomTitlebar },
-				'z-40 fixed top-0 right-0 left-0 flex justify-between items-center h-16 bg-background/68',
+				{ 'pt-5 app-region-no-drag': hasCustomTitlebar },
+				'app-region-drag px-[10vw] md:max-xl:px-[max(5vw, 80px)] z-40 fixed top-0 right-0 left-0 flex justify-between items-center h-16 bg-background/68',
 			)
 		"
 	>
 		<Titlebar v-if="hasCustomTitlebar" />
-		<div class="navigation-buttons flex items-center flex-1">
-			<button-icon @click="go('back')">
+		<div class="flex items-center flex-1 max-lg:flex-none">
+			<button-icon @click="go('back')" class="app-region-no-drag">
 				<IconArrowLeft class="size-6" />
 			</button-icon>
-			<button-icon @click="go('forward')">
+			<button-icon @click="go('forward')" class="app-region-no-drag">
 				<IconArrowRight class="size-6" />
 			</button-icon>
 		</div>
 		<div
-			class="navigation-links flex items-center justify-center flex-1 select-none uppercase mx-3"
+			class="navigation-links flex items-center justify-center flex-1 max-lg:flex-none select-none uppercase mx-3 app-region-no-drag"
 		>
 			<router-link to="/" :class="{ active: $route.name === 'home' }">{{
 				$t("nav.home")
@@ -30,7 +30,7 @@
 			}}</router-link>
 		</div>
 		<div class="right-part flex items-center justify-end flex-1">
-			<div class="search-box flex justify-end">
+			<div class="search-box flex justify-end app-region-no-drag max-sm:hidden">
 				<div
 					class="container flex items-center h-8 rounded-lg w-50"
 					:class="{ active: inputFocus }"
@@ -51,10 +51,10 @@
 				</div>
 			</div>
 			<DropdownMenu>
-				<DropdownMenuTrigger>
+				<DropdownMenuTrigger as-child>
 					<img
 						draggable="false"
-						class="avatar select-none size-8 rounded-full cursor-pointer hover:brightness-80 ml-3"
+						class="flex-none app-region-no-drag select-none size-8 rounded-full cursor-pointer hover:brightness-80 ml-3"
 						:src="avatarUrl"
 						loading="lazy"
 					/>
@@ -174,41 +174,11 @@ const logout = () => {
 
 <style lang="scss" scoped>
 nav {
-	padding: {
-		right: 10vw;
-		left: 10vw;
-	}
-
 	backdrop-filter: saturate(180%) blur(20px);
-	-webkit-app-region: drag;
-}
-
-@media (max-width: 1336px) {
-	nav {
-		padding: 0 max(5vw, 90px);
-	}
-}
-
-nav.has-custom-titlebar {
-	padding-top: 20px;
-	-webkit-app-region: no-drag;
-}
-
-.navigation-buttons {
-	button {
-		-webkit-app-region: no-drag;
-	}
-}
-
-@media (max-width: 970px) {
-	.navigation-buttons {
-		flex: unset;
-	}
 }
 
 .navigation-links {
 	a {
-		-webkit-app-region: no-drag;
 		font-size: 18px;
 		font-weight: 700;
 		text-decoration: none;
@@ -234,8 +204,6 @@ nav.has-custom-titlebar {
 }
 
 .search-box {
-	-webkit-app-region: no-drag;
-
 	.container {
 		background: var(--color-secondary-bg-for-transparent);
 	}
@@ -266,19 +234,5 @@ nav.has-custom-titlebar {
 			color: var(--color-primary);
 		}
 	}
-}
-
-[data-theme="dark"] {
-	.search-box {
-		.active {
-			input,
-			.svg-icon {
-			}
-		}
-	}
-}
-
-.right-part .avatar {
-	-webkit-app-region: no-drag;
 }
 </style>
