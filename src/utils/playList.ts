@@ -4,6 +4,7 @@ import router from "../router";
 
 import { useDataStore } from "@/store/data";
 import { useGlobalStore } from "@/store/global";
+import type { Playlist } from "@/types";
 
 export function hasListSource() {
 	const { player } = useGlobalStore();
@@ -27,8 +28,16 @@ export function getListSourcePath() {
 		return `/${player.playlistSource.type}/${player.playlistSource.id}`;
 	}
 }
-
-export async function getRecommendPlayList(limit, removePrivateRecommand) {
+/**
+ * 获取推荐歌单
+ * @param limit 限制数量
+ * @param removePrivateRecommand 是否移除私人歌单
+ * @returns 推荐歌单
+ */
+export async function getRecommendPlayList(
+	limit: number,
+	removePrivateRecommand: boolean,
+): Promise<Playlist[]> {
 	if (isAccountLoggedIn()) {
 		const playlists = await Promise.all([
 			api.playlist.dailyRecommendPlaylist(),

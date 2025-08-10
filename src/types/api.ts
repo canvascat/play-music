@@ -1,3 +1,4 @@
+import type { ToplistArtistType } from "@/api/NCMAPI";
 import type {
 	Album,
 	Artist,
@@ -212,8 +213,10 @@ export interface ArtistMVResponse extends BaseApiResponse {
 }
 
 export interface TopArtistResponse extends BaseApiResponse {
-	artists: Artist[];
-	more: boolean;
+	list: {
+		artists: Artist[];
+		type: ToplistArtistType;
+	};
 }
 
 // 搜索相关API响应
@@ -298,19 +301,7 @@ export interface RecommendPlaylistResponse extends BaseApiResponse {
 }
 
 export interface RecommendResourceResponse extends BaseApiResponse {
-	recommend: Array<{
-		id: number;
-		type: number;
-		name: string;
-		copywriter: string;
-		picUrl: string;
-		canDislike: boolean;
-		trackNumberUpdateTime: number;
-		playCount: number;
-		trackCount: number;
-		highQuality: boolean;
-		alg: string;
-	}>;
+	recommend: Playlist[];
 }
 
 // 评论相关API响应
@@ -378,45 +369,7 @@ export interface QRCheckResponse extends BaseApiResponse {
 
 // 榜单相关API响应
 export interface ToplistResponse extends BaseApiResponse {
-	list: Array<{
-		subscribers: any[];
-		tracks: Track[];
-		updateFrequency: string;
-		backgroundCoverId: number;
-		backgroundCoverUrl: any;
-		titleImage: number;
-		titleImageUrl: any;
-		englishTitle: any;
-		opRecommend: boolean;
-		recommendInfo: any;
-		socialPlaylistCover: any;
-		tsSongCount: number;
-		adType: number;
-		trackNumberUpdateTime: number;
-		cloudTrackCount: number;
-		subscribedCount: number;
-		createTime: number;
-		highQuality: boolean;
-		updateTime: number;
-		userId: number;
-		coverImgUrl: string;
-		anonimous: boolean;
-		newImported: boolean;
-		specialType: number;
-		trackUpdateTime: number;
-		commentThreadId: string;
-		privacy: number;
-		trackCount: number;
-		playCount: number;
-		ordered: boolean;
-		description: string;
-		status: number;
-		tags: string[];
-		name: string;
-		id: number;
-		coverImgId_str: string;
-		ToplistType: string;
-	}>;
+	list: Playlist[];
 }
 
 // 通用分页查询参数

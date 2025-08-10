@@ -1,5 +1,6 @@
 // 核心音乐数据类型定义
 
+import type { AlbumListArea } from "@/api/NCMAPI";
 import type Player from "@/utils/Player";
 import type { Shortcut } from "@/utils/shortcuts";
 
@@ -333,7 +334,7 @@ export interface Settings {
 	unmYtDlExe?: string;
 	enableOsdlyricsSupport?: boolean;
 	/** 音乐语言偏好 */
-	musicLanguage?: string;
+	musicLanguage?: AlbumListArea;
 	enableRealIP?: boolean;
 	realIP?: string;
 }
