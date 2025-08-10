@@ -23,9 +23,9 @@
 				loading="lazy"
 				class="select-none size-full rounded-xl border border-white/4 aspect-square"
 			/>
-			<transition v-if="coverHover || alwaysShowShadow" name="fade">
+			<FadeIn v-if="coverHover || alwaysShowShadow">
 				<div v-show="focus || alwaysShowShadow" class="shadow" :style="shadowStyles"></div>
-			</transition>
+			</FadeIn>
 		</div>
 	</div>
 </template>
@@ -34,9 +34,10 @@
 import { type CSSProperties, computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { IconPlay } from "@/components/icon";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
+import { FadeIn } from "./transition";
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 const playActions = {
 	album: player.playAlbumByID,
 	playlist: player.playPlaylistByID,
@@ -148,17 +149,5 @@ const goTo = () => {
 	background-size: cover;
 	border-radius: 0.75em;
 	aspect-ratio: 1 / 1;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-	transition: opacity 0.3s;
-}
-
-.fade-enter-from,
-.fade-leave-to
-
-/* .fade-leave-active below version 2.1.8 */ {
-	opacity: 0;
 }
 </style>
