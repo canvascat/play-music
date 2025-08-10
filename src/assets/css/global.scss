@@ -35,20 +35,3 @@ a {
 		cursor: default !important;
 	}
 }
-
-* {
-	scrollbar-width: thin;
-	scrollbar-color: var(--border) transparent;
-}
-::-webkit-scrollbar {
-	width: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-	background: var(--border);
-	border-radius: 5px;
-}
-
-::-webkit-scrollbar-track {
-	background: transparent;
-}

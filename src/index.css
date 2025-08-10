@@ -43,7 +43,6 @@
 }
 
 :root {
-	--color-text: #000;
 	--color-primary: #335eea;
 	--color-primary-bg: #eaeffd;
 	--color-secondary: #7a7a7b;
@@ -53,7 +52,6 @@
 }
 
 [data-theme="dark"] {
-	--color-text: #ffffff;
 	--color-primary: #335eea;
 	--color-primary-bg: #bbcdff;
 	--color-secondary: #7a7a7b;
@@ -63,7 +61,7 @@
 }
 
 :root {
-	--radius: 0.65rem;
+	--radius: 0.5rem;
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.141 0.005 285.823);
 	--card: oklch(1 0 0);
@@ -137,8 +135,9 @@
 		@apply border-border outline-ring/50;
 	}
 
-	body {
-		@apply bg-background text-foreground;
+	body,
+	.lyrics-page {
+		@apply bg-background text-foreground font-semibold;
 	}
 
 	:where(.svg-icon) {
@@ -148,6 +147,29 @@
 
 	/* @import "./assets/css/global.scss"; */
 	@import "./assets/css/slider.css";
+}
+
+/* for electron https://www.electronjs.org/docs/latest/tutorial/custom-window-interactions#custom-draggable-regions */
+@utility app-region-* {
+	app-region: --value("drag", "no-drag");
+}
+
+/* custom scrollbar */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--border) transparent;
+}
+::-webkit-scrollbar {
+	width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 5px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
 }
 
 html {
