@@ -69,7 +69,6 @@
 }
 
 .plyr--full-ui {
-	box-sizing: border-box;
 }
 
 .plyr--full-ui *,
@@ -334,7 +333,7 @@ a.plyr__control::before {
 	right: calc(((18px / 2) + calc(10px * 0.7)) - (4px / 2));
 	right: calc(
 		((var(--plyr-control-icon-size, 18px) / 2) + calc(var(--plyr-control-spacing, 10px) * 0.7)) -
-		(var(--plyr-menu-arrow-size, 4px) / 2)
+			(var(--plyr-menu-arrow-size, 4px) / 2)
 	);
 	top: 100%;
 	width: 0;
@@ -401,8 +400,7 @@ a.plyr__control::before {
 	border-left-color: var(--plyr-menu-arrow-color, #728197);
 	right: calc((calc(10px * 0.7) * 1.5) - 4px);
 	right: calc(
-		(calc(var(--plyr-control-spacing, 10px) * 0.7) * 1.5) -
-		var(--plyr-menu-item-arrow-size, 4px)
+		(calc(var(--plyr-control-spacing, 10px) * 0.7) * 1.5) - var(--plyr-menu-item-arrow-size, 4px)
 	);
 }
 
@@ -430,8 +428,7 @@ a.plyr__control::before {
 	border-right-color: var(--plyr-menu-arrow-color, #728197);
 	left: calc((calc(10px * 0.7) * 1.5) - 4px);
 	left: calc(
-		(calc(var(--plyr-control-spacing, 10px) * 0.7) * 1.5) -
-		var(--plyr-menu-item-arrow-size, 4px)
+		(calc(var(--plyr-control-spacing, 10px) * 0.7) * 1.5) - var(--plyr-menu-item-arrow-size, 4px)
 	);
 }
 
@@ -533,8 +530,7 @@ a.plyr__control::before {
 	display: block;
 	height: calc((3px * 2) + 13px);
 	height: calc(
-		(var(--plyr-range-thumb-active-shadow-width, 3px) * 2) +
-		var(--plyr-range-thumb-height, 13px)
+		(var(--plyr-range-thumb-active-shadow-width, 3px) * 2) + var(--plyr-range-thumb-height, 13px)
 	);
 	margin: 0;
 	padding: 0;
@@ -584,8 +580,7 @@ a.plyr__control::before {
 	-webkit-appearance: none;
 	margin-top: calc(((13px - 5px) / 2) * -1);
 	margin-top: calc(
-		((var(--plyr-range-thumb-height, 13px) - var(--plyr-range-track-height, 5px)) / 2) *
-		-1
+		((var(--plyr-range-thumb-height, 13px) - var(--plyr-range-track-height, 5px)) / 2) * -1
 	);
 }
 
@@ -850,8 +845,7 @@ a.plyr__control::before {
 .plyr__controls > .plyr__control:first-child + .plyr__control .plyr__tooltip::before {
 	left: calc((18px / 2) + calc(10px * 0.7));
 	left: calc(
-		(var(--plyr-control-icon-size, 18px) / 2) +
-		calc(var(--plyr-control-spacing, 10px) * 0.7)
+		(var(--plyr-control-icon-size, 18px) / 2) + calc(var(--plyr-control-spacing, 10px) * 0.7)
 	);
 }
 
@@ -866,8 +860,7 @@ a.plyr__control::before {
 	left: auto;
 	right: calc((18px / 2) + calc(10px * 0.7));
 	right: calc(
-		(var(--plyr-control-icon-size, 18px) / 2) +
-		calc(var(--plyr-control-spacing, 10px) * 0.7)
+		(var(--plyr-control-icon-size, 18px) / 2) + calc(var(--plyr-control-spacing, 10px) * 0.7)
 	);
 	transform: translateX(50%);
 }
@@ -1079,7 +1072,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
 }
 
 .plyr--full-ui.plyr--audio input[type="range"]:active::-moz-range-thumb {
@@ -1094,7 +1087,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
 }
 
 .plyr--full-ui.plyr--audio input[type="range"]:active::-ms-thumb {
@@ -1109,7 +1102,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(35, 40, 47, 0.1));
 }
 
 .plyr--audio .plyr__progress__buffer {
@@ -1281,7 +1274,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
 }
 
 .plyr--full-ui.plyr--video input[type="range"]:active::-moz-range-thumb {
@@ -1296,7 +1289,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
 }
 
 .plyr--full-ui.plyr--video input[type="range"]:active::-ms-thumb {
@@ -1311,7 +1304,7 @@ a.plyr__control::before {
 			0 0 0 1px rgba(35, 40, 47, 0.2)
 		),
 		0 0 0 var(--plyr-range-thumb-active-shadow-width, 3px)
-		var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
+			var(--plyr-audio-range-thumb-active-shadow-color, rgba(255, 255, 255, 0.5));
 }
 
 .plyr--video .plyr__progress__buffer {
