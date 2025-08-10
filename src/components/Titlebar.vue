@@ -1,7 +1,33 @@
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import { useGlobalStore } from "@/store/global";
+import { MaximizeIcon, MinimizeIcon, XIcon, ChevronDownIcon } from "lucide-vue-next";
+
+const isMaximized = ref(false);
+
+const title = computed(() => useGlobalStore().title);
+
+if (window.IS_ELECTRON === true) {
+	window.ipcRenderer?.on("isMaximized", (_, value) => {
+		isMaximized.value = value;
+	});
+}
+
+const windowMinimize = () => {
+	window.ipcRenderer?.send("minimize");
+};
+const windowMaxRestore = () => {
+	window.ipcRenderer?.send("maximizeOrUnmaximize");
+};
+const windowClose = () => {
+	window.ipcRenderer?.send("close");
+};
+</script>
+
 <template>
-	<div class="win32-titlebar flex items-start fixed top-0 left-0 right-0" :class="$style.drag">
+	<div class="flex items-start fixed top-0 left-0 right-0 app-region-drag">
 		<div class="text-sm py-2 px-3">{{ title }}</div>
-		<div class="flex ml-auto" :class="$style['no-drag']">
+		<div class="flex ml-auto app-region-no-drag">
 			<div
 				class="w-12 h-8 place-items-center place-content-center cursor-pointer hover:bg-accent"
 				@click="windowMinimize"
@@ -23,39 +49,3 @@
 		</div>
 	</div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from "vue";
-import { useStore } from "@/store/pinia";
-import { MaximizeIcon, MinimizeIcon, XIcon, ChevronDownIcon } from "lucide-vue-next";
-
-const isMaximized = ref(false);
-
-const title = computed(() => useStore().title);
-
-if (window.IS_ELECTRON === true) {
-	window.ipcRenderer?.on("isMaximized", (_, value) => {
-		isMaximized.value = value;
-	});
-}
-
-const windowMinimize = () => {
-	window.ipcRenderer?.send("minimize");
-};
-const windowMaxRestore = () => {
-	window.ipcRenderer?.send("maximizeOrUnmaximize");
-};
-const windowClose = () => {
-	window.ipcRenderer?.send("close");
-};
-</script>
-
-<style module>
-.drag {
-	-webkit-app-region: drag;
-}
-
-.no-drag {
-	-webkit-app-region: no-drag;
-}
-</style>
