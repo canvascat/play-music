@@ -3,6 +3,7 @@ import { mapTrackPlayableStatus } from "@/utils/common";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { getTrackDetail } from "./track";
 import * as NCMAPI from "./NCMAPI";
+import type { TopArtistResponse } from "@/types";
 
 /**
  * 获取歌手单曲
@@ -50,7 +51,9 @@ export function getArtistAlbum(params: NCMAPI.artist_album[0]) {
  * 3: 韩国
  * 4: 日本
  */
-export function toplistOfArtists(type: NCMAPI.toplist_artist[0]["type"]) {
+export function toplistOfArtists(
+	type: NCMAPI.toplist_artist[0]["type"],
+): Promise<TopArtistResponse> {
 	return request({
 		url: "/toplist/artist",
 		method: "get",
