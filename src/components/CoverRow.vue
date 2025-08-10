@@ -1,6 +1,11 @@
 <template>
 	<div :class="cn('grid grid-cols-5 gap-x-11 gap-y-6', props.class)" :style="rowStyles">
-		<div v-for="item in items" :key="item.id" class="item" :class="{ artist: type === 'artist' }">
+		<div
+			v-for="item in items"
+			:key="item.id"
+			class="text-foreground"
+			:class="{ 'flex flex-col text-center': type === 'artist' }"
+		>
 			<Cover
 				:id="item.id"
 				:image-url="getImageUrl(item)"
@@ -9,16 +14,18 @@
 			/>
 			<div class="mt-2">
 				<div v-if="showPlayCount" class="info">
-					<span class="play-count opacity-58 font-semibold text-xs"
+					<span class="opacity-58 font-semibold text-xs md:max-md:text-sm text-foreground"
 						><IconPlay class="size-2 mr-1" />{{ formatPlayCount(item.playCount) }}
 					</span>
 				</div>
 				<div
-					class="title text-base font-semibold line-clamp-2 break-all"
+					class="title text-base font-semibold line-clamp-2 break-all mt-1"
 					:style="{ fontSize: subTextFontSize }"
 				>
-					<span v-if="isExplicit(item)" class="explicit-symbol"><ExplicitSymbol /></span>
-					<span v-if="isPrivacy(item)" class="lock-icon opacity-28 mr-1">
+					<span v-if="isExplicit(item)" class="text-foreground opacity-28 float-right"
+						><ExplicitSymbol
+					/></span>
+					<span v-if="isPrivacy(item)" class="text-foreground opacity-28 mr-1">
 						<IconLock class="size-3" />
 					</span>
 					<router-link :to="getTitleLink(item)">{{ item.name }}</router-link>
@@ -156,41 +163,3 @@ const getImageUrl = (item: CoverRowItem): string => {
 	return `${img?.replace("http://", "https://")}?param=512y512`;
 };
 </script>
-
-<style lang="scss" scoped>
-.item {
-	color: var(--color-text);
-}
-
-.item.artist {
-	display: flex;
-	flex-direction: column;
-	text-align: center;
-	.cover {
-		display: flex;
-	}
-	.title {
-		margin-top: 4px;
-	}
-}
-
-@media (max-width: 834px) {
-	.item .text .title {
-		font-size: 14px;
-	}
-}
-
-.explicit-symbol {
-	opacity: 0.28;
-	color: var(--color-text);
-	float: right;
-}
-
-.lock-icon {
-	color: var(--color-text);
-}
-
-.play-count {
-	color: var(--color-text);
-}
-</style>
