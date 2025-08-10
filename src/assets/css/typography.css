@@ -1,0 +1,84 @@
+h1 {
+	@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+}
+
+h2 {
+	@apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0;
+}
+
+h3 {
+	@apply scroll-m-20 text-2xl font-semibold tracking-tight;
+}
+
+h4 {
+	@apply scroll-m-20 text-xl font-semibold tracking-tight;
+}
+
+p {
+	@apply leading-7 [&:not(:first-child)]:mt-6;
+}
+
+blockquote {
+	@apply mt-6 border-l-2 pl-6 italic text-muted-foreground;
+}
+
+hr {
+	@apply my-4 md:my-8 border-border;
+}
+
+table {
+	@apply w-full caption-bottom text-sm;
+}
+
+tr {
+	@apply border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted;
+}
+
+thead tr {
+	@apply hover:bg-transparent;
+}
+
+th,
+td {
+	@apply h-12 px-4 text-left align-middle;
+}
+
+thead th {
+	@apply h-12 px-4 text-left align-middle font-medium text-muted-foreground;
+}
+
+tbody td {
+	@apply align-middle;
+}
+
+ul {
+	@apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+
+ol {
+	@apply my-6 ml-6 list-decimal [&>li]:mt-2;
+}
+
+code {
+	@apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm;
+}
+
+kbd {
+	@apply inline-flex items-center gap-1 rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground shadow-[inset_0_-1px_0_0_var(--border)];
+}
+
+.lead {
+	@apply text-xl text-muted-foreground;
+}
+
+.large {
+	@apply text-lg font-semibold;
+}
+
+.small {
+	@apply text-sm font-medium leading-none;
+}
+
+.muted {
+	@apply text-sm text-muted-foreground;
+}
