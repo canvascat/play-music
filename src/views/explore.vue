@@ -1,6 +1,6 @@
 <template>
 	<div class="explore-page">
-		<h1 class="text-foreground text-6xl">{{ $t("explore.explore") }}</h1>
+		<h1 class="my-10">{{ $t("explore.explore") }}</h1>
 		<div class="flex flex-wrap">
 			<div
 				v-for="category in settings.enabledPlaylistCategories"
