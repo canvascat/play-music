@@ -79,7 +79,7 @@
 						@click="goToMv(latestMV.id)"
 					>
 						<img :src="latestMV.coverUrl" loading="lazy" class="rounded-lg size-24" />
-						<transition name="fade">
+						<FadeIn>
 							<div
 								v-show="mvHover"
 								class="shadow"
@@ -87,7 +87,7 @@
 									background: 'url(' + latestMV.coverUrl + ')',
 								}"
 							></div>
-						</transition>
+						</FadeIn>
 					</div>
 					<div class="info">
 						<div class="name">
@@ -152,7 +152,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 
 import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
@@ -176,11 +176,12 @@ import { ref, computed, onActivated } from "vue";
 import { useRoute, useRouter, onBeforeRouteUpdate } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { IconMore, IconPlay } from "@/components/icon";
+import { FadeIn } from "@/components/transition";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const { player } = useStore();
+const { player } = useGlobalStore();
 const show = ref(false);
 const artist = ref({
 	img1v1Url: "https://p1.music.126.net/VnZiScyynLG7atLIZ2YPkw==/18686200114669622.jpg",
@@ -405,18 +406,6 @@ function openInBrowser(id: string) {
 		z-index: -1;
 		background-size: cover;
 		border-radius: 0.75em;
-	}
-
-	.fade-enter-active,
-	.fade-leave-active {
-		transition: opacity 0.3s;
-	}
-
-	.fade-enter-from,
-  .fade-leave-to
-
-  /* .fade-leave-active below version 2.1.8 */ {
-		opacity: 0;
 	}
 }
 </style>
