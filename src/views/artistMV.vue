@@ -1,8 +1,8 @@
 <template>
 	<div v-show="show">
-		<h1 class="text-4xl mt-9 mb-4.5 flex items-center">
+		<h1 class="mt-9 mb-4.5 flex items-center">
 			<img
-				class="h-11 w-11 rounded-full mr-3"
+				class="size-12 rounded-full mr-4 border"
 				:src="resizeImage(artist.img1v1Url, 1024)"
 				loading="lazy"
 			/>{{ artist.name }}'s Music Videos
