@@ -43,11 +43,10 @@
 						{{ $t("common.play") }}
 					</ButtonTwoTone>
 					<ButtonTwoTone
-						:icon="dynamicDetail.isSub ? IconHeartSolid : IconHeart"
-						:color="dynamicDetail.isSub ? 'blue' : 'grey'"
-						:text-color="dynamicDetail.isSub ? '#335eea' : ''"
-						:background-color="dynamicDetail.isSub ? 'var(--color-secondary-bg)' : ''"
+						color="grey"
 						@click="likeAlbum"
+						:icon="dynamicDetail.isSub ? IconHeartSolid : IconHeart"
+						:class="cn(dynamicDetail.isSub && 'text-primary')"
 					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>
@@ -105,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import * as api from "@/api";
 import { splitSoundtrackAlbumTitle, splitAlbumTitle } from "@/utils/common";
 import NProgress from "nprogress";
@@ -132,6 +131,7 @@ import { computed, ref, toValue, shallowRef } from "vue";
 import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { IconHeart, IconHeartSolid, IconMore, IconPlay } from "@/components/icon";
 import type { Album, AlbumDetailDynamicResponse, Track } from "@/types";
+import { cn } from "@/lib/utils";
 
 const { t } = useI18n();
 
@@ -198,7 +198,7 @@ const tracksByDisc = computed(() => {
 const router = useRouter();
 loadData(+router.currentRoute.value.params.id);
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 
 function likeAlbum(showToast = false) {
 	if (!isAccountLoggedIn()) {
