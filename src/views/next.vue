@@ -1,7 +1,6 @@
-
 <script setup lang="ts">
 import { ref, computed, watch, onActivated } from "vue";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import * as api from "@/api";
 import TrackList from "@/components/TrackList.vue";
 import Button from "@/components/ui/button/Button.vue";
@@ -16,7 +15,7 @@ interface Track {
 	[key: string]: any;
 }
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 
 // 响应式数据
 const tracks = ref<Track[]>([]);
@@ -78,18 +77,28 @@ const loadTracks = () => {
 </script>
 
 <template>
-  <h1 class="text-4xl mt-9 mb-4.5">{{ $t('next.nowPlaying') }}</h1>
-  <TrackList :tracks="[currentTrack]" type="playlist" dbclick-track-func="none" />
+	<h1 class="mt-9 mb-4.5">{{ $t("next.nowPlaying") }}</h1>
+	<TrackList :tracks="[currentTrack]" type="playlist" dbclick-track-func="none" />
 
-  <div class="mt-9 mb-4.5 flex justify-between" v-show="playNextList.length > 0">
-    <h1 class="text-4xl">插队播放
-    </h1>
-    <Button variant="ghost" @click="player.clearPlayNextList()">清除队列</Button>
-  </div>
+	<div class="mt-9 mb-4.5 flex justify-between" v-show="playNextList.length > 0">
+		<h1>插队播放</h1>
+		<Button variant="ghost" @click="player.clearPlayNextList()">清除队列</Button>
+	</div>
 
-  <TrackList v-show="playNextList.length > 0" :tracks="playNextTracks" type="playlist" :highlight-playing-track="false"
-    dbclick-track-func="playTrackOnListByID" item-key="id+index" :extra-context-menu-item="['removeTrackFromQueue']" />
-  <h1 class="text-4xl mt-9 mb-4.5">{{ $t('next.nextUp') }}</h1>
-  <TrackList :tracks="filteredTracks" type="playlist" :highlight-playing-track="false"
-    dbclick-track-func="playTrackOnListByID" />
+	<TrackList
+		v-show="playNextList.length > 0"
+		:tracks="playNextTracks"
+		type="playlist"
+		:highlight-playing-track="false"
+		dbclick-track-func="playTrackOnListByID"
+		item-key="id+index"
+		:extra-context-menu-item="['removeTrackFromQueue']"
+	/>
+	<h1 class="mt-9 mb-4.5">{{ $t("next.nextUp") }}</h1>
+	<TrackList
+		:tracks="filteredTracks"
+		type="playlist"
+		:highlight-playing-track="false"
+		dbclick-track-func="playTrackOnListByID"
+	/>
 </template>
