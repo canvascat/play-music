@@ -1,9 +1,11 @@
 <template>
 	<div v-show="show" ref="library">
-		<h1>
-			<img class="avatar" :src="resizeImage(dataStore.user?.avatarUrl)" loading="lazy" />{{
-				dataStore.user?.nickname
-			}}{{ $t("library.sLibrary") }}
+		<h1 class="flex items-center mt-9 mb-4.5">
+			<img
+				class="size-12 mr-4 rounded-full border"
+				:src="resizeImage(dataStore.user?.avatarUrl)"
+				loading="lazy"
+			/>{{ dataStore.user?.nickname }}{{ $t("library.sLibrary") }}
 		</h1>
 		<div class="section-one">
 			<div class="liked-songs" @click="goToLikedSongsList">
@@ -208,7 +210,7 @@
 			ref="cloudDiskUploadInput"
 			type="file"
 			style="display: none"
-			@change="uploadSongToCloudDisk"
+			@change="uploadSongToCloudDisk(($event.target as HTMLInputElement)?.files)"
 		/>
 	</div>
 </template>
@@ -216,7 +218,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onActivated } from "vue";
 import { useRouter } from "vue-router";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { isAccountLoggedIn } from "@/utils/auth";
 import * as api from "@/api";
 import NProgress from "nprogress";
@@ -240,6 +242,7 @@ import { useModalStore } from "@/store/modal";
 import type { Playlist } from "@/types";
 import { randomItem } from "@/utils/common";
 import { useDataStore } from "@/store/data";
+import { useLikedStore } from "@/store/liked";
 
 /**
  * Pick the lyric part from a string formed in `[timecode] lyric`.
@@ -254,9 +257,11 @@ function extractLyricPart(rawLyric: string): string {
 const router = useRouter();
 const { t } = useI18n();
 const modalStore = useModalStore();
+const { player } = useGlobalStore();
+
 const {
 	liked,
-	player,
+	uploadSongToCloudDisk,
 	fetchLikedSongsWithDetails,
 	fetchLikedSongs,
 	fetchLikedPlaylist,
@@ -265,8 +270,7 @@ const {
 	fetchLikedMVs,
 	fetchCloudDisk,
 	fetchPlayHistory,
-	updateLiked,
-} = useStore();
+} = useLikedStore();
 
 const dataStore = useDataStore();
 
@@ -412,36 +416,9 @@ const changePlaylistFilter = (type: "mine" | "all" | "liked") => {
 const selectUploadFiles = () => {
 	cloudDiskUploadInput.value?.click();
 };
-
-const uploadSongToCloudDisk = (e: Event) => {
-	const target = e.target as HTMLInputElement;
-	const files = target.files;
-	if (!files || files.length === 0) return;
-
-	api.user.uploadSong(files[0]).then((result) => {
-		if (result.code === 200) {
-			updateLiked("cloudDisk", [result.privateCloud, ...liked.cloudDisk]);
-		}
-	});
-};
 </script>
 
 <style lang="scss" scoped>
-h1 {
-	font-size: 42px;
-	color: var(--color-text);
-	display: flex;
-	align-items: center;
-
-	.avatar {
-		height: 44px;
-		margin-right: 12px;
-		vertical-align: -7px;
-		border-radius: 50%;
-		border: rgba(0, 0, 0, 0.2);
-	}
-}
-
 .section-one {
 	display: flex;
 	margin-top: 24px;
@@ -463,7 +440,6 @@ h1 {
 	display: flex;
 	flex-direction: column;
 	transition: all 0.4s;
-	box-sizing: border-box;
 
 	background: var(--color-primary-bg);
 
@@ -543,7 +519,6 @@ h1 {
 	display: flex;
 	flex-wrap: wrap;
 	font-size: 18px;
-	color: var(--color-text);
 
 	.tab {
 		font-weight: 600;
@@ -586,7 +561,6 @@ h1 {
 }
 
 button.tab-button {
-	color: var(--color-text);
 	border-radius: 8px;
 	padding: 0 14px;
 	display: flex;
@@ -614,7 +588,6 @@ button.tab-button {
 }
 
 button.playHistory-button {
-	color: var(--color-text);
 	border-radius: 8px;
 	padding: 6px 8px;
 	margin-bottom: 12px;
@@ -635,7 +608,6 @@ button.playHistory-button {
 }
 
 button.playHistory-button--selected {
-	color: var(--color-text);
 	background: var(--color-secondary-bg);
 	opacity: 1;
 	font-weight: 700;
