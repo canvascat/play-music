@@ -23,7 +23,7 @@ importers:
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.18(typescript@5.8.3))(zod@4.0.13)
       '@vueuse/core':
-        specifier: ^13.5.0
+        specifier: ^13.6.0
         version: 13.6.0(vue@3.5.18(typescript@5.8.3))
       NeteaseCloudMusicApi:
         specifier: ^4.27.0
@@ -83,7 +83,7 @@ importers:
         specifier: ^1.4.4
         version: 1.5.4
       reka-ui:
-        specifier: ^2.3.2
+        specifier: ^2.4.0
         version: 2.4.0(typescript@5.8.3)(vue@3.5.18(typescript@5.8.3))
       rxjs:
         specifier: ^7.8.2
