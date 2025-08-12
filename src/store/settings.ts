@@ -18,7 +18,7 @@ import { playlistCategories } from "@/utils/staticData";
 //   "automaticallyCacheSongs": true,
 //   "cacheLimit": 8192,
 //   "enableReversedMode": false,
-//   "nyancatStyle": false,
+
 //   "showLyricsTranslation": true,
 //   "lyricsBackground": true,
 //   "enableOsdlyricsSupport": false,
