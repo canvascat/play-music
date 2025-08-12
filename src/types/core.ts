@@ -306,7 +306,6 @@ export interface Settings {
 	enableUnblockNeteaseMusic?: boolean;
 	unmSource?: string;
 	enableReversedMode?: boolean;
-	nyancatStyle?: boolean;
 	showLyricsTranslation?: boolean;
 	lyricsBackground?: boolean | "blur" | "dynamic";
 	closeAppOption?: "ask" | "close" | "minimize";
@@ -438,52 +437,10 @@ export interface Lyric {
 	ytlf?: LyricContent;
 }
 
-// API响应基础类型
-export interface ApiResponse<T = any> {
-	code: number;
-	message?: string;
-	msg?: string;
-	data?: T;
-	result?: T;
-	[key: string]: any;
-}
-
 // 分页类型
 export interface PaginationParams {
 	limit?: number;
 	offset?: number;
-}
-
-// 事件类型
-export interface EventBus {
-	"player:progress": number;
-	"player:track-change": Track;
-	"player:play": null;
-	"player:pause": null;
-	"player:next": null;
-	"player:previous": null;
-	"player:repeat-mode-change": RepeatMode;
-	"player:shuffle-change": boolean;
-	"player:volume-change": number;
-	"toast:show": {
-		message: string;
-		type?: "success" | "error" | "warning" | "info";
-	};
-}
-
-// 组件通用Props类型
-export interface BaseProps {
-	class?: string;
-	style?: string | Record<string, any>;
-}
-
-// 路由相关类型
-export interface RouteQuery {
-	[key: string]: string | string[] | undefined;
-}
-
-export interface RouteParams {
-	[key: string]: string;
 }
 
 // 重新导出API类型
