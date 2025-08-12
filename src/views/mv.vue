@@ -58,7 +58,7 @@ import {
 	DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import MvRow from "@/components/MvRow.vue";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import { copyText } from "@/utils/copy";
 import { formatPlayCount } from "@/utils/filters";
 
@@ -69,9 +69,6 @@ import { toast } from "vue-sonner";
 
 const { t } = useI18n();
 
-defineOptions({
-	name: "mv",
-});
 const videoPlayer = ref<HTMLVideoElement | null>(null);
 
 onBeforeRouteUpdate((to, _from, next) => {
@@ -95,7 +92,7 @@ const mv = ref({
 let mvPlayer: Plyr | null = null;
 const simiMvs = ref<any[]>([]);
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 const route = useRoute();
 onMounted(() => {
 	let videoOptions = {
@@ -192,7 +189,6 @@ function openInBrowser(id: string) {
 
 .video-info {
 	margin-top: 12px;
-	color: var(--color-text);
 
 	.title {
 		font-size: 24px;
@@ -219,7 +215,7 @@ function openInBrowser(id: string) {
 	.section-title {
 		font-size: 18px;
 		font-weight: 600;
-		color: var(--color-text);
+
 		opacity: 0.88;
 		margin-bottom: 12px;
 	}
