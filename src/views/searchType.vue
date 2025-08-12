@@ -1,6 +1,6 @@
 <template>
 	<div v-show="show" class="search">
-		<h1 class="mt-8 mb-7 text-foreground">
+		<h1 class="mt-8 mb-7">
 			<span class="opacity-58">{{ $t("search.searchFor") }} {{ typeNameTable[type] }}</span> "{{
 				keywords
 			}}"
