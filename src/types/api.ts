@@ -10,7 +10,7 @@ import type {
 	Track,
 	TrackPrivilege,
 	User,
-} from "./index";
+} from "./core";
 
 // API响应基础结构
 export interface BaseApiResponse {
