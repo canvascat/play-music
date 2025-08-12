@@ -15,7 +15,7 @@
 			<div class="info">
 				<div class="title">
 					<span v-if="playlist.privacy === 10" class="lock-icon">
-						<IconLock class="size-6.5" /></span
+						<IconLock class="size-6.5" /> </span
 					>{{ playlist.name }}
 				</div>
 				<div class="artist">
@@ -50,11 +50,10 @@
 					</ButtonTwoTone>
 					<ButtonTwoTone
 						v-if="playlist.creator.userId !== dataStore.user?.userId"
-						:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
-						:color="playlist.subscribed ? 'blue' : 'grey'"
-						:text-color="playlist.subscribed ? '#335eea' : ''"
-						:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
+						color="grey"
 						@click="likePlaylist"
+						:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
+						:class="cn('size-4', playlist.subscribed && 'text-primary')"
 					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>
@@ -83,7 +82,7 @@
 					</DropdownMenu>
 				</div>
 			</div>
-			<div v-if="displaySearchInPlaylist" class="search-box">
+			<div v-if="displaySearchInPlaylist" class="search-box app-region-no-drag">
 				<div class="container" :class="{ active: inputFocus }">
 					<IconSearch />
 					<div class="input">
@@ -113,15 +112,17 @@
 				>
 					{{ $t("common.play") }}
 				</ButtonTwoTone>
+
 				<ButtonTwoTone
 					v-if="playlist.creator.userId !== dataStore.user?.userId"
-					:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
-					:color="playlist.subscribed ? 'blue' : 'grey'"
-					:text-color="playlist.subscribed ? '#335eea' : ''"
-					:background-color="playlist.subscribed ? 'var(--color-secondary-bg)' : ''"
+					color="grey"
 					@click="likePlaylist"
-				/>
-
+				>
+					<component
+						:is="playlist.subscribed ? IconHeartSolid : IconHeart"
+						:class="cn('size-4', playlist.subscribed && 'text-primary')"
+					/>
+				</ButtonTwoTone>
 				<DropdownMenu>
 					<DropdownMenuTrigger as-child>
 						<ButtonTwoTone :icon="IconMore" color="grey" />
@@ -155,7 +156,10 @@
 				<img class="avatar" :src="resizeImage(dataStore.user?.avatarUrl)" loading="lazy" />
 				{{ dataStore.user?.nickname }}{{ $t("library.sLikedSongs") }}
 			</h1>
-			<div class="search-box-likepage" @click="searchInPlaylist()">
+			<div
+				class="search-box-likepage app-region-no-drag md:max-xl:right-2"
+				@click="searchInPlaylist()"
+			>
 				<div class="container" :class="{ active: inputFocus }">
 					<IconSearch />
 					<div class="input" :style="{ width: searchInputWidth }">
@@ -207,7 +211,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { specialPlaylist } from "@/const";
-import { useStore } from "@/store/pinia";
+import { useGlobalStore } from "@/store/global";
 import type { Playlist } from "@/types";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { formatDate, resizeImage } from "@/utils/filters";
@@ -221,8 +225,9 @@ import {
 	IconMore,
 } from "@/components/icon";
 import { useDataStore } from "@/store/data";
+import { cn } from "@/lib/utils";
 
-const { player } = useStore();
+const { player } = useGlobalStore();
 
 const dataStore = useDataStore();
 
@@ -634,7 +639,6 @@ function inputDebounce() {
 	right: 20px;
 	bottom: -55px;
 	justify-content: flex-end;
-	-webkit-app-region: no-drag;
 
 	.container {
 		display: flex;
@@ -693,7 +697,6 @@ function inputDebounce() {
 	right: 12vw;
 	top: 95px;
 	justify-content: flex-end;
-	-webkit-app-region: no-drag;
 
 	.input {
 		transition: all 0.5s;
@@ -736,22 +739,6 @@ function inputDebounce() {
 			opacity: 1;
 			color: var(--color-primary);
 		}
-	}
-}
-
-[data-theme="dark"] {
-	.search-box-likepage {
-		.active {
-			input,
-			.svg-icon {
-			}
-		}
-	}
-}
-
-@media (max-width: 1336px) {
-	.search-box-likepage {
-		right: 8vw;
 	}
 }
 
