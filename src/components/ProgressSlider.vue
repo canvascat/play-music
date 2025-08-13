@@ -2,7 +2,7 @@
 import type { SliderRootProps } from "reka-ui";
 import type { HTMLAttributes } from "vue";
 import { reactiveOmit } from "@vueuse/core";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { SliderRange, SliderRoot, SliderThumb, SliderTrack, useForwardProps } from "reka-ui";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
@@ -16,21 +16,28 @@ const props = defineProps<
 	}
 >();
 
-const modelValue = defineModel<number>();
+const modelValue = defineModel<number>({ default: 0 });
 
 const delegatedProps = reactiveOmit(props, "class", "white", "tooltip");
 
 const forwarded = useForwardProps(delegatedProps);
 
-// 将 number 转换为 number[] 以适配 SliderRoot
-const value = computed({
-	get() {
-		return [modelValue.value ?? 0];
-	},
-	set(value) {
-		modelValue.value = value?.[0] ?? 0;
-	},
+const tempValues = ref([0]);
+const updateing = ref(false);
+
+const values = computed(() => {
+	return updateing.value ? tempValues.value : [modelValue.value];
 });
+
+const update = (payload: number[] = [0]) => {
+	updateing.value = true;
+	tempValues.value = payload;
+};
+
+const commit = (payload: number[]) => {
+	modelValue.value = payload[0];
+	updateing.value = false;
+};
 </script>
 
 <template>
@@ -46,7 +53,9 @@ const value = computed({
 			:min="0"
 			:step="1"
 			v-bind="forwarded"
-			v-model="value"
+			:model-value="values"
+			@update:model-value="update"
+			@value-commit="commit"
 		>
 			<SliderTrack
 				data-slot="slider-track"
@@ -77,7 +86,7 @@ const value = computed({
 				</TooltipTrigger>
 
 				<TooltipContent :side-offset="6">
-					{{ formatTrackTime(modelValue) || "00:00" }}
+					{{ formatTrackTime(values[0]) || "00:00" }}
 				</TooltipContent>
 			</Tooltip>
 		</SliderRoot>
