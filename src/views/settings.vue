@@ -62,7 +62,7 @@
 				</div>
 			</div>
 
-			<!-- <h3>音质</h3> -->
+			<!-- <h2>音质</h2> -->
 			<div class="item">
 				<div class="left">
 					<div class="title">{{ $t("settings.musicQuality.text") }}</div>
@@ -95,7 +95,7 @@
 				</div>
 			</div>
 
-			<h3 v-if="isElectron">缓存</h3>
+			<h2 v-if="isElectron">缓存</h2>
 			<div v-if="isElectron" class="item">
 				<div class="left">
 					<div class="title">
@@ -103,15 +103,7 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="automatically-cache-songs"
-							v-model="automaticallyCacheSongs"
-							type="checkbox"
-							name="automatically-cache-songs"
-						/>
-						<label for="automatically-cache-songs"></label>
-					</div>
+					<Toggle v-model="automaticallyCacheSongs" name="automatically-cache-songs" />
 				</div>
 			</div>
 			<div v-if="isElectron" class="item">
@@ -149,21 +141,13 @@
 				</div>
 			</div>
 
-			<h3>{{ $t("settings.lyric") }}</h3>
+			<h2>{{ $t("settings.lyric") }}</h2>
 			<div class="item">
 				<div class="left">
 					<div class="title">{{ $t("settings.showLyricsTranslation") }}</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="show-lyrics-translation"
-							v-model="showLyricsTranslation"
-							type="checkbox"
-							name="show-lyrics-translation"
-						/>
-						<label for="show-lyrics-translation"></label>
-					</div>
+					<Toggle v-model="enableOsdlyricsSupport" name="enable-osdlyrics-support" />
 				</div>
 			</div>
 			<div class="item">
@@ -213,20 +197,11 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="enable-osdlyrics-support"
-							v-model="enableOsdlyricsSupport"
-							type="checkbox"
-							name="enable-osdlyrics-support"
-						/>
-						<label for="enable-osdlyrics-support"></label>
-					</div>
+					<Toggle v-model="enableOsdlyricsSupport" name="enable-osdlyrics-support" />
 				</div>
 			</div>
-
 			<section v-if="isElectron" class="unm-configuration">
-				<h3>UnblockNeteaseMusic</h3>
+				<h2>UnblockNeteaseMusic</h2>
 				<div class="item">
 					<div class="left">
 						<div class="title">
@@ -237,15 +212,7 @@
 						</div>
 					</div>
 					<div class="right">
-						<div class="toggle">
-							<input
-								id="enable-unblock-netease-music"
-								v-model="enableUnblockNeteaseMusic"
-								type="checkbox"
-								name="enable-unblock-netease-music"
-							/>
-							<label for="enable-unblock-netease-music"></label>
-						</div>
+						<Toggle v-model="enableUnblockNeteaseMusic" name="enable-unblock-netease-music" />
 					</div>
 				</div>
 
@@ -283,10 +250,7 @@
 						</div>
 					</div>
 					<div class="right">
-						<div class="toggle">
-							<input id="unm-enable-flac" v-model="unmEnableFlac" type="checkbox" />
-							<label for="unm-enable-flac" />
-						</div>
+						<Toggle v-model="unmEnableFlac" name="unm-enable-flac" />
 					</div>
 				</div>
 
@@ -387,7 +351,7 @@
 				</div>
 			</section>
 
-			<h3>{{ $t("settings.customization") }}</h3>
+			<h2>{{ $t("settings.customization") }}</h2>
 			<div class="item">
 				<div class="left">
 					<div class="title">
@@ -406,19 +370,11 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="enable-discord-rich-presence"
-							v-model="enableDiscordRichPresence"
-							type="checkbox"
-							name="enable-discord-rich-presence"
-						/>
-						<label for="enable-discord-rich-presence"></label>
-					</div>
+					<Toggle v-model="enableDiscordRichPresence" name="enable-discord-rich-presence" />
 				</div>
 			</div>
 
-			<h3>{{ $t("settings.others") }}</h3>
+			<h2>{{ $t("settings.others") }}</h2>
 			<div v-if="isElectron && !isMac" class="item">
 				<div class="left">
 					<div class="title">{{ $t("settings.closeAppOption.text") }}</div>
@@ -443,15 +399,7 @@
 					<div class="title">{{ $t("settings.enableCustomTitlebar") }}</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="enable-custom-titlebar"
-							v-model="enableCustomTitlebar"
-							type="checkbox"
-							name="enable-custom-titlebar"
-						/>
-						<label for="enable-custom-titlebar"></label>
-					</div>
+					<Toggle v-model="enableCustomTitlebar" name="enable-custom-titlebar" />
 				</div>
 			</div>
 
@@ -460,15 +408,7 @@
 					<div class="title">{{ $t("settings.showLibraryDefault") }}</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="show-library-default"
-							v-model="showLibraryDefault"
-							type="checkbox"
-							name="show-library-default"
-						/>
-						<label for="show-library-default"></label>
-					</div>
+					<Toggle v-model="showLibraryDefault" name="show-library-default" />
 				</div>
 			</div>
 
@@ -479,15 +419,7 @@
 					</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="show-playlists-by-apple-music"
-							v-model="showPlaylistsByAppleMusic"
-							type="checkbox"
-							name="show-playlists-by-apple-music"
-						/>
-						<label for="show-playlists-by-apple-music"></label>
-					</div>
+					<Toggle v-model="showPlaylistsByAppleMusic" name="show-playlists-by-apple-music" />
 				</div>
 			</div>
 
@@ -496,15 +428,7 @@
 					<div class="title">{{ $t("settings.subTitleDefault") }}</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="sub-title-default"
-							v-model="subTitleDefault"
-							type="checkbox"
-							name="sub-title-default"
-						/>
-						<label for="sub-title-default"></label>
-					</div>
+					<Toggle v-model="subTitleDefault" name="sub-title-default" />
 				</div>
 			</div>
 
@@ -513,32 +437,12 @@
 					<div class="title">{{ $t("settings.enableReversedMode") }}</div>
 				</div>
 				<div class="right">
-					<div class="toggle">
-						<input
-							id="enable-reversed-mode"
-							v-model="enableReversedMode"
-							type="checkbox"
-							name="enable-reversed-mode"
-						/>
-						<label for="enable-reversed-mode"></label>
-					</div>
-				</div>
-			</div>
-
-			<div class="item">
-				<div class="left">
-					<div class="title" style="transform: scaleX(-1)">🐈️ 🏳️‍🌈</div>
-				</div>
-				<div class="right">
-					<div class="toggle">
-						<input id="nyancat-style" v-model="nyancatStyle" type="checkbox" name="nyancat-style" />
-						<label for="nyancat-style"></label>
-					</div>
+					<Toggle v-model="enableReversedMode" name="enable-reversed-mode" />
 				</div>
 			</div>
 
 			<div v-if="isElectron">
-				<h3>代理</h3>
+				<h2>代理</h2>
 				<div class="item">
 					<div class="left">
 						<div class="title">代理协议</div>
@@ -571,21 +475,13 @@
 				</div>
 			</div>
 			<div v-if="isElectron">
-				<h3>Real IP</h3>
+				<h2>Real IP</h2>
 				<div class="item">
 					<div class="left">
 						<div class="title">Real IP</div>
 					</div>
 					<div class="right">
-						<div class="toggle">
-							<input
-								id="enable-real-ip"
-								v-model="enableRealIP"
-								type="checkbox"
-								name="enable-real-ip"
-							/>
-							<label for="enable-real-ip"></label>
-						</div>
+						<Toggle v-model="enableRealIP" name="enable-real-ip" />
 					</div>
 				</div>
 				<div id="real-ip" :class="{ disabled: !enableRealIP }">
@@ -599,21 +495,13 @@
 			</div>
 
 			<div v-if="isElectron">
-				<h3>快捷键</h3>
+				<h2>快捷键</h2>
 				<div class="item">
 					<div class="left">
 						<div class="title">{{ $t("settings.enableGlobalShortcut") }}</div>
 					</div>
 					<div class="right">
-						<div class="toggle">
-							<input
-								id="enable-enable-global-shortcut"
-								v-model="enableGlobalShortcut"
-								type="checkbox"
-								name="enable-enable-global-shortcut"
-							/>
-							<label for="enable-enable-global-shortcut"></label>
-						</div>
+						<Toggle v-model="enableGlobalShortcut" name="enable-enable-global-shortcut" />
 					</div>
 				</div>
 				<div
@@ -700,6 +588,7 @@ import { IconLogout } from "@/components/icon";
 import { useDataStore } from "@/store/data";
 import { useSettingsStore } from "@/store/settings";
 import { useLastfmStore } from "@/store/lastfm";
+import Toggle from "@/components/Toggle.vue";
 
 const i18n = useI18n();
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
@@ -736,7 +625,7 @@ const {
 
 const dataStore = useDataStore();
 
-const isElectron = window.IS_ELECTRON;
+const isElectron = window.IS_ELECTRON || true;
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
 const lastfmStore = useLastfmStore();
@@ -870,15 +759,7 @@ const showPlaylistsByAppleMusic = computed({
 		updateSetting("showPlaylistsByAppleMusic", value);
 	},
 });
-const nyancatStyle = computed({
-	get() {
-		if (settings.nyancatStyle === undefined) return false;
-		return settings.nyancatStyle;
-	},
-	set(value) {
-		updateSetting("nyancatStyle", value);
-	},
-});
+
 const automaticallyCacheSongs = computed({
 	get() {
 		if (settings.automaticallyCacheSongs === undefined) return false;
@@ -1178,7 +1059,7 @@ function formatShortcut(shortcut: string) {
 	} else if (settings.lang === "zh-TW") {
 		shortcut = shortcut.replace("Space", "空白鍵");
 	}
-	if (process.platform === "darwin") {
+	if (isMac) {
 		return shortcut
 			.replace("CommandOrControl", "⌘")
 			.replace("Command", "⌘")
@@ -1241,19 +1122,6 @@ function exitRecordShortcut() {
 <style lang="scss" scoped>
 .container {
 	width: 720px;
-}
-
-h2 {
-	margin-top: 48px;
-	font-size: 36px;
-}
-
-h3 {
-	margin-top: 48px;
-	padding-bottom: 12px;
-	font-size: 26px;
-
-	border-bottom: 1px solid rgba(128, 128, 128, 0.18);
 }
 
 .user {
@@ -1406,7 +1274,6 @@ input::-webkit-inner-spin-button {
 		border-radius: 0.5rem;
 		min-width: 146px;
 		min-height: 34px;
-		box-sizing: border-box;
 
 		&.active {
 			color: var(--color-primary);
@@ -1446,71 +1313,5 @@ input::-webkit-inner-spin-button {
 		0 3px 3px hsla(0, 0%, 0%, 0.05);
 	-webkit-transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
 	transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
-}
-
-.toggle {
-	margin: auto;
-}
-
-.toggle input {
-	opacity: 0;
-	position: absolute;
-}
-
-.toggle input + label {
-	position: relative;
-	display: inline-block;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	-webkit-transition: 0.4s ease;
-	transition: 0.4s ease;
-	height: 32px;
-	width: 52px;
-	background: var(--color-secondary-bg);
-	border-radius: 8px;
-}
-
-.toggle input + label:before {
-	content: "";
-	position: absolute;
-	display: block;
-	-webkit-transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
-	transition: 0.2s cubic-bezier(0.24, 0, 0.5, 1);
-	height: 32px;
-	width: 52px;
-	top: 0;
-	left: 0;
-	border-radius: 8px;
-}
-
-.toggle input + label:after {
-	content: "";
-	position: absolute;
-	display: block;
-	box-shadow:
-		0 0 0 1px hsla(0, 0%, 0%, 0.02),
-		0 4px 0px 0 hsla(0, 0%, 0%, 0.01),
-		0 4px 9px hsla(0, 0%, 0%, 0.08),
-		0 3px 3px hsla(0, 0%, 0%, 0.03);
-	-webkit-transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
-	transition: 0.35s cubic-bezier(0.54, 1.6, 0.5, 1);
-	background: #fff;
-	height: 20px;
-	width: 20px;
-	top: 6px;
-	left: 6px;
-	border-radius: 6px;
-}
-
-.toggle input:checked + label:before {
-	background: var(--color-primary);
-	-webkit-transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
-	transition: width 0.2s cubic-bezier(0, 0, 0, 0.1);
-}
-
-.toggle input:checked + label:after {
-	left: 26px;
 }
 </style>
