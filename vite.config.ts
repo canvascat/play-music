@@ -11,8 +11,9 @@ import process from "node:process";
 // https://vite.dev/config/
 export default defineConfig(({ mode, command }) => {
 	const alias = {
-		"@electron": fileURLToPath(new URL("./electron", import.meta.url)),
 		"@": fileURLToPath(new URL("./src", import.meta.url)),
+		"@electron": fileURLToPath(new URL("./electron", import.meta.url)),
+		"@main": fileURLToPath(new URL("./electron/main", import.meta.url)),
 	};
 	const config = {
 		mode: "development",
