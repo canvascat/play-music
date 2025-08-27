@@ -5,6 +5,7 @@ jspm_packages/
 # Build outputs
 /dist
 /dist_electron
+/dist-electron
 .vite/
 out/
 build/Release
