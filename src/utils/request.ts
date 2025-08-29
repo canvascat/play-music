@@ -56,7 +56,7 @@ service.interceptors.response.use(
 
 		if (response && typeof data === "object" && data.code === 301 && data.msg === "需要登录") {
 			console.warn("Token has expired. Logout now!");
-			console.debug(`[need login] ${error.config.method?.toUpperCase()} ${error.config.url}`);
+			console.debug(`[need login] ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
 
 			// 登出帳戶
 			doLogout();
@@ -66,7 +66,31 @@ service.interceptors.response.use(
 	},
 );
 
-const request = <T = any>(config: AxiosRequestConfig) => service(config) as Promise<T>;
+const request = <T = any>(
+	config: Pick<AxiosRequestConfig, "url" | "method" | "params">,
+): Promise<T> => {
+	config = { method: "get", ...config };
+	return service(config);
+};
+
+request.upload = (config: Pick<AxiosRequestConfig, "url" | "data">) => {
+	const { url, data } = config;
+	const formData = new FormData();
+	Object.entries(data).forEach(([key, value]) => {
+		formData.append(key, value as string | Blob);
+	});
+
+	return service({
+		url,
+		method: "post",
+		data: formData,
+		params: noCacheParams({}),
+		headers: {
+			"Content-Type": "multipart/form-data",
+		},
+		timeout: 200000,
+	});
+};
 
 export const noCacheParams = <T>(params: T, noCache = true) => {
 	return { ...params, timestamp: noCache ? Date.now() : undefined };
