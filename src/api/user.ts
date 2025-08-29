@@ -128,19 +128,8 @@ export function likedMVs(params: NCMAPI.mv_sublist[0]): Promise<LikedMVsResponse
 /**
  * 上传歌曲到云盘（需要登录）
  */
-export function uploadSong(file: File) {
-	let formData = new FormData();
-	formData.append("songFile", file);
-	return request({
-		url: "/cloud",
-		method: "post",
-		params: noCacheParams({}),
-		data: formData,
-		headers: {
-			"Content-Type": "multipart/form-data",
-		},
-		timeout: 200000,
-	}).catch((error) => {
+export function uploadSong(songFile: File) {
+	return request.upload({ url: "/cloud", data: { songFile } }).catch((error) => {
 		alert(`上传失败，Error: ${error}`);
 	});
 }
