@@ -127,9 +127,27 @@ export interface TopSongResponse extends BaseApiResponse {
 }
 
 // 歌单相关API响应
+/**
+ * 歌单详情响应类型
+ * 包含歌单的完整信息、权限信息、相关视频等
+ */
 export interface PlaylistDetailResponse extends BaseApiResponse {
+	/** 相关视频 */
+	relatedVideos: any;
+	/** 歌单详细信息 */
 	playlist: Playlist;
-	privileges: any[];
+	/** 歌曲权限信息 */
+	privileges: TrackPrivilege[];
+	/** 共享权限 */
+	sharedPrivilege: any;
+	/** 资源入口 */
+	resEntrance: any;
+	/** 来源用户 */
+	fromUsers: any;
+	/** 来源用户数量 */
+	fromUserCount: number;
+	/** 歌曲来源用户 */
+	songFromUsers: any;
 }
 
 export interface PlaylistTracksResponse extends BaseApiResponse {
