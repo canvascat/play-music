@@ -1,5 +1,6 @@
 import request, { noCacheParams } from "@/utils/request";
 import * as MCNAPI from "./NCMAPI";
+import type { MVDetailResponse, MVUrlResponse } from "@/types/api";
 
 // TODO 删除mv相关功能
 
@@ -10,7 +11,7 @@ import * as MCNAPI from "./NCMAPI";
  * - 调用例子 : /mv/detail?mvid=5436712
  
  */
-export function mvDetail(mvid: MCNAPI.mv_detail[0]["mvid"]) {
+export function mvDetail(mvid: MCNAPI.mv_detail[0]["mvid"]): Promise<MVDetailResponse> {
 	return request({
 		url: "/mv/detail",
 		method: "get",
@@ -25,7 +26,7 @@ export function mvDetail(mvid: MCNAPI.mv_detail[0]["mvid"]) {
  * - r: 分辨率,默认1080,可从 /mv/detail 接口获取分辨率列表
  * - 调用例子 : /mv/url?id=5436712 /mv/url?id=10896407&r=1080
  */
-export function mvUrl(params: MCNAPI.mv_url[0]) {
+export function mvUrl(params: MCNAPI.mv_url[0]): Promise<MVUrlResponse> {
 	return request({
 		url: "/mv/url",
 		method: "get",

@@ -1,4 +1,4 @@
-import request from "@/utils/request";
+import request, { noCacheParams } from "@/utils/request";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import type { SearchResponse, PersonalFMResponse, ApiResponse } from "@/types/api";
 
@@ -36,9 +36,7 @@ export function personalFM(): Promise<PersonalFMResponse> {
 	return request({
 		url: "/personal_fm",
 		method: "get",
-		params: {
-			timestamp: Date.now(),
-		},
+		params: noCacheParams({}),
 	});
 }
 
@@ -46,9 +44,6 @@ export function fmTrash(id: number): Promise<ApiResponse> {
 	return request({
 		url: "/fm_trash",
 		method: "post",
-		params: {
-			timestamp: Date.now(),
-			id,
-		},
+		params: noCacheParams({ id }),
 	});
 }
