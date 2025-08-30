@@ -3,14 +3,21 @@ import { mapTrackPlayableStatus } from "@/utils/common";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { getTrackDetail } from "./track";
 import * as NCMAPI from "./NCMAPI";
-import type { TopArtistResponse } from "@/types";
+import type {
+	ArtistAlbumResponse,
+	ArtistDetailResponse,
+	ArtistMVResponse,
+	BaseApiResponse,
+	SimilarArtistResponse,
+	TopArtistResponse,
+} from "@/types";
 
 /**
  * 获取歌手单曲
  * 说明 : 调用此接口 , 传入歌手 id, 可获得歌手部分信息和热门歌曲
  * @param {number} id - 歌手 id, 可由搜索接口获得
  */
-export function getArtist(id: NCMAPI.artists[0]["id"]) {
+export function getArtist(id: NCMAPI.artists[0]["id"]): Promise<ArtistDetailResponse> {
 	return request({
 		url: "/artists",
 		method: "get",
@@ -34,7 +41,7 @@ export function getArtist(id: NCMAPI.artists[0]["id"]) {
  * - limit: 取出数量 , 默认为 50
  * - offset: 偏移数量 , 用于分页 , 如 :( 页数 -1)*50, 其中 50 为 limit 的值 , 默认为 0
  */
-export function getArtistAlbum(params: NCMAPI.artist_album[0]) {
+export function getArtistAlbum(params: NCMAPI.artist_album[0]): Promise<ArtistAlbumResponse> {
 	return request({
 		url: "/artist/album",
 		method: "get",
@@ -65,7 +72,7 @@ export function toplistOfArtists(
  * 说明 : 调用此接口 , 传入歌手 id, 可获得歌手 mv 信息 , 具体 mv 播放地址可调 用/mv传入此接口获得的 mvid 来拿到 , 如 : /artist/mv?id=6452,/mv?mvid=5461064
  * @param {number} params.id 歌手 id, 可由搜索接口获得
  */
-export function artistMv(params: NCMAPI.artist_mv[0]) {
+export function artistMv(params: NCMAPI.artist_mv[0]): Promise<ArtistMVResponse> {
 	return request({
 		url: "/artist/mv",
 		method: "get",
@@ -79,7 +86,7 @@ export function artistMv(params: NCMAPI.artist_mv[0]) {
  * - id: 歌手 id
  * - t: 操作,1 为收藏,其他为取消收藏
  */
-export function followAArtist(params: NCMAPI.artist_sub[0]) {
+export function followAArtist(params: NCMAPI.artist_sub[0]): Promise<BaseApiResponse> {
 	return request({
 		url: "/artist/sub",
 		method: "post",
@@ -92,7 +99,7 @@ export function followAArtist(params: NCMAPI.artist_sub[0]) {
  * 说明 : 调用此接口 , 传入歌手 id, 可获得相似歌手
  * - id: 歌手 id
  */
-export function similarArtists(id: NCMAPI.simi_artist[0]["id"]) {
+export function similarArtists(id: NCMAPI.simi_artist[0]["id"]): Promise<SimilarArtistResponse> {
 	return request({
 		url: "/simi/artist",
 		method: "post",
