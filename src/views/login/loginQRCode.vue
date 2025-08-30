@@ -6,7 +6,7 @@
 		<CardContent class="flex justify-center">
 			<div
 				v-show="qrCodeSvg"
-				class="bg-[var(--color-primary-bg)] overflow-hidden mb-3 rounded-2xl p-6"
+				class="bg-[var(--color-primary-bg)] overflow-hidden mb-3 rounded-2xl p-4"
 			>
 				<img :src="qrCodeSvg" loading="lazy" />
 			</div>
@@ -47,7 +47,7 @@ function handleLoginResponse(data) {
 
 async function updateQrCodeSvg(text: string) {
 	const svg = await QRCode.toString(text, {
-		width: 192,
+		width: 128,
 		margin: 0,
 		color: { dark: "#335eea", light: "#00000000" },
 		type: "svg",
