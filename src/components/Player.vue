@@ -1,14 +1,7 @@
 <template>
 	<div class="player bg-background/68" @click="toggleLyrics">
-		<div
-			class="progress-bar"
-			:class="{
-				nyancat: settings.nyancatStyle,
-				'nyancat-stop': settings.nyancatStyle && !player.playing,
-			}"
-			@click.stop
-		>
-			<ProgressSilder v-model="progress" :min="0" :max="player.currentTrackDuration" :step="1" />
+		<div class="progress-bar" @click.stop>
+			<ProgressSlider v-model="progress" :max="player.currentTrackDuration" tooltip lazy />
 		</div>
 		<div class="grid grid-cols-3 h-full px-[10vw] md:max-xl:px-[5vw]">
 			<div class="playing">
@@ -118,7 +111,7 @@
 							<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
 						</ButtonIcon>
 						<div class="volume-bar">
-							<VolumeSlider v-model="volume" :min="0" :max="1" :step="0.01" />
+							<VolumeSlider v-model="volume" />
 						</div>
 					</div>
 
@@ -136,7 +129,7 @@ import { useGlobalStore } from "@/store/global";
 // import "@/assets/css/slider.css";
 
 import ButtonIcon from "@/components/ButtonIcon.vue";
-import ProgressSilder from "@/components/ProgressSilder.vue";
+import ProgressSlider from "@/components/ProgressSlider.vue";
 import { goToListSource, hasListSource } from "@/utils/playList";
 import { resizeImage } from "@/utils/filters";
 import { computed, onMounted, onBeforeMount } from "vue";
