@@ -23,8 +23,12 @@
 		<div class="left-side">
 			<div>
 				<div class="cover">
-					<div class="cover-container">
-						<img :src="imageUrl" loading="lazy" />
+					<div class="relative">
+						<img
+							:src="imageUrl"
+							loading="lazy"
+							class="size-[54vh] select-none object-cover rounded-2xl"
+						/>
 						<div class="shadow" :style="{ backgroundImage: `url(${imageUrl})` }"></div>
 					</div>
 				</div>
@@ -65,16 +69,7 @@
 									<IconVolumeHalf v-show="volume <= 0.5 && volume !== 0" />
 								</ButtonIcon>
 								<div class="volume-bar">
-									<vue-slider
-										v-model="volume"
-										:min="0"
-										:max="1"
-										:interval="0.01"
-										:drag-on-click="true"
-										:duration="0"
-										tooltip="none"
-										:dot-size="12"
-									></vue-slider>
+									<VolumeSlider v-model="volume" white />
 								</div>
 							</div>
 							<div class="buttons">
@@ -95,19 +90,7 @@
 					<div class="progress-bar">
 						<span>{{ formatTrackTime(progress) || "0:00" }}</span>
 						<div class="slider">
-							<vue-slider
-								v-model="progress"
-								:min="0"
-								:max="player.currentTrackDuration"
-								:interval="1"
-								:drag-on-click="true"
-								:duration="0"
-								:dot-size="12"
-								:height="2"
-								:tooltip-formatter="formatTrackTime"
-								:lazy="true"
-								:silent="true"
-							></vue-slider>
+							<ProgressSlider v-model="progress" :max="player.currentTrackDuration" white />
 						</div>
 						<span>{{ formatTrackTime(player.currentTrackDuration) }}</span>
 					</div>
@@ -209,17 +192,18 @@
 				</div>
 			</transition>
 		</div>
-		<div class="close-button" @click="toggleLyrics">
-			<button>
-				<IconArrowDown />
-			</button>
-		</div>
-		<div class="close-button" style="left: 24px" @click="toggleFullscreen">
-			<button>
-				<IconFullscreenExit v-if="isFullscreen" />
-				<IconFullscreen v-else />
-			</button>
-		</div>
+		<button
+			class="close-button fixed top-6 z-300 rounded-xl size-11 flex justify-center items-center opacity-28 transition-all duration-200 right-6 app-region-no-drag"
+			@click="toggleLyrics"
+		>
+			<IconArrowDown class="size-5.5" />
+		</button>
+		<button
+			class="close-button fixed top-6 z-300 rounded-xl size-11 flex justify-center items-center opacity-28 transition-all duration-200 left-6 app-region-no-drag"
+			@click="toggleFullscreen"
+		>
+			<component :is="isFullscreen ? IconFullscreenExit : IconFullscreen" class="size-5.5" />
+		</button>
 	</div>
 </template>
 
@@ -228,12 +212,14 @@
 // Some of the codes are from https://github.com/sl1673495/vue-netease-music
 
 import { ref, computed, watch, onMounted } from "vue";
-import { useStore } from "@/store/pinia";
-import VueSlider from "vue-slider-component";
+import { useGlobalStore } from "@/store/global";
+
 import { formatTrackTime, getImageColor } from "@/utils/common";
 import * as api from "@/api";
 import { lyricParser } from "@/utils/lyrics";
 import ButtonIcon from "@/components/ButtonIcon.vue";
+import VolumeSlider from "@/components/VolumeSlider.vue";
+import ProgressSlider from "@/components/ProgressSlider.vue";
 import {
 	IconArrowDown,
 	IconFullscreen,
@@ -262,6 +248,7 @@ import { useI18n } from "vue-i18n";
 import { usePlayerProgress, useRafFnWithDep } from "@/lib/hook";
 import { useFullscreen } from "@vueuse/core";
 import { useSettingsStore } from "@/store/settings";
+import { useLikedStore } from "@/store/liked";
 
 const { t } = useI18n();
 
@@ -282,9 +269,10 @@ interface LyricItem {
 	contents: string[];
 }
 
-const store = useStore();
-const { player, toggleLyrics, likeATrack, fetchLikedPlaylist } = store;
+const store = useGlobalStore();
+const { player, toggleLyrics } = store;
 const { settings } = useSettingsStore();
+const { fetchLikedPlaylist, likeATrack } = useLikedStore();
 
 const lyric = ref<LyricLine[]>([]);
 const tlyric = ref<LyricLine[]>([]);
@@ -644,7 +632,6 @@ const mute = () => {
 	.controls {
 		max-width: 54vh;
 		margin-top: 24px;
-		color: var(--color-text);
 
 		.title {
 			margin-top: 8px;
@@ -755,7 +742,6 @@ const mute = () => {
 			}
 
 			.lyric-switch-icon {
-				color: var(--color-text);
 				font-size: 14px;
 				line-height: 14px;
 				opacity: 0.88;
@@ -765,20 +751,6 @@ const mute = () => {
 }
 
 .cover {
-	position: relative;
-
-	.cover-container {
-		position: relative;
-	}
-
-	img {
-		border-radius: 0.75em;
-		width: 54vh;
-		height: 54vh;
-		user-select: none;
-		object-fit: cover;
-	}
-
 	.shadow {
 		position: absolute;
 		top: 12px;
@@ -795,7 +767,7 @@ const mute = () => {
 .right-side {
 	flex: 1;
 	font-weight: 600;
-	color: var(--color-text);
+
 	margin-right: 24px;
 	z-index: 0;
 
@@ -807,7 +779,13 @@ const mute = () => {
 		max-width: 460px;
 		overflow-y: auto;
 		transition: 0.5s;
-		scrollbar-width: none; // firefox
+		scrollbar-width: none;
+		mask-image: linear-gradient(
+			rgba(0, 0, 0, 0),
+			rgba(0, 0, 0, 0.1) 132px,
+			rgb(0, 0, 0) calc(50% - 66px),
+			rgba(0, 0, 0, 0)
+		);
 
 		.line {
 			margin: 2px 0;
@@ -872,26 +850,6 @@ const mute = () => {
 }
 
 .close-button {
-	position: fixed;
-	top: 24px;
-	right: 24px;
-	z-index: 300;
-	border-radius: 0.75rem;
-	height: 44px;
-	width: 44px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	opacity: 0.28;
-	transition: 0.2s;
-	-webkit-app-region: no-drag;
-
-	.svg-icon {
-		color: var(--color-text);
-		height: 22px;
-		width: 22px;
-	}
-
 	&:hover {
 		background: var(--color-secondary-bg-for-transparent);
 		opacity: 0.88;
