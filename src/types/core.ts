@@ -1,8 +1,8 @@
 // 核心音乐数据类型定义
 
-import type { AlbumListArea } from "@/api/NCMAPI";
-import type Player from "@/utils/Player";
-import type { Shortcut } from "@/utils/shortcuts";
+// import type { AlbumListArea } from "@/api/NCMAPI";
+// import type Player from "@/utils/Player";
+// import type { Shortcut } from "@/utils/shortcuts";
 
 export interface Track {
 	id: number;
@@ -56,6 +56,99 @@ export interface Track {
 	};
 	chargeInfoList?: any[];
 	playable?: boolean;
+}
+
+export interface TrackUrl {
+	/** 歌曲ID */
+	id: number;
+	/** 歌曲播放链接 */
+	url: string;
+	/** 比特率 */
+	br: number;
+	/** 文件大小（字节） */
+	size: number;
+	/** 文件MD5值 */
+	md5: string;
+	/** 响应状态码 */
+	code: number;
+	/** 链接过期时间（秒） */
+	expi: number;
+	/** 音频格式 */
+	type: string;
+	/** 音量增益 */
+	gain: number;
+	/** 峰值音量 */
+	peak: number;
+	/** 音量增益（关闭状态） */
+	closedGain: number;
+	/** 峰值音量（关闭状态） */
+	closedPeak: number;
+	/** 付费类型 */
+	fee: number;
+	/** 未知字段 */
+	uf: any;
+	/** 是否已付费 */
+	payed: number;
+	/** 歌曲标记 */
+	flag: number;
+	/** 是否可以扩展 */
+	canExtend: boolean;
+	/** 免费试听信息 */
+	freeTrialInfo: any;
+	/** 音质等级 */
+	level: string;
+	/** 编码类型 */
+	encodeType: string;
+	/** 声道布局 */
+	channelLayout: any;
+	/** 免费试听权限 */
+	freeTrialPrivilege: {
+		/** 资源是否可消费 */
+		resConsumable: boolean;
+		/** 用户是否可消费 */
+		userConsumable: boolean;
+		/** 试听类型 */
+		listenType: any;
+		/** 无法试听的原因 */
+		cannotListenReason: any;
+		/** 播放原因 */
+		playReason: any;
+		/** 免费限制标签类型 */
+		freeLimitTagType: any;
+	};
+	/** 免费时间试听权限 */
+	freeTimeTrialPrivilege: {
+		/** 资源是否可消费 */
+		resConsumable: boolean;
+		/** 用户是否可消费 */
+		userConsumable: boolean;
+		/** 试听类型 */
+		type: number;
+		/** 剩余试听时间 */
+		remainTime: number;
+	};
+	/** URL来源 */
+	urlSource: number;
+	/** 版权来源 */
+	rightSource: number;
+	/** 播客控制 */
+	podcastCtrp: any;
+	/** 特效类型 */
+	effectTypes: any;
+	/** 时长（毫秒） */
+	time: number;
+	/** 消息 */
+	message: any;
+	/** 音质混淆 */
+	levelConfuse: any;
+	/** 音乐ID */
+	musicId: string;
+	/** 伴奏 */
+	accompany: any;
+	/** 采样率 */
+	sr: number;
+	/** 音频效果 */
+	auEff: any;
 }
 
 export interface CloudDiskTrack {
@@ -355,4 +448,29 @@ export interface Lyric {
 export interface PaginationParams {
 	limit?: number;
 	offset?: number;
+}
+
+/**
+ * 歌单分类项类型
+ * 包含歌单分类的基本信息
+ */
+export interface PlaylistCategory {
+	/** 分类名称 */
+	name: string;
+	/** 资源数量 */
+	resourceCount: number;
+	/** 图片ID */
+	imgId: number;
+	/** 图片URL */
+	imgUrl: string | null;
+	/** 分类类型 */
+	type: number;
+	/** 分类类别 */
+	category: number;
+	/** 资源类型 */
+	resourceType: number;
+	/** 是否热门 */
+	hot: boolean;
+	/** 是否活动 */
+	activity: boolean;
 }

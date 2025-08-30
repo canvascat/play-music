@@ -7,8 +7,10 @@ import type {
 	MV,
 	PaginationParams,
 	Playlist,
+	PlaylistCategory,
 	Track,
 	TrackPrivilege,
+	TrackUrl,
 	User,
 } from "./core";
 
@@ -112,27 +114,12 @@ export interface TrackDetailResponse extends BaseApiResponse {
 
 export interface TrackLyricResponse extends BaseApiResponse, Lyric {}
 
+/**
+ * 歌曲URL响应类型
+ * 包含歌曲的播放链接、音质、文件大小等信息
+ */
 export interface TrackUrlResponse extends BaseApiResponse {
-	data: Array<{
-		id: number;
-		url: string;
-		br: number;
-		size: number;
-		md5: string;
-		code: number;
-		expi: number;
-		type: string;
-		gain: number;
-		peak: number;
-		fee: number;
-		uf: any;
-		payed: number;
-		flag: number;
-		canExtend: boolean;
-		freeTrialInfo: any;
-		level: string;
-		encodeType: string;
-	}>;
+	data: TrackUrl[];
 }
 
 export interface TopSongResponse extends BaseApiResponse {
@@ -150,26 +137,24 @@ export interface PlaylistTracksResponse extends BaseApiResponse {
 	privileges: any[];
 }
 
+/**
+ * 歌单分类响应类型
+ * 包含歌单分类的完整信息，包括全部歌单、子分类和分类映射
+ */
 export interface PlaylistCatResponse extends BaseApiResponse {
+	/** 全部歌单信息 */
+	all: PlaylistCategory;
+	/** 子分类列表 */
+	sub: PlaylistCategory[];
+	/** 分类映射表 */
 	categories: Record<string, string>;
-	sub: Array<{
-		name: string;
-		resourceCount: number;
-		imgId: number;
-		imgUrl: string;
-		type: number;
-		category: number;
-		resourceType: number;
-		hot: boolean;
-		activity: boolean;
-	}>;
 }
 
 export interface TopPlaylistResponse extends BaseApiResponse {
 	playlists: Playlist[];
 	total: number;
 	more: boolean;
-	cat: string;
+	// cat: string;
 }
 
 // 专辑相关API响应
@@ -177,7 +162,6 @@ export interface AlbumDetailResponse extends BaseApiResponse {
 	album: Album;
 	songs: Track[];
 }
-
 export interface AlbumDetailDynamicResponse extends BaseApiResponse {
 	onSale: boolean;
 	albumGameInfo: any;
@@ -217,6 +201,10 @@ export interface TopArtistResponse extends BaseApiResponse {
 		artists: Artist[];
 		type: ToplistArtistType;
 	};
+}
+
+export interface SimilarArtistResponse extends BaseApiResponse {
+	artists: Artist[];
 }
 
 // 搜索相关API响应
