@@ -308,36 +308,100 @@ export interface User {
 }
 
 export interface TrackPrivilege {
+	/** 歌曲ID */
 	id: number;
+	/** 付费类型 */
 	fee: number;
+	/** 是否已付费 */
 	payed: number;
+	/** 实际付费状态 */
+	realPayed: number;
+	/** 状态 */
 	st: number;
+	/** 播放权限 */
 	pl: number;
+	/** 下载权限 */
 	dl: number;
+	/** 特殊权限 */
 	sp: number;
+	/** 版权权限 */
 	cp: number;
+	/** 子权限 */
 	subp: number;
+	/** 是否可分享 */
 	cs: boolean;
+	/** 最大比特率 */
 	maxbr: number;
+	/** 免费权限 */
 	fl: number;
+	/** PC权限 */
+	pc: any;
+	/** 是否显示提示 */
 	toast: boolean;
+	/** 标记 */
 	flag: number;
+	/** 是否付费大爆炸 */
+	paidBigBang: boolean;
+	/** 是否预售 */
 	preSell: boolean;
+	/** 播放最大比特率 */
 	playMaxbr: number;
+	/** 下载最大比特率 */
 	downloadMaxbr: number;
+	/** 最大比特率等级 */
 	maxBrLevel: string;
+	/** 播放最大比特率等级 */
 	playMaxBrLevel: string;
+	/** 下载最大比特率等级 */
 	downloadMaxBrLevel: string;
+	/** 播放权限等级 */
 	plLevel: string;
+	/** 下载权限等级 */
 	dlLevel: string;
+	/** 免费权限等级 */
 	flLevel: string;
+	/** 资源状态 */
 	rscl: any;
+	/** 免费试听权限 */
 	freeTrialPrivilege: {
+		/** 资源是否可消费 */
 		resConsumable: boolean;
+		/** 用户是否可消费 */
 		userConsumable: boolean;
-		listenType?: any;
+		/** 试听类型 */
+		listenType: number;
+		/** 无法试听的原因 */
+		cannotListenReason: number;
+		/** 播放原因 */
+		playReason: any;
+		/** 免费限制标签类型 */
+		freeLimitTagType: any;
 	};
-	chargeInfoList: any[];
+	/** 版权来源 */
+	rightSource: number;
+	/** 收费信息列表 */
+	chargeInfoList: Array<{
+		/** 比特率 */
+		rate: number;
+		/** 收费URL */
+		chargeUrl: any;
+		/** 收费消息 */
+		chargeMessage: any;
+		/** 收费类型 */
+		chargeType: number;
+	}>;
+	/** 响应码 */
+	code: number;
+	/** 消息 */
+	message: any;
+	/** 播放权限等级 */
+	plLevels: any;
+	/** 下载权限等级 */
+	dlLevels: any;
+	/** 是否忽略缓存 */
+	ignoreCache: any;
+	/** 背景数据 */
+	bd: any;
 }
 
 export interface MV {
