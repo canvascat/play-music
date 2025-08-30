@@ -1,4 +1,10 @@
-import type { TrackDetailResponse, TrackLyricResponse } from "@/types/api";
+import type {
+	TrackDetailResponse,
+	TrackLyricResponse,
+	TrackUrlResponse,
+	TopSongResponse,
+	BaseApiResponse,
+} from "@/types/api";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";
@@ -12,7 +18,7 @@ import { pinia } from "@/store/pinia";
  * !!!未登录状态返回试听片段(返回字段包含被截取的正常歌曲的开始时间和结束时间)
  * @param {string} id - 音乐的 id，例如 id=405998841,33894312
  */
-export function getMP3(id: NCMAPI.song_url[0]["id"]) {
+export function getMP3(id: NCMAPI.song_url[0]["id"]): Promise<TrackUrlResponse> {
 	const getBr = () => {
 		// 当返回的 quality >= 400000时，就会优先返回 hi-res
 		const quality = useSettingsStore(pinia).settings?.musicQuality ?? "320000";
@@ -88,7 +94,7 @@ export async function getLyric(id: number): Promise<TrackLyricResponse> {
  * 说明 : 调用此接口 , 可获取新歌速递
  * @param {number} type - 地区类型 id, 对应以下: 全部:0 华语:7 欧美:96 日本:8 韩国:16
  */
-export function topSong(type: NCMAPI.top_song[0]["type"]) {
+export function topSong(type: NCMAPI.top_song[0]["type"]): Promise<TopSongResponse> {
 	return request({
 		url: "/top/song",
 		method: "get",
@@ -104,7 +110,7 @@ export function topSong(type: NCMAPI.top_song[0]["type"]) {
  * - id - 歌曲 id
  * - like - 默认为 true 即喜欢 , 若传 false, 则取消喜欢
  */
-export function likeATrack(params: NCMAPI.like[0]) {
+export function likeATrack(params: NCMAPI.like[0]): Promise<BaseApiResponse> {
 	return request({
 		url: "/like",
 		method: "get",
@@ -120,7 +126,7 @@ export function likeATrack(params: NCMAPI.like[0]) {
  * - sourceid - 歌单或专辑 id
  * - time - 歌曲播放时间,单位为秒
  */
-export function scrobble(params: NCMAPI.scrobble[0]) {
+export function scrobble(params: NCMAPI.scrobble[0]): Promise<BaseApiResponse> {
 	return request({
 		url: "/scrobble",
 		method: "get",
