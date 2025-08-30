@@ -17,17 +17,17 @@
 			</button-icon>
 		</div>
 		<div
-			class="navigation-links flex items-center justify-center flex-1 max-lg:flex-none select-none uppercase mx-3 app-region-no-drag"
+			class="navigation-links flex items-center justify-center flex-1 max-lg:flex-none select-none uppercase mx-3"
 		>
-			<router-link to="/" :class="{ active: $route.name === 'home' }">{{
+			<RouterLink to="/" active-class="active" class="app-region-no-drag">{{
 				$t("nav.home")
-			}}</router-link>
-			<router-link to="/explore" :class="{ active: $route.name === 'explore' }">{{
+			}}</RouterLink>
+			<RouterLink to="/explore" active-class="active" class="app-region-no-drag">{{
 				$t("nav.explore")
-			}}</router-link>
-			<router-link to="/library" :class="{ active: $route.name === 'library' }">{{
+			}}</RouterLink>
+			<RouterLink to="/library" active-class="active" class="app-region-no-drag">{{
 				$t("nav.library")
-			}}</router-link>
+			}}</RouterLink>
 		</div>
 		<div class="right-part flex items-center justify-end flex-1">
 			<div class="search-box flex justify-end app-region-no-drag max-sm:hidden">
