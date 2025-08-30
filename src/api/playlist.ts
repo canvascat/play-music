@@ -1,8 +1,11 @@
 import type {
+	BaseApiResponse,
+	PlaylistCatResponse,
 	PlaylistDetailResponse,
 	RecommendPlaylistResponse,
 	RecommendResourceResponse,
 	ToplistResponse,
+	TopPlaylistResponse,
 } from "@/types";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import request, { noCacheParams } from "@/utils/request";
@@ -59,9 +62,12 @@ export function getPlaylistDetail(
 		url: "/playlist/detail",
 		method: "get",
 		params: noCacheParams(params, noCache),
-	}).then((data) => {
+	}).then((data: PlaylistDetailResponse) => {
 		if (data.playlist) {
-			data.playlist.tracks = mapTrackPlayableStatus(data.playlist.tracks, data.privileges || []);
+			data.playlist.tracks = mapTrackPlayableStatus(
+				data.playlist.tracks || [],
+				data.privileges || [],
+			);
 		}
 		return data;
 	});
@@ -73,7 +79,9 @@ export function getPlaylistDetail(
  * - limit: 取出歌单数量 , 默认为 20
  * - before: 分页参数,取上一页最后一个歌单的 updateTime 获取下一页数据
  */
-export function highQualityPlaylist(params?: NCMAPI.top_playlist_highquality[0]) {
+export function highQualityPlaylist(
+	params?: NCMAPI.top_playlist_highquality[0],
+): Promise<TopPlaylistResponse> {
 	return request({
 		url: "/top/playlist/highquality",
 		method: "get",
@@ -88,7 +96,7 @@ export function highQualityPlaylist(params?: NCMAPI.top_playlist_highquality[0])
  * - cat: tag, 比如 " 华语 "、" 古风 " 、" 欧美 "、" 流行 ", 默认为 "全部",可从歌单分类接口获取(/playlist/catlist)
  * - limit: 取出歌单数量 , 默认为 50
  */
-export function topPlaylist(params?: NCMAPI.top_playlist[0]) {
+export function topPlaylist(params?: NCMAPI.top_playlist[0]): Promise<TopPlaylistResponse> {
 	return request({
 		url: "/top/playlist",
 		method: "get",
@@ -100,7 +108,7 @@ export function topPlaylist(params?: NCMAPI.top_playlist[0]) {
  * 歌单分类
  * 说明 : 调用此接口,可获取歌单分类,包含 category 信息
  */
-export function playlistCatlist() {
+export function playlistCatlist(): Promise<PlaylistCatResponse> {
 	return request({
 		url: "/playlist/catlist",
 		method: "get",
@@ -127,7 +135,7 @@ export function toplists(): Promise<ToplistResponse> {
  * @param {number} params.t
  * @param {number} params.id
  */
-export function subscribePlaylist(params: NCMAPI.playlist_subscribe[0]) {
+export function subscribePlaylist(params: NCMAPI.playlist_subscribe[0]): Promise<BaseApiResponse> {
 	return request({
 		url: "/playlist/subscribe",
 		method: "post",
