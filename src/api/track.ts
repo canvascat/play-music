@@ -48,10 +48,12 @@ export function getTrackDetail(ids: number | string): Promise<TrackDetailRespons
 			params: {
 				ids,
 			},
-		}).then((data) => {
+		}).then((data: TrackDetailResponse) => {
 			data.songs.map((song) => {
 				const privilege = data.privileges.find((t) => t.id === song.id);
-				db.track.detail.write(song, privilege);
+				if (privilege) {
+					db.track.detail.write(song, privilege);
+				}
 			});
 			data.songs = mapTrackPlayableStatus(data.songs, data.privileges);
 			return data;
@@ -68,7 +70,7 @@ export function getTrackDetail(ids: number | string): Promise<TrackDetailRespons
 		if (result) {
 			result.songs = mapTrackPlayableStatus(result.songs, result.privileges);
 		}
-		return result ?? fetchLatest();
+		return (result ?? fetchLatest()) as TrackDetailResponse;
 	});
 }
 
