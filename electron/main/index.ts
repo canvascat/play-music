@@ -5,6 +5,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTIPCServer } from "tipc-electron/main";
 import functions from "./functions";
+import { createMenu } from "./menu";
+import { isWindows, isDevelopment } from "./platform";
+import process from "node:process";
 
 // const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,6 +55,12 @@ async function createWindow() {
 		height: 720,
 		titleBarStyle: "hiddenInset",
 		frame: false,
+		// 调整红黄绿按钮位置，只在macOS上生效
+		// 14*55
+		trafficLightPosition: {
+			x: 25,
+			y: 25,
+		},
 		icon: path.join(process.env.VITE_PUBLIC, "favicon.ico"),
 		webPreferences: {
 			preload,
@@ -83,6 +92,23 @@ async function createWindow() {
 		if (url.startsWith("https:")) shell.openExternal(url);
 		return { action: "deny" };
 	});
+
+	createMenu(win);
+}
+
+function initDevtools() {
+	// Exit cleanly on request from parent process in development mode.
+	if (isWindows) {
+		process.on("message", (data) => {
+			if (data === "graceful-exit") {
+				app.quit();
+			}
+		});
+	} else {
+		process.on("SIGTERM", () => {
+			app.quit();
+		});
+	}
 }
 
 // 创建TIPC服务器
@@ -93,7 +119,12 @@ app.on("before-quit", () => {
 	dispose();
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+	if (isDevelopment) {
+		initDevtools();
+	}
+	createWindow();
+});
 
 app.on("window-all-closed", () => {
 	win = null;
