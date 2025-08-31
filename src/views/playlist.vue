@@ -53,7 +53,7 @@
 						color="grey"
 						@click="likePlaylist"
 						:icon="playlist.subscribed ? IconHeartSolid : IconHeart"
-						:class="cn('size-4', playlist.subscribed && 'text-primary')"
+						:class="cn(playlist.subscribed && 'text-primary')"
 					/>
 					<DropdownMenu>
 						<DropdownMenuTrigger as-child>
