@@ -69,7 +69,7 @@ service.interceptors.response.use(
 const request = <T = any>(
 	config: Pick<AxiosRequestConfig, "url" | "method" | "params">,
 ): Promise<T> => {
-	config = { method: "get", ...config };
+	config = { ...config, method: "get" };
 	return service(config);
 };
 
@@ -92,7 +92,7 @@ request.upload = (config: Pick<AxiosRequestConfig, "url" | "data">) => {
 	});
 };
 
-export const noCacheParams = <T>(params: T, noCache = true) => {
+export const noCacheParams = <T>(params?: T, noCache = true) => {
 	return { ...params, timestamp: noCache ? Date.now() : undefined };
 };
 
