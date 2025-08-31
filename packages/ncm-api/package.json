@@ -1,0 +1,23 @@
+{
+	"name": "ncm-api",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"dev": "bun run src/server/index.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.14.0",
+	"devDependencies": {
+		"@unblockneteasemusic/rust-napi": "^0.4.0",
+		"NeteaseCloudMusicApi": "^4.27.0",
+		"hono": "^4.9.5"
+	},
+	"peerDependencies": {
+		"@unblockneteasemusic/rust-napi": "^0.4.0",
+		"NeteaseCloudMusicApi": "^4.27.0",
+		"hono": "^4.9.5"
+	}
+}
