@@ -1,4 +1,4 @@
-import type { GlobalState } from "@/types";
+import type { GlobalState, Track } from "@/types";
 import Player from "@/utils/Player";
 import updateApp from "@/utils/updateApp";
 import pkg from "../../package.json";
@@ -32,7 +32,7 @@ export const useGlobalStore = defineStore("global", {
 		toggleLyrics() {
 			this.showLyrics = !this.showLyrics;
 		},
-		updateDailyTracks(dailyTracks) {
+		updateDailyTracks(dailyTracks: Track[]) {
 			this.dailyTracks = dailyTracks;
 		},
 
