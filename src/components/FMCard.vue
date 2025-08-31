@@ -51,7 +51,7 @@ import { useGlobalStore } from "@/store/global";
 import { resizeImage } from "@/utils/filters";
 import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
-import { getImageColor } from "@/utils/common";
+import getImageColor from "@/utils/image-color";
 
 const { player } = useGlobalStore();
 

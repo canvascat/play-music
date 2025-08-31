@@ -1,16 +1,11 @@
 import { useGlobalStore } from "@/store/global";
 import type { Track, TrackPrivilege } from "@/types/index";
 import { isAccountLoggedIn } from "./auth";
-import { Vibrant, WorkerPipeline } from "node-vibrant/worker";
-import Color from "color";
-import PipelineWorker from "node-vibrant/worker.worker?worker";
 import pkg from "../../package.json";
 import { randomInt } from "es-toolkit";
 import { useDataStore } from "@/store/data";
 import { useSettingsStore } from "@/store/settings";
 import { pinia } from "@/store/pinia";
-
-Vibrant.use(new WorkerPipeline(PipelineWorker as never));
 
 function isTrackPlayable(track: Track, vipType?: number) {
 	const result = {
@@ -163,15 +158,6 @@ export function formatTrackTime(value?: number | string) {
 	const min = ~~(value / 60);
 	const sec = (~~(value % 60)).toString().padStart(2, "0");
 	return `${min}:${sec}`;
-}
-
-export async function getImageColor(
-	src: string,
-	type: keyof Awaited<ReturnType<Vibrant["getPalette"]>>,
-) {
-	const palette = await new Vibrant(src, { colorCount: 2 }).getPalette();
-	const rgb = palette[type]?.rgb;
-	return new Color(rgb);
 }
 
 export function setTitle(track?: Track): void {

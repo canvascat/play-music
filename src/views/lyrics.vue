@@ -214,7 +214,8 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useGlobalStore } from "@/store/global";
 
-import { formatTrackTime, getImageColor } from "@/utils/common";
+import { formatTrackTime } from "@/utils/common";
+import getImageColor from "@/utils/image-color";
 import * as api from "@/api";
 import { lyricParser } from "@/utils/lyrics";
 import ButtonIcon from "@/components/ButtonIcon.vue";
