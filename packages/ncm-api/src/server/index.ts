@@ -6,7 +6,8 @@ import fsp from "node:fs/promises";
 import path from "node:path";
 import { serveStatic } from "hono/bun";
 import { fileURLToPath } from "node:url";
-import request from "NeteaseCloudMusicApi/util/request";
+// import request from "NeteaseCloudMusicApi/util/request";
+import { request } from "../util/request";
 
 async function getModulesDefinitions(modulesPath: string, specificRoute: Record<string, string>) {
 	const files = await fsp.readdir(modulesPath);
@@ -29,7 +30,7 @@ async function getModulesDefinitions(modulesPath: string, specificRoute: Record<
 
 	return modules;
 }
-
+// https://hono.dev/docs/
 const app = new Hono();
 
 const NeteaseCloudMusicApiRoot = path.dirname(
@@ -97,4 +98,7 @@ for (const moduleDef of moduleDefinitions) {
 	});
 }
 
-export default app;
+export default {
+	fetch: app.fetch,
+	port: 3001,
+};
