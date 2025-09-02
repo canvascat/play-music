@@ -4,13 +4,15 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "bun run src/server/index.ts"
+		"dev": "bun --watch --port=3001 run src/server/index.ts",
+		"run:ncm": "npx NeteaseCloudMusicApi"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"packageManager": "pnpm@10.14.0",
 	"devDependencies": {
+		"@types/bun": "^1.2.21",
 		"@unblockneteasemusic/rust-napi": "^0.4.0",
 		"NeteaseCloudMusicApi": "^4.27.0",
 		"hono": "^4.9.5"

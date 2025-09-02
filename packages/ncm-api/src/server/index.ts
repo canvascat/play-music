@@ -98,7 +98,4 @@ for (const moduleDef of moduleDefinitions) {
 	});
 }
 
-export default {
-	fetch: app.fetch,
-	port: 3001,
-};
+export default app;
