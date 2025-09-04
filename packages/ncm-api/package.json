@@ -10,7 +10,8 @@
 	},
 	"exports": {
 		"./server": "./src/server/index.ts",
-		"./types": "./src/types/index.ts"
+		"./types": "./src/types/index.ts",
+		"./module/user_account": "./src/module/user_account.ts"
 	},
 	"files": [
 		"src"
