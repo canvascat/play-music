@@ -76,6 +76,7 @@
 		"@vue/tsconfig": "^0.7.0",
 		"electron": "37.2.5",
 		"glob": "^11.0.3",
+		"ncm-api": "workspace:*",
 		"oxlint": "^1.8.0",
 		"prettier": "^3.6.2",
 		"sass": "^1.26.11",
@@ -105,5 +106,5 @@
 			"vue-demi"
 		]
 	},
-	"packageManager": "pnpm@10.15.0"
+	"packageManager": "pnpm@10.15.1"
 }
