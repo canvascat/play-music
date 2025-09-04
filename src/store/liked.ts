@@ -1,4 +1,4 @@
-import type { LikedState } from "@/types";
+import type { LikedState } from "@/types/state";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useDataStore } from "./data";

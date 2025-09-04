@@ -4,14 +4,15 @@ import NProgress from "nprogress";
 import { ref, onMounted } from "vue";
 
 import CoverRow from "@/components/CoverRow.vue";
-import type { Album } from "@/types";
+import type { Album } from "ncm-api/types";
+import { AlbumListArea } from "ncm-api/types";
 
 const albums = ref<Album[]>([]);
 
 onMounted(() => {
 	api.album
 		.newAlbums({
-			area: api.NCMAPI.AlbumListArea.ea,
+			area: AlbumListArea.ea,
 			limit: 100,
 		})
 		.then((data) => {

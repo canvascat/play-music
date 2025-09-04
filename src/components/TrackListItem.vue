@@ -79,7 +79,7 @@ import { isNil } from "es-toolkit";
 import { formatTime } from "@/utils/filters";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import type { Track, Artist, Album } from "@/types";
+import type { Track, Artist, Album } from "ncm-api/types";
 import { IconPlay, IconHeart, IconHeartSolid, IconVolume } from "@/components/icon";
 import { useSettingsStore } from "@/store/settings";
 

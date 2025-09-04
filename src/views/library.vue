@@ -239,7 +239,7 @@ import {
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useModalStore } from "@/store/modal";
-import type { Playlist } from "@/types";
+import type { Playlist } from "ncm-api/types";
 import { randomItem } from "@/utils/common";
 import { useDataStore } from "@/store/data";
 import { useLikedStore } from "@/store/liked";

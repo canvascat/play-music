@@ -50,9 +50,9 @@ import CoverRow from "@/components/CoverRow.vue";
 import FMCard from "@/components/FMCard.vue";
 import DailyTracksCard from "@/components/DailyTracksCard.vue";
 import { useSettingsStore } from "@/store/settings";
-import { AlbumListArea, ToplistArtistType } from "@/api/NCMAPI";
+import { AlbumListArea, ToplistArtistType } from "ncm-api/types";
 import { shuffle } from "es-toolkit";
-import type { Album, Artist, Playlist } from "@/types";
+import type { Album, Artist, Playlist } from "ncm-api/types";
 
 const { settings } = useSettingsStore();
 

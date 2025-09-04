@@ -1,7 +1,7 @@
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { computed } from "vue";
-import type { User } from "@/types";
+import type { User } from "ncm-api/types";
 import * as api from "@/api";
 import { isAccountLoggedIn } from "@/utils/auth";
 

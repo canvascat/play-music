@@ -1,4 +1,5 @@
-import type { GlobalState, Track } from "@/types";
+import type { GlobalState } from "@/types/state";
+import type { Track } from "ncm-api/types";
 import Player from "@/utils/Player";
 import updateApp from "@/utils/updateApp";
 import pkg from "../../package.json";

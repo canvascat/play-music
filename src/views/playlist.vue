@@ -212,7 +212,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { specialPlaylist } from "@/const";
 import { useGlobalStore } from "@/store/global";
-import type { Playlist } from "@/types";
+import type { Playlist } from "ncm-api/types";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { formatDate, resizeImage } from "@/utils/filters";
 import nativeAlert from "@/utils/nativeAlert";

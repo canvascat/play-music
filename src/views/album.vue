@@ -130,7 +130,7 @@ import { toast } from "vue-sonner";
 import { computed, ref, toValue, shallowRef } from "vue";
 import { onBeforeRouteUpdate, useRouter } from "vue-router";
 import { IconHeart, IconHeartSolid, IconMore, IconPlay } from "@/components/icon";
-import type { Album, AlbumDetailDynamicResponse, Track } from "@/types";
+import type { Album, AlbumDetailDynamicResponse, Track } from "ncm-api/types";
 import { cn } from "@/lib/utils";
 
 const { t } = useI18n();

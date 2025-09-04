@@ -91,7 +91,7 @@ import {
 } from "@/components/ui/context-menu";
 import { copyText } from "@/utils/copy";
 import { useModalStore } from "@/store/modal";
-import type { CloudDiskTrack } from "@/types";
+import type { CloudDiskTrack } from "ncm-api/types";
 import { useLikedStore } from "@/store/liked";
 
 const { t } = useI18n();

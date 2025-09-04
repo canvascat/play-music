@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { useLocalStorage } from "@vueuse/core";
-import type { Settings } from "@/types";
+import type { Settings } from "@/types/state";
 import shortcuts, { type Shortcut } from "@/utils/shortcuts";
 import { cloneDeep } from "es-toolkit";
 import { changeAppearance } from "@/utils/common";
