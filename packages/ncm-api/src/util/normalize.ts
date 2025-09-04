@@ -6,9 +6,9 @@ import type { RequestOptions } from "./option";
 /**
  * 响应接口
  */
-export interface RequestAnswer {
+export interface RequestAnswer<Data = any> {
 	status: number;
-	body: any;
+	body: Data;
 	cookie?: string[];
 }
 
@@ -201,7 +201,10 @@ export async function normalizeArguments(
 	return { url, headers, encryptData, e_r: data.e_r };
 }
 
-export async function normalzieResponse(res: Response, e_r?: boolean): Promise<RequestAnswer> {
+export async function normalzieResponse<Data = any>(
+	res: Response,
+	e_r?: boolean,
+): Promise<RequestAnswer<Data>> {
 	const answer: RequestAnswer = { status: 500, body: {}, cookie: [] };
 	answer.cookie = res.headers.getSetCookie().map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""));
 

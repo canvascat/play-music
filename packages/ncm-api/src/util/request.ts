@@ -12,9 +12,9 @@ import { normalizeArguments, normalzieResponse } from "./normalize";
  * @param data - 请求数据
  * @param options - 请求选项
  */
-export const request = async (...args: Parameters<typeof normalizeArguments>) => {
+export const request = async <Data = any>(...args: Parameters<typeof normalizeArguments>) => {
 	const { url, headers, encryptData, e_r } = await normalizeArguments(...args);
 	const body = new URLSearchParams(encryptData);
 	const response = await fetch(url, { method: "POST", headers, body });
-	return normalzieResponse(response, e_r);
+	return normalzieResponse<Data>(response, e_r);
 };
