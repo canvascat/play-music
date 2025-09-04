@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Track } from "@/types";
+import type { Track } from "ncm-api/types";
 import db from "../db";
 
 let tracksCacheBytes = 0;

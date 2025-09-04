@@ -4,7 +4,8 @@ import { isProxy } from "vue";
 import { toast } from "vue-sonner";
 import * as api from "@/api";
 import { pinia } from "@/store/pinia";
-import type { PersonalFMResponse, PlaylistSource, RepeatMode, Track } from "@/types";
+import type { PersonalFMResponse, Track } from "ncm-api/types";
+import type { PlaylistSource, RepeatMode } from "@/types/state";
 import { isAccountLoggedIn } from "@/utils/auth";
 import * as db from "@/utils/db/index";
 import { isCreateMpris } from "@/utils/platform";
@@ -288,7 +289,7 @@ export default class Player {
 				this._playNextTrack();
 			} else {
 				const t = this._progress;
-				this._replaceCurrentTrackAudio(this.currentTrack, false, false).then((replaced) => {
+				this._replaceCurrentTrackAudio(this.currentTrack!, false, false).then((replaced) => {
 					// 如果 replaced 为 false，代表当前的 track 已经不是这里想要替换的track
 					// 此时则不修改当前的歌曲进度
 					if (replaced) {
@@ -338,54 +339,52 @@ export default class Player {
 		source ??= this._getAudioSourceBlobURL(await getAudioSourceFromUnblockMusic(track));
 		return source;
 	}
-	private _replaceCurrentTrack(
+	private async _replaceCurrentTrack(
 		id: number,
 		autoplay = true,
 		ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK,
 	) {
-		return api.track.getTrackDetail(id).then((data) => {
-			const track = data.songs[0];
-			this._currentTrack = track;
-			this._updateMediaSessionMetaData(track);
-			return this._replaceCurrentTrackAudio(track, autoplay, true, ifUnplayableThen);
-		});
+		const { songs } = await api.track.getTrackDetail(id);
+		const track = songs[0];
+		this._currentTrack = track;
+		this._updateMediaSessionMetaData(track);
+		return this._replaceCurrentTrackAudio(track, autoplay, true, ifUnplayableThen);
 	}
 	/**
 	 * @returns 是否成功加载音频，并使用加载完成的音频替换了howler实例
 	 */
-	private _replaceCurrentTrackAudio(
-		track,
-		autoplay,
-		isCacheNextTrack,
+	private async _replaceCurrentTrackAudio(
+		track: Track,
+		autoplay: boolean,
+		isCacheNextTrack: boolean,
 		ifUnplayableThen: UnplayableCondition = UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK,
 	) {
-		return this._getAudioSource(track).then((source) => {
-			if (source) {
-				let replaced = false;
-				if (track.id === this.currentTrackID) {
-					this._playAudioSource(source, autoplay);
-					replaced = true;
-				}
-				if (isCacheNextTrack) {
-					this._cacheNextTrack();
-				}
-				return replaced;
-			} else {
-				toast(`无法播放 ${track.name}`);
-				switch (ifUnplayableThen) {
-					case UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK:
-						this._playNextTrack();
-						break;
-					case UNPLAYABLE_CONDITION.PLAY_PREV_TRACK:
-						this.playPrevTrack();
-						break;
-					default:
-						toast(`undefined Unplayable condition: ${ifUnplayableThen}`);
-						break;
-				}
-				return false;
+		const source = await this._getAudioSource(track);
+		if (source) {
+			let replaced = false;
+			if (track.id === this.currentTrackID) {
+				this._playAudioSource(source, autoplay);
+				replaced = true;
 			}
-		});
+			if (isCacheNextTrack) {
+				this._cacheNextTrack();
+			}
+			return replaced;
+		} else {
+			toast(`无法播放 ${track.name}`);
+			switch (ifUnplayableThen) {
+				case UNPLAYABLE_CONDITION.PLAY_NEXT_TRACK:
+					this._playNextTrack();
+					break;
+				case UNPLAYABLE_CONDITION.PLAY_PREV_TRACK:
+					this.playPrevTrack();
+					break;
+				default:
+					toast(`undefined Unplayable condition: ${ifUnplayableThen}`);
+					break;
+			}
+			return false;
+		}
 	}
 	private _cacheNextTrack() {
 		const nextTrackID = this._isPersonalFM

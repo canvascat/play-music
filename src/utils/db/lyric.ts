@@ -1,4 +1,4 @@
-import type { TrackLyricResponse } from "@/types";
+import type { TrackLyricResponse } from "ncm-api/types";
 import db from "./db";
 
 export async function write(id: number, lyrics: TrackLyricResponse) {

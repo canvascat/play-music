@@ -1,4 +1,4 @@
-import type { AlbumDetailResponse } from "@/types";
+import type { AlbumDetailResponse } from "ncm-api/types";
 import db from "./db";
 
 export async function write(id: number, album: AlbumDetailResponse) {

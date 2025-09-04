@@ -1,5 +1,5 @@
 import { useGlobalStore } from "@/store/global";
-import type { Track, TrackPrivilege } from "@/types/index";
+import type { Track, TrackPrivilege } from "ncm-api/types";
 import { isAccountLoggedIn } from "./auth";
 import pkg from "../../package.json";
 import { randomInt } from "es-toolkit";

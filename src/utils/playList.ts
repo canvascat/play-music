@@ -4,7 +4,7 @@ import router from "../router";
 
 import { useDataStore } from "@/store/data";
 import { useGlobalStore } from "@/store/global";
-import type { Playlist } from "@/types";
+import type { Playlist } from "ncm-api/types";
 
 export function hasListSource() {
 	const { player } = useGlobalStore();

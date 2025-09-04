@@ -1,4 +1,4 @@
-import type { Track, TrackPrivilege } from "@/types";
+import type { Track, TrackPrivilege } from "ncm-api/types";
 import db from "../db";
 
 export function write(track: Track, privilege: TrackPrivilege) {

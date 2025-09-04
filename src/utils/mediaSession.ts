@@ -1,4 +1,4 @@
-import type { Track } from "@/types";
+import type { Track } from "ncm-api/types";
 import type Player from "./Player";
 
 export function initMediaSession(this: Player) {

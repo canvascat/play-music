@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { AlbumDetailResponse, Track, TrackLyricResponse, TrackPrivilege } from "@/types/index";
+import type { AlbumDetailResponse, Track, TrackLyricResponse, TrackPrivilege } from "ncm-api/types";
 
 interface AlbumCache {
 	id: number;

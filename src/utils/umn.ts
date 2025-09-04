@@ -2,7 +2,7 @@ import type { SearchMode } from "@unblockneteasemusic/rust-napi";
 
 import * as db from "@/utils/db/index";
 import { decode as base642Buffer } from "@/utils/base64";
-import type { Track } from "@/types";
+import type { Track } from "ncm-api/types";
 import { useSettingsStore } from "@/store/settings";
 import { pinia } from "@/store/pinia";
 
