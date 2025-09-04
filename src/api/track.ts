@@ -4,7 +4,7 @@ import type {
 	TrackUrlResponse,
 	TopSongResponse,
 	BaseApiResponse,
-} from "@/types/api";
+} from "ncm-api/types";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import * as db from "@/utils/db/index";
 import request, { noCacheParams } from "@/utils/request";

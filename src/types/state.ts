@@ -1,6 +1,13 @@
 import type Player from "@/utils/Player";
-import type { Album, Artist, CloudDiskTrack, MV, Playlist, Track } from "./core";
-import type { AlbumListArea } from "@/api/NCMAPI";
+import type {
+	Album,
+	Artist,
+	CloudDiskTrack,
+	MV,
+	Playlist,
+	Track,
+	AlbumListArea,
+} from "ncm-api/types";
 import type { Shortcut } from "@/utils/shortcuts";
 
 // 播放器相关类型

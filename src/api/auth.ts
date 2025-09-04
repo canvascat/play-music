@@ -1,5 +1,5 @@
 import request, { noCacheParams } from "@/utils/request";
-import * as NCMAPI from "./NCMAPI";
+import type * as NCMAPI from "./NCMAPI";
 
 /**
  * 手机登录

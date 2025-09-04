@@ -1,6 +1,6 @@
 import request, { noCacheParams } from "@/utils/request";
-import * as MCNAPI from "./NCMAPI";
-import type { MVDetailResponse, MVUrlResponse } from "@/types/api";
+import type * as MCNAPI from "./NCMAPI";
+import type { MVDetailResponse, MVUrlResponse } from "ncm-api/types";
 
 // TODO 删除mv相关功能
 

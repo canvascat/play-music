@@ -6,7 +6,7 @@ import type {
 	RecommendResourceResponse,
 	ToplistResponse,
 	TopPlaylistResponse,
-} from "@/types";
+} from "ncm-api/types";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import request, { noCacheParams } from "@/utils/request";
 import type * as NCMAPI from "./NCMAPI";

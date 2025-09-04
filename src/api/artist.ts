@@ -2,7 +2,7 @@ import request, { noCacheParams } from "@/utils/request";
 import { mapTrackPlayableStatus } from "@/utils/common";
 import { isAccountLoggedIn } from "@/utils/auth";
 import { getTrackDetail } from "./track";
-import * as NCMAPI from "./NCMAPI";
+import type * as NCMAPI from "./NCMAPI";
 import type {
 	ArtistAlbumResponse,
 	ArtistDetailResponse,
@@ -10,7 +10,7 @@ import type {
 	BaseApiResponse,
 	SimilarArtistResponse,
 	TopArtistResponse,
-} from "@/types";
+} from "ncm-api/types";
 
 /**
  * 获取歌手单曲

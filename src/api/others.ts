@@ -1,6 +1,6 @@
 import request, { noCacheParams } from "@/utils/request";
 import { mapTrackPlayableStatus } from "@/utils/common";
-import type { SearchResponse, PersonalFMResponse, ApiResponse } from "@/types/api";
+import type { SearchResponse, PersonalFMResponse, ApiResponse } from "ncm-api/types";
 
 interface SearchParams {
 	keywords: string;

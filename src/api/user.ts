@@ -1,9 +1,16 @@
 import request, { noCacheParams } from "@/utils/request";
-import * as NCMAPI from "./NCMAPI";
-import type { UserAccountResponse, UserDetailResponse, UserPlaylistResponse } from "@/types";
-import type { CloudDiskResponse, UserPlayHistoryResponse } from "@/types/api";
-import type { LikedAlbumsResponse, LikedMVsResponse, LikedSongsResponse } from "@/types/api";
-import type { LikedArtistsResponse } from "@/types/api";
+import type * as NCMAPI from "./NCMAPI";
+import type {
+	UserAccountResponse,
+	UserDetailResponse,
+	UserPlaylistResponse,
+	CloudDiskResponse,
+	UserPlayHistoryResponse,
+	LikedAlbumsResponse,
+	LikedMVsResponse,
+	LikedSongsResponse,
+	LikedArtistsResponse,
+} from "ncm-api/types";
 
 /**
  * 获取用户详情

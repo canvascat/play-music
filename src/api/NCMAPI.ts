@@ -1,3 +1,29 @@
+import type {
+	AlbumListArea,
+	AlbumSongsaleboardAlbumType,
+	AlbumSongsaleboardType,
+	ArtistArea,
+	ArtistType,
+	ArtistSongsOrder,
+	BannerType,
+	CommentType,
+	DailySigninType,
+	ListOrder,
+	SearchType,
+	SubAction,
+	ToplistArtistType,
+	UserRecordType,
+	AlbumListStyleArea,
+	MvArea,
+	MvOrder,
+	MvType,
+	ResourceType,
+	SearchSuggestType,
+	ShareResourceType,
+	SoundQualityType,
+	TopSongType,
+} from "ncm-api/types";
+
 export interface RequestBaseConfig {}
 
 export interface MultiPageConfig {
@@ -26,110 +52,6 @@ export interface ImageUploadConfig {
 //   body: Body // API Response body
 //   cookie: string[]
 // }
-
-export const enum SubAction {
-	sub = 1,
-	unsub = 0,
-}
-export const enum AlbumListArea {
-	all = "ALL",
-	zh = "ZH",
-	ea = "EA",
-	kr = "KR",
-	jp = "JP",
-}
-
-export const enum ListOrder {
-	hot = "hot",
-	new = "new",
-}
-
-export const enum AlbumListStyleArea {
-	zh = "Z_H",
-	ea = "E_A",
-	kr = "KR",
-	jp = "JP",
-}
-
-export const enum AlbumSongsaleboardType {
-	daily = "daily",
-	week = "week",
-	year = "year",
-	total = "total",
-}
-
-export const enum AlbumSongsaleboardAlbumType {
-	album = 0,
-	single = 1,
-}
-
-export const enum ArtistListArea {
-	zh = "Z_H",
-	ea = "E_A",
-	kr = "KR",
-	jp = "JP",
-}
-
-export const enum ArtistArea {
-	all = "-1",
-	zh = "7",
-	ea = "96",
-	ja = "8",
-	kr = "16",
-	other = "0",
-}
-
-export const enum ArtistType {
-	male = "1",
-	female = "2",
-	band = "3",
-}
-
-export const enum ArtistSongsOrder {
-	hot = "hot",
-	time = "time",
-}
-
-export const enum BannerType {
-	pc = 0,
-	android = 1,
-	iphone = 2,
-	ipad = 3,
-}
-
-export const enum SearchType {
-	single = 1,
-	album = 10,
-	artist = 100,
-	playlist = 1000,
-	user = 1002,
-	mv = 1004,
-	lyric = 1006,
-	dj = 1009,
-	video = 1014,
-	complex = 1018,
-}
-
-export const enum CommentType {
-	song = 0,
-	mv = 1,
-	playlist = 2,
-	album = 3,
-	dj = 4,
-	video = 5,
-	event = 6,
-}
-
-export const enum CommentAction {
-	add = 1,
-	delete = 0,
-	reply = 2,
-}
-
-export const enum DailySigninType {
-	android = 0,
-	pc = 1,
-}
 
 export type activate_init_profile = [{ nickname: string }, any];
 
@@ -288,67 +210,67 @@ export type cloudsearch = [
 	any,
 ];
 
-export type comment = [
-	{
-		id: string | number;
-		type: CommentType;
-		t: CommentAction.delete;
-		commentId: string | number;
-	},
-	any,
-];
+// export type comment = [
+// 	{
+// 		id: string | number;
+// 		type: CommentType;
+// 		t: CommentAction.delete;
+// 		commentId: string | number;
+// 	},
+// 	any,
+// ];
 
-export type comment_1 = [
-	{
-		type: CommentType.event;
-		t: CommentAction.delete;
-		threadId: string;
-		commentId: string | number;
-	},
-	any,
-];
+// export type comment_1 = [
+// 	{
+// 		type: CommentType.event;
+// 		t: CommentAction.delete;
+// 		threadId: string;
+// 		commentId: string | number;
+// 	},
+// 	any,
+// ];
 
-export type comment_2 = [
-	{
-		id: string | number;
-		type: CommentType;
-		t: CommentAction.add;
-		content: string | number;
-	},
-	any,
-];
+// export type comment_2 = [
+// 	{
+// 		id: string | number;
+// 		type: CommentType;
+// 		t: CommentAction.add;
+// 		content: string | number;
+// 	},
+// 	any,
+// ];
 
-export type comment_3 = [
-	{
-		type: CommentType.event;
-		t: CommentAction.add;
-		threadId: string;
-		content: string | number;
-	},
-	any,
-];
+// export type comment_3 = [
+// 	{
+// 		type: CommentType.event;
+// 		t: CommentAction.add;
+// 		threadId: string;
+// 		content: string | number;
+// 	},
+// 	any,
+// ];
 
-export type comment_4 = [
-	{
-		id: string | number;
-		type: CommentType;
-		t: CommentAction.reply;
-		content: string | number;
-		commentId: string | number;
-	},
-	any,
-];
+// export type comment_4 = [
+// 	{
+// 		id: string | number;
+// 		type: CommentType;
+// 		t: CommentAction.reply;
+// 		content: string | number;
+// 		commentId: string | number;
+// 	},
+// 	any,
+// ];
 
-export type comment_5 = [
-	{
-		type: CommentType.event;
-		t: CommentAction.reply;
-		threadId: string;
-		content: string | number;
-		commentId: string | number;
-	},
-	any,
-];
+// export type comment_5 = [
+// 	{
+// 		type: CommentType.event;
+// 		t: CommentAction.reply;
+// 		threadId: string;
+// 		content: string | number;
+// 		commentId: string | number;
+// 	},
+// 	any,
+// ];
 
 export type comment_album = [
 	{
@@ -651,29 +573,6 @@ export type msg_private_history = [
 	any,
 ];
 
-export const enum MvArea {
-	all = "全部",
-	zh = "内地",
-	hk = "港台",
-	ea = "欧美",
-	kr = "韩国",
-	jp = "日本",
-}
-
-export const enum MvType {
-	all = "全部",
-	offical = "官方版",
-	raw = "原生",
-	live = "现场版",
-	netease = "网易出品",
-}
-
-export const enum MvOrder {
-	trend = "上升最快",
-	hot = "最热",
-	new = "最新",
-}
-
 export type mv_all = [
 	{
 		area?: MvArea;
@@ -809,12 +708,6 @@ export type related_allvideo = [{ id: string | number }, any];
 
 export type related_playlist = [{ id: string | number }, any];
 
-export const enum ResourceType {
-	mv = 1,
-	dj = 4,
-	video = 5,
-	event = 6,
-}
 type PlaylistType = "NROMAL" | "VIDEO";
 
 export type resource_like = [
@@ -852,11 +745,6 @@ export type search_hot_detail = [{}, any];
 
 export type search_multimatch = [{ type?: number; keywords: string }, any];
 
-export const enum SearchSuggestType {
-	mobile = "mobile",
-	web = "web",
-}
-
 export type search_suggest = [{ keywords: string; type?: SearchSuggestType }, any];
 
 export type send_playlist = [
@@ -871,14 +759,6 @@ export type send_playlist = [
 export type send_text = [{ msg: string; user_ids: string }, any];
 
 export type setting = [{}, any];
-
-export const enum ShareResourceType {
-	song = "song",
-	playlist = "playlist",
-	mv = "mv",
-	djprogram = "djprogram",
-	djradio = "djradio",
-}
 
 export type share_resource = [
 	{
@@ -990,16 +870,6 @@ export type song_order_update = [{ pid: string | number; ids: string }, any];
 
 export type song_url = [{ id: string | number; br?: string | number }, any];
 
-export const enum SoundQualityType {
-	standard = "standard",
-	exhigh = "exhigh",
-	lossless = "lossless",
-	hires = "hires",
-	jyeffect = "jyeffect",
-	jymaster = "jymaster",
-	sky = "sky",
-}
-
 export type song_url_v1 = [{ id: string | number; level: SoundQualityType }, any];
 
 export type top_album = [
@@ -1029,24 +899,9 @@ export type top_playlist_highquality = [
 	any,
 ];
 
-export const enum TopSongType {
-	all = 0,
-	zh = 7,
-	ea = 96,
-	kr = 16,
-	ja = 8,
-}
-
 export type top_song = [{ type: TopSongType }, any];
 
 export type toplist = [{}, any];
-
-export const enum ToplistArtistType {
-	zh = 1,
-	ea = 2,
-	kr = 3,
-	ja = 4,
-}
 
 export type toplist_artist = [{ type?: ToplistArtistType }, any];
 
@@ -1087,11 +942,6 @@ export type user_follows = [{ uid: string | number } & MultiPageConfig, any];
 export type user_level = [{}, any];
 
 export type user_playlist = [{ uid: string | number } & MultiPageConfig, any];
-
-export const enum UserRecordType {
-	all = 0,
-	weekly = 1,
-}
 
 export type user_record = [{ uid: string | number; type?: UserRecordType }, any];
 
