@@ -1,69 +1,18 @@
 import encrypt from "NeteaseCloudMusicApi/util/crypto";
 import { cookieToJson, cookieObjToString, toBoolean } from "NeteaseCloudMusicApi/util/index";
-import { APP_CONF } from "NeteaseCloudMusicApi/util/config.json";
+
 import CryptoJS from "crypto-js";
 import { default as axios } from "axios";
 
 import fs from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
-
-const anonymous_token = fs.readFileSync(path.resolve(tmpdir(), "./anonymous_token"), "utf-8");
 import { URLSearchParams } from "node:url";
 
-const WNMCID = (function () {
-	const characters = "abcdefghijklmnopqrstuvwxyz";
-	let randomString = "";
-	for (let i = 0; i < 6; i++)
-		randomString += characters.charAt(Math.floor(Math.random() * characters.length));
-	return `${randomString}.${Date.now().toString()}.01.0`;
-})();
+import { chooseUserAgent } from "./normalize";
+import { APP_CONF, WNMCID, osMap } from "./config";
 
-const osMap = {
-	pc: {
-		os: "pc",
-		appver: "3.0.18.203152",
-		osver: "Microsoft-Windows-10-Professional-build-22631-64bit",
-		channel: "netease",
-	},
-	linux: {
-		os: "linux",
-		appver: "1.2.1.0428",
-		osver: "Deepin 20.9",
-		channel: "netease",
-	},
-	android: {
-		os: "android",
-		appver: "8.20.20.231215173437",
-		osver: "14",
-		channel: "xiaomi",
-	},
-	iphone: {
-		os: "iPhone OS",
-		appver: "9.0.90",
-		osver: "16.2",
-		channel: "distribution",
-	},
-};
-
-const chooseUserAgent = (crypto, uaType = "pc") => {
-	const userAgentMap = {
-		weapi: {
-			pc: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
-		},
-		linuxapi: {
-			linux:
-				"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36",
-		},
-		api: {
-			pc: "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36 Chrome/91.0.4472.164 NeteaseMusicDesktop/3.0.18.203152",
-			android:
-				"NeteaseMusic/9.1.65.240927161425(9001065);Dalvik/2.1.0 (Linux; U; Android 14; 23013RK75C Build/UKQ1.230804.001)",
-			iphone: "NeteaseMusic 9.0.90/5038 (iPhone; iOS 16.2; zh_CN)",
-		},
-	};
-	return userAgentMap[crypto][uaType] || "";
-};
+const anonymous_token = fs.readFileSync(path.resolve(tmpdir(), "./anonymous_token"), "utf-8");
 
 export default function createRequest(uri, data, options) {
 	return new Promise((resolve, reject) => {
