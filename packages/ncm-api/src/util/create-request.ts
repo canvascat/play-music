@@ -1,15 +1,14 @@
-import encrypt from "NeteaseCloudMusicApi/util/crypto";
+// import encrypt from "NeteaseCloudMusicApi/util/crypto";
+import { encrypt, decrypt } from "../crypto";
 import { cookieToJson, cookieObjToString, toBoolean } from "NeteaseCloudMusicApi/util/index";
 
-import CryptoJS from "crypto-js";
-import { default as axios } from "axios";
-
+import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { tmpdir } from "node:os";
 import { URLSearchParams } from "node:url";
 
-import { chooseUserAgent } from "./normalize";
+import { chooseUserAgent, type RequestAnswer } from "./normalize";
 import { APP_CONF, WNMCID, osMap } from "./config";
 
 const anonymous_token = fs.readFileSync(path.resolve(tmpdir(), "./anonymous_token"), "utf-8");
@@ -30,12 +29,12 @@ export default function createRequest(uri, data, options) {
 			cookie = cookieToJson(cookie);
 		}
 		if (typeof cookie === "object") {
-			let _ntes_nuid = CryptoJS.lib.WordArray.random(32).toString();
+			let _ntes_nuid = randomBytes(32).toString("hex");
 			let os = osMap[cookie.os] || osMap["iphone"];
 			cookie = {
 				...cookie,
 				__remember_me: "true",
-				// NMTID: CryptoJS.lib.WordArray.random(16).toString(),
+				// NMTID: randomBytes(16).toString("hex"),
 				ntes_kaola_ad: "1",
 				_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
 				_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
@@ -49,7 +48,7 @@ export default function createRequest(uri, data, options) {
 				appver: cookie.appver || os.appver,
 			};
 			if (uri.indexOf("login") === -1) {
-				cookie["NMTID"] = CryptoJS.lib.WordArray.random(16).toString();
+				cookie["NMTID"] = randomBytes(16).toString("hex");
 			}
 			if (!cookie.MUSIC_U) {
 				// 游客
@@ -59,7 +58,7 @@ export default function createRequest(uri, data, options) {
 		}
 
 		let url = "",
-			encryptData = "",
+			encryptData: ConstructorParameters<typeof URLSearchParams>[0] = "",
 			crypto = options.crypto,
 			csrfToken = cookie["__csrf"] || "";
 
@@ -141,50 +140,59 @@ export default function createRequest(uri, data, options) {
 				console.log("[ERR]", "Unknown Crypto:", crypto);
 				break;
 		}
-		const answer = { status: 500, body: {}, cookie: [] };
-		// console.log(headers, 'headers')
-		let settings = {
-			method: "POST",
-			url: url,
-			headers: headers,
-			data: new URLSearchParams(encryptData).toString(),
+		const answer: RequestAnswer = {
+			status: 500,
+			body: {},
+			cookie: [],
 		};
 
-		if (data.e_r) {
-			settings = {
-				...settings,
-				encoding: null,
-				responseType: "arraybuffer",
-			};
-		}
+		// 准备fetch请求配置
+		const fetchOptions: RequestInit = {
+			method: "POST",
+			headers: {
+				...headers,
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			body: new URLSearchParams(encryptData).toString(),
+		};
 
-		axios(settings)
-			.then((res) => {
-				const body = res.data;
-				answer.cookie = (res.headers["set-cookie"] || []).map((x) =>
-					x.replace(/\s*Domain=[^(;|$)]+;*/, ""),
-				);
+		fetch(url, fetchOptions)
+			.then(async (res) => {
+				// 处理cookies
+				const setCookieHeaders = res.headers.get("set-cookie");
+				answer.cookie = setCookieHeaders
+					? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
+					: [];
+
 				try {
 					if (crypto === "eapi" && data.e_r) {
 						// eapi接口返回值被加密，需要解密
-						answer.body = encrypt.eapiResDecrypt(body.toString("hex").toUpperCase());
+						const arrayBuffer = await res.arrayBuffer();
+						const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
+						answer.body = decrypt.eapiRes(hexString);
 					} else {
-						answer.body = typeof body == "object" ? body : JSON.parse(body.toString());
+						// 解析JSON响应
+						const text = await res.text();
+						try {
+							answer.body = JSON.parse(text);
+						} catch {
+							answer.body = text;
+						}
 					}
 
-					if (answer.body.code) {
+					if (answer.body && answer.body.code) {
 						answer.body.code = Number(answer.body.code);
 					}
 
-					answer.status = Number(answer.body.code || res.status);
-					if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body.code) > -1) {
+					answer.status = Number(answer.body?.code || res.status);
+					if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
 						// 特殊状态码
 						answer.status = 200;
 					}
 				} catch (e) {
 					// console.log(e)
 					// can't decrypt and can't parse directly
-					answer.body = body;
+					answer.body = await res.text();
 					answer.status = res.status;
 				}
 
