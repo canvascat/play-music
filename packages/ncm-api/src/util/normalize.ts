@@ -29,7 +29,7 @@ function toBoolean(val: unknown): boolean {
  * @param uaType - 用户代理类型
  * @returns 用户代理字符串
  */
-const chooseUserAgent = (crypto: string, uaType: string = "pc"): string => {
+export const chooseUserAgent = (crypto: string, uaType: string = "pc"): string => {
 	const userAgentMap: Record<string, Record<string, string>> = {
 		weapi: {
 			pc: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
