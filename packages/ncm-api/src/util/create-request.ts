@@ -16,59 +16,18 @@ export default async function createRequest(
 	data: Record<string, any>,
 	options: RequestOptions,
 ): Promise<RequestAnswer> {
-	const { url, headers, body, crypto, e_r } = normalizeArguments(uri, data, options);
+	const { url, headers, body, needDecrypt } = normalizeArguments(uri, data, options);
 
 	let res: Response;
-	const answer: RequestAnswer = { status: 500, body: {}, cookie: [] };
 	try {
 		res = await fetch(url, { method: "POST", headers, body });
 	} catch (error) {
-		answer.status = 502;
-		answer.body = { code: 502, msg: error };
-		throw answer;
+		throw { status: 502, body: { code: 502, msg: error } };
 	}
+	const answer = await normalizeResponse(res, needDecrypt);
 
-	// 处理cookies
-	const setCookieHeaders = res.headers.get("set-cookie");
-	answer.cookie = setCookieHeaders
-		? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
-		: [];
-
-	try {
-		if (crypto === "eapi" && e_r) {
-			// eapi接口返回值被加密，需要解密
-			const arrayBuffer = await res.arrayBuffer();
-			const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
-			answer.body = decrypt.eapiRes(hexString);
-		} else {
-			// 解析JSON响应
-			const text = await res.text();
-			try {
-				answer.body = JSON.parse(text);
-			} catch {
-				answer.body = text;
-			}
-		}
-
-		if (answer.body && answer.body.code) {
-			answer.body.code = Number(answer.body.code);
-		}
-
-		answer.status = Number(answer.body?.code || res.status);
-		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
-			// 特殊状态码
-			answer.status = 200;
-		}
-	} catch (e) {
-		// console.log(e)
-		// can't decrypt and can't parse directly
-		answer.body = await res.text();
-		answer.status = res.status;
-	}
-
-	answer.status = 100 < answer.status && answer.status < 600 ? answer.status : 400;
 	if (answer.status === 200) return answer;
-	else throw answer;
+	throw answer;
 }
 
 function toBoolean(val: any) {
@@ -119,6 +78,13 @@ function normalizeCookie(cookie?: string | Record<string, string>) {
 	return cookie;
 }
 
+/**
+ * 标准化请求参数
+ * @param uri 请求路径
+ * @param data 请求数据
+ * @param options 请求选项
+ * @returns 标准化请求参数
+ */
 function normalizeArguments(
 	uri: string,
 	data: Record<string, any> = {},
@@ -233,5 +199,56 @@ function normalizeArguments(
 
 	const body = new URLSearchParams(encryptData).toString();
 
-	return { url, headers, body, crypto, e_r: data.e_r };
+	const needDecrypt = crypto === "eapi" && data.e_r;
+
+	return { url, headers, body, needDecrypt };
+}
+/**
+ * 标准化响应
+ * @param res 响应
+ * @param needDecrypt 是否需要解密
+ * @returns 标准化响应
+ */
+async function normalizeResponse(res: Response, needDecrypt?: boolean): Promise<RequestAnswer> {
+	const answer: RequestAnswer = { status: 500, body: {}, cookie: [] };
+	// 处理cookies
+	const setCookieHeaders = res.headers.get("set-cookie");
+	answer.cookie = setCookieHeaders
+		? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
+		: [];
+
+	try {
+		if (needDecrypt) {
+			// eapi接口返回值被加密，需要解密
+			const arrayBuffer = await res.arrayBuffer();
+			const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
+			answer.body = decrypt.eapiRes(hexString);
+		} else {
+			// 解析JSON响应
+			const text = await res.text();
+			try {
+				answer.body = JSON.parse(text);
+			} catch {
+				answer.body = text;
+			}
+		}
+
+		if (answer.body && answer.body.code) {
+			answer.body.code = Number(answer.body.code);
+		}
+
+		answer.status = Number(answer.body?.code || res.status);
+		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
+			// 特殊状态码
+			answer.status = 200;
+		}
+	} catch (e) {
+		console.log(e);
+		// can't decrypt and can't parse directly
+		answer.body = await res.text();
+		answer.status = res.status;
+	}
+
+	answer.status = 100 < answer.status && answer.status < 600 ? answer.status : 400;
+	return answer;
 }
