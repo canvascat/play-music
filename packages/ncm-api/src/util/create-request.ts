@@ -25,40 +25,17 @@ export default async function createRequest(
 	}
 	// headers['X-Real-IP'] = '118.88.88.88'
 
-	let cookie = options.cookie || {};
-	if (typeof cookie === "string") {
-		cookie = cookieToJson(cookie);
+	const cookie = normalizeCookie(options.cookie);
+	if (uri.indexOf("login") === -1) {
+		cookie["NMTID"] = randomBytes(16).toString("hex");
 	}
-	if (typeof cookie === "object") {
-		let _ntes_nuid = randomBytes(32).toString("hex");
-		let os = osMap[cookie.os] || osMap["iphone"];
-		cookie = {
-			...cookie,
-			__remember_me: "true",
-			// NMTID: randomBytes(16).toString("hex"),
-			ntes_kaola_ad: "1",
-			_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
-			_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
-			WNMCID: cookie.WNMCID || WNMCID,
-			WEVNSM: cookie.WEVNSM || "1.0.0",
-
-			osver: cookie.osver || os.osver,
-			deviceId: cookie.deviceId || global.deviceId,
-			os: cookie.os || os.os,
-			channel: cookie.channel || os.channel,
-			appver: cookie.appver || os.appver,
-		};
-		if (uri.indexOf("login") === -1) {
-			cookie["NMTID"] = randomBytes(16).toString("hex");
-		}
-		if (!cookie.MUSIC_U) {
-			// 游客
-			cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
-		}
-		headers["Cookie"] = Object.keys(cookie)
-			.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(cookie[key])}`)
-			.join("; ");
+	if (!cookie.MUSIC_U) {
+		// 游客
+		cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
 	}
+	headers["Cookie"] = Object.keys(cookie)
+		.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(cookie[key])}`)
+		.join("; ");
 
 	let url = "";
 	let encryptData: ConstructorParameters<typeof URLSearchParams>[0] = "";
@@ -81,17 +58,17 @@ export default async function createRequest(
 			headers["User-Agent"] = options.ua || chooseUserAgent("weapi");
 			data.csrf_token = csrfToken;
 			encryptData = encrypt.weapi(data);
-			url = APP_CONF.domain + "/weapi/" + uri.substr(5);
+			url = `${APP_CONF.domain}/weapi/${uri.slice(5)}`;
 			break;
 
 		case "linuxapi":
 			headers["User-Agent"] = options.ua || chooseUserAgent("linuxapi", "linux");
 			encryptData = encrypt.linuxapi({
 				method: "POST",
-				url: APP_CONF.domain + uri,
+				url: `${APP_CONF.domain}${uri}`,
 				params: data,
 			});
-			url = APP_CONF.domain + "/api/linux/forward";
+			url = `${APP_CONF.domain}/api/linux/forward`;
 			break;
 
 		case "eapi":
@@ -104,7 +81,7 @@ export default async function createRequest(
 				appver: cookie.appver, // app版本
 				versioncode: cookie.versioncode || "140", //版本号
 				mobilename: cookie.mobilename || "", //设备model
-				buildver: cookie.buildver || Date.now().toString().substr(0, 10),
+				buildver: cookie.buildver || Date.now().toString().slice(0, 10),
 				resolution: cookie.resolution || "1920x1080", //设备分辨率
 				__csrf: csrfToken,
 				channel: cookie.channel, //下载渠道
@@ -115,7 +92,7 @@ export default async function createRequest(
 			if (cookie.MUSIC_U) header["MUSIC_U"] = cookie.MUSIC_U;
 			if (cookie.MUSIC_A) header["MUSIC_A"] = cookie.MUSIC_A;
 			headers["Cookie"] = Object.keys(header)
-				.map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(header[key]))
+				.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(header[key])}`)
 				.join("; ");
 			headers["User-Agent"] = options.ua || chooseUserAgent("api", "iphone");
 
@@ -130,10 +107,10 @@ export default async function createRequest(
 							: APP_CONF.encryptResponse,
 				); // 用于加密接口返回值
 				encryptData = encrypt.eapi(uri, data);
-				url = APP_CONF.apiDomain + "/eapi/" + uri.substr(5);
+				url = `${APP_CONF.apiDomain}/eapi/${uri.slice(5)}`;
 			} else if (crypto === "api") {
 				// 不使用任何加密
-				url = APP_CONF.apiDomain + uri;
+				url = `${APP_CONF.apiDomain}${uri}`;
 				encryptData = data;
 			}
 			break;
@@ -224,4 +201,36 @@ function cookieToJson(cookie: string = "") {
 			.filter((item) => item.length === 2)
 			.map(([key, value]) => [key.trim(), value.trim()]),
 	);
+}
+
+function normalizeCookie(cookie?: string | Record<string, string>) {
+	cookie = cookie || {};
+	if (typeof cookie === "string") {
+		cookie = cookieToJson(cookie);
+	}
+
+	const _ntes_nuid = randomBytes(32).toString("hex");
+	const os = osMap[cookie.os] || osMap["iphone"];
+	cookie = {
+		...cookie,
+		__remember_me: "true",
+		// NMTID: randomBytes(16).toString("hex"),
+		ntes_kaola_ad: "1",
+		_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
+		_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
+		WNMCID: cookie.WNMCID || WNMCID,
+		WEVNSM: cookie.WEVNSM || "1.0.0",
+
+		osver: cookie.osver || os.osver,
+		deviceId: cookie.deviceId || global.deviceId,
+		os: cookie.os || os.os,
+		channel: cookie.channel || os.channel,
+		appver: cookie.appver || os.appver,
+	};
+
+	if (!cookie.MUSIC_U) {
+		// 游客
+		cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
+	}
+	return cookie;
 }
