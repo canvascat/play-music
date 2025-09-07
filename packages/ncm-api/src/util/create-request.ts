@@ -15,9 +15,118 @@ export default async function createRequest(
 	uri: string,
 	data: Record<string, any>,
 	options: RequestOptions,
+): Promise<RequestAnswer> {
+	const { url, headers, body, crypto, e_r } = normalizeArguments(uri, data, options);
+
+	let res: Response;
+	const answer: RequestAnswer = { status: 500, body: {}, cookie: [] };
+	try {
+		res = await fetch(url, { method: "POST", headers, body });
+	} catch (error) {
+		answer.status = 502;
+		answer.body = { code: 502, msg: error };
+		throw answer;
+	}
+
+	// 处理cookies
+	const setCookieHeaders = res.headers.get("set-cookie");
+	answer.cookie = setCookieHeaders
+		? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
+		: [];
+
+	try {
+		if (crypto === "eapi" && e_r) {
+			// eapi接口返回值被加密，需要解密
+			const arrayBuffer = await res.arrayBuffer();
+			const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
+			answer.body = decrypt.eapiRes(hexString);
+		} else {
+			// 解析JSON响应
+			const text = await res.text();
+			try {
+				answer.body = JSON.parse(text);
+			} catch {
+				answer.body = text;
+			}
+		}
+
+		if (answer.body && answer.body.code) {
+			answer.body.code = Number(answer.body.code);
+		}
+
+		answer.status = Number(answer.body?.code || res.status);
+		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
+			// 特殊状态码
+			answer.status = 200;
+		}
+	} catch (e) {
+		// console.log(e)
+		// can't decrypt and can't parse directly
+		answer.body = await res.text();
+		answer.status = res.status;
+	}
+
+	answer.status = 100 < answer.status && answer.status < 600 ? answer.status : 400;
+	if (answer.status === 200) return answer;
+	else throw answer;
+}
+
+function toBoolean(val: any) {
+	if (typeof val === "boolean") return val;
+	// if (val === "") return val;
+	return val === "true" || val == "1";
+}
+
+function cookieToJson(cookie: string = "") {
+	return Object.fromEntries(
+		cookie
+			.split(";")
+			.map((item) => item.split("="))
+			.filter((item) => item.length === 2)
+			.map(([key, value]) => [key.trim(), value.trim()]),
+	);
+}
+
+function normalizeCookie(cookie?: string | Record<string, string>) {
+	cookie = cookie || {};
+	if (typeof cookie === "string") {
+		cookie = cookieToJson(cookie);
+	}
+
+	const _ntes_nuid = randomBytes(32).toString("hex");
+	const os = osMap[cookie.os] || osMap["iphone"];
+	cookie = {
+		...cookie,
+		__remember_me: "true",
+		// NMTID: randomBytes(16).toString("hex"),
+		ntes_kaola_ad: "1",
+		_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
+		_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
+		WNMCID: cookie.WNMCID || WNMCID,
+		WEVNSM: cookie.WEVNSM || "1.0.0",
+
+		osver: cookie.osver || os.osver,
+		deviceId: cookie.deviceId || global.deviceId,
+		os: cookie.os || os.os,
+		channel: cookie.channel || os.channel,
+		appver: cookie.appver || os.appver,
+	};
+
+	if (!cookie.MUSIC_U) {
+		// 游客
+		cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
+	}
+	return cookie;
+}
+
+function normalizeArguments(
+	uri: string,
+	data: Record<string, any> = {},
+	options: RequestOptions | string = {},
 ) {
-	let headers = options.headers || {};
-	let ip = options.realIP || options.ip || "";
+	options = typeof options === "string" ? { crypto: options } : options;
+	const headers = options.headers || {};
+	const ip = options.realIP || options.ip || "";
 	// console.log(ip)
 	if (ip) {
 		headers["X-Real-IP"] = ip;
@@ -120,117 +229,9 @@ export default async function createRequest(
 			console.log("[ERR]", "Unknown Crypto:", crypto);
 			break;
 	}
-	const answer: RequestAnswer = {
-		status: 500,
-		body: {},
-		cookie: [],
-	};
+	headers["Content-Type"] = "application/x-www-form-urlencoded";
 
-	// 准备fetch请求配置
-	const fetchOptions: RequestInit = {
-		method: "POST",
-		headers: {
-			...headers,
-			"Content-Type": "application/x-www-form-urlencoded",
-		},
-		body: new URLSearchParams(encryptData).toString(),
-	};
-	let res: Response;
-	try {
-		res = await fetch(url, fetchOptions);
-	} catch (error) {
-		answer.status = 502;
-		answer.body = { code: 502, msg: error };
-		throw answer;
-	}
+	const body = new URLSearchParams(encryptData).toString();
 
-	// 处理cookies
-	const setCookieHeaders = res.headers.get("set-cookie");
-	answer.cookie = setCookieHeaders
-		? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
-		: [];
-
-	try {
-		if (crypto === "eapi" && data.e_r) {
-			// eapi接口返回值被加密，需要解密
-			const arrayBuffer = await res.arrayBuffer();
-			const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
-			answer.body = decrypt.eapiRes(hexString);
-		} else {
-			// 解析JSON响应
-			const text = await res.text();
-			try {
-				answer.body = JSON.parse(text);
-			} catch {
-				answer.body = text;
-			}
-		}
-
-		if (answer.body && answer.body.code) {
-			answer.body.code = Number(answer.body.code);
-		}
-
-		answer.status = Number(answer.body?.code || res.status);
-		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
-			// 特殊状态码
-			answer.status = 200;
-		}
-	} catch (e) {
-		// console.log(e)
-		// can't decrypt and can't parse directly
-		answer.body = await res.text();
-		answer.status = res.status;
-	}
-
-	answer.status = 100 < answer.status && answer.status < 600 ? answer.status : 400;
-	if (answer.status === 200) return answer;
-	else throw answer;
-}
-
-function toBoolean(val: any) {
-	if (typeof val === "boolean") return val;
-	// if (val === "") return val;
-	return val === "true" || val == "1";
-}
-
-function cookieToJson(cookie: string = "") {
-	return Object.fromEntries(
-		cookie
-			.split(";")
-			.map((item) => item.split("="))
-			.filter((item) => item.length === 2)
-			.map(([key, value]) => [key.trim(), value.trim()]),
-	);
-}
-
-function normalizeCookie(cookie?: string | Record<string, string>) {
-	cookie = cookie || {};
-	if (typeof cookie === "string") {
-		cookie = cookieToJson(cookie);
-	}
-
-	const _ntes_nuid = randomBytes(32).toString("hex");
-	const os = osMap[cookie.os] || osMap["iphone"];
-	cookie = {
-		...cookie,
-		__remember_me: "true",
-		// NMTID: randomBytes(16).toString("hex"),
-		ntes_kaola_ad: "1",
-		_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
-		_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
-		WNMCID: cookie.WNMCID || WNMCID,
-		WEVNSM: cookie.WEVNSM || "1.0.0",
-
-		osver: cookie.osver || os.osver,
-		deviceId: cookie.deviceId || global.deviceId,
-		os: cookie.os || os.os,
-		channel: cookie.channel || os.channel,
-		appver: cookie.appver || os.appver,
-	};
-
-	if (!cookie.MUSIC_U) {
-		// 游客
-		cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
-	}
-	return cookie;
+	return { url, headers, body, crypto, e_r: data.e_r };
 }
