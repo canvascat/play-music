@@ -1,7 +1,4 @@
-// import encrypt from "NeteaseCloudMusicApi/util/crypto";
 import { encrypt, decrypt } from "../crypto";
-import { cookieToJson, cookieObjToString, toBoolean } from "NeteaseCloudMusicApi/util/index";
-
 import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
@@ -58,13 +55,15 @@ export default async function createRequest(
 			// 游客
 			cookie.MUSIC_A = cookie.MUSIC_A || anonymous_token;
 		}
-		headers["Cookie"] = cookieObjToString(cookie);
+		headers["Cookie"] = Object.keys(cookie)
+			.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(cookie[key])}`)
+			.join("; ");
 	}
 
-	let url = "",
-		encryptData: ConstructorParameters<typeof URLSearchParams>[0] = "",
-		crypto = options.crypto,
-		csrfToken = cookie["__csrf"] || "";
+	let url = "";
+	let encryptData: ConstructorParameters<typeof URLSearchParams>[0] = "";
+	let crypto = options.crypto;
+	const csrfToken = cookie["__csrf"] || "";
 
 	if (crypto === "") {
 		// 加密方式为空，以配置文件的加密方式为准
@@ -209,4 +208,20 @@ export default async function createRequest(
 	answer.status = 100 < answer.status && answer.status < 600 ? answer.status : 400;
 	if (answer.status === 200) return answer;
 	else throw answer;
+}
+
+function toBoolean(val: any) {
+	if (typeof val === "boolean") return val;
+	// if (val === "") return val;
+	return val === "true" || val == "1";
+}
+
+function cookieToJson(cookie: string = "") {
+	return Object.fromEntries(
+		cookie
+			.split(";")
+			.map((item) => item.split("="))
+			.filter((item) => item.length === 2)
+			.map(([key, value]) => [key.trim(), value.trim()]),
+	);
 }
