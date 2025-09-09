@@ -5,12 +5,13 @@
 	"main": "index.js",
 	"module": "src/server/index.ts",
 	"scripts": {
-		"dev": "bun --watch --port=3001 run src/server/index.ts",
+		"dev": "bun --watch --port=3000 run src/server/index.ts",
 		"run:ncm": "npx NeteaseCloudMusicApi"
 	},
 	"exports": {
 		"./server": "./src/server/index.ts",
 		"./types": "./src/types/index.ts",
+		"./electron": "./src/electron/index.ts",
 		"./module/user_account": "./src/module/user_account.ts"
 	},
 	"files": [
