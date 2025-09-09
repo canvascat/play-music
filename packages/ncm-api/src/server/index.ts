@@ -7,7 +7,7 @@ import path from "node:path";
 import { serveStatic } from "hono/bun";
 import { fileURLToPath } from "node:url";
 // import request from "NeteaseCloudMusicApi/util/request";
-import request from "../util/create-request";
+import request from "../util/request";
 
 async function getModulesDefinitions(modulesPath: string, specificRoute: Record<string, string>) {
 	const files = await fsp.readdir(modulesPath);

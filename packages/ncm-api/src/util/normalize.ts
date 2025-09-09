@@ -3,6 +3,10 @@ import { decrypt, encrypt } from "../crypto/native";
 import { APP_CONF, getDeviceId, osMap, WNMCID } from "./config";
 import type { RequestOptions } from "./option";
 
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { tmpdir } from "node:os";
+
 /**
  * 响应接口
  */
@@ -29,7 +33,7 @@ function toBoolean(val: unknown): boolean {
  * @param uaType - 用户代理类型
  * @returns 用户代理字符串
  */
-export const chooseUserAgent = (crypto: string, uaType: string = "pc"): string => {
+const chooseUserAgent = (crypto: string, uaType: string = "pc"): string => {
 	const userAgentMap: Record<string, Record<string, string>> = {
 		weapi: {
 			pc: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0",
@@ -48,74 +52,91 @@ export const chooseUserAgent = (crypto: string, uaType: string = "pc"): string =
 	return userAgentMap[crypto]?.[uaType] || "";
 };
 
+function cookieToJson(cookie: string = "") {
+	return Object.fromEntries(
+		cookie
+			.split(";")
+			.map((item) => item.split("="))
+			.filter((item) => item.length === 2)
+			.map(([key, value]) => [key.trim(), value.trim()]),
+	);
+}
+
+let anonymous_token = null as string | null;
+async function getAnonymousToken() {
+	if (!anonymous_token) {
+		anonymous_token = await readFile(path.resolve(tmpdir(), "./anonymous_token"), "utf-8");
+	}
+	return anonymous_token;
+}
+
+async function normalizeCookie(cookie?: string | Record<string, string>) {
+	cookie = cookie || {};
+	if (typeof cookie === "string") {
+		cookie = cookieToJson(cookie);
+	}
+
+	const _ntes_nuid = randomBytes(32).toString("hex");
+	const os = osMap[cookie.os] || osMap["iphone"];
+	cookie = {
+		...cookie,
+		__remember_me: "true",
+		// NMTID: randomBytes(16).toString("hex"),
+		ntes_kaola_ad: "1",
+		_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
+		_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
+		WNMCID: cookie.WNMCID || WNMCID,
+		WEVNSM: cookie.WEVNSM || "1.0.0",
+
+		osver: cookie.osver || os.osver,
+		deviceId: cookie.deviceId || (await getDeviceId()),
+		os: cookie.os || os.os,
+		channel: cookie.channel || os.channel,
+		appver: cookie.appver || os.appver,
+	};
+
+	if (!cookie.MUSIC_U) {
+		// 游客
+		cookie.MUSIC_A = cookie.MUSIC_A || (await getAnonymousToken());
+	}
+	return cookie;
+}
+
+/**
+ * 标准化请求参数
+ * @param uri 请求路径
+ * @param data 请求数据
+ * @param options 请求选项
+ * @returns 标准化请求参数
+ */
 export async function normalizeArguments(
 	uri: string,
 	data: Record<string, any> = {},
-	options: RequestOptions | string = "weapi",
+	options: RequestOptions | string = {},
 ) {
 	options = typeof options === "string" ? { crypto: options } : options;
 	const headers = options.headers || {};
 	const ip = options.realIP || options.ip || "";
-
+	// console.log(ip)
 	if (ip) {
 		headers["X-Real-IP"] = ip;
 		headers["X-Forwarded-For"] = ip;
 	}
+	// headers['X-Real-IP'] = '118.88.88.88'
 
-	let cookie = options.cookie || {};
-	// const cookies = await getCookies();
-
-	//   cookie = Object.fromEntries(
-	// 	cookies.map(({ name, value }) => [name, value]),
-	// );
-
-	if (Object.keys(cookie).length > 0) {
-		// 使用 Node.js 内置 crypto 模块替代 CryptoJS
-		let _ntes_nuid = randomBytes(32).toString("hex");
-		let os = osMap[cookie.os] || osMap["iphone"];
-		cookie = {
-			...cookie,
-			__remember_me: "true",
-			ntes_kaola_ad: "1",
-			_ntes_nuid: cookie._ntes_nuid || _ntes_nuid,
-			_ntes_nnid: cookie._ntes_nnid || `${_ntes_nuid},${Date.now().toString()}`,
-			WNMCID: cookie.WNMCID || WNMCID,
-			WEVNSM: cookie.WEVNSM || "1.0.0",
-			osver: cookie.osver || os.osver,
-			deviceId: cookie.deviceId || (await getDeviceId()),
-			os: cookie.os || os.os,
-			channel: cookie.channel || os.channel,
-			appver: cookie.appver || os.appver,
-		};
-
-		if (uri.indexOf("login") === -1) {
-			// 使用 Node.js 内置 crypto 模块替代 CryptoJS
-			cookie["NMTID"] = randomBytes(16).toString("hex");
-		}
-
-		// if (!cookie.MUSIC_U) {
-		// 	// 游客
-		// 	cookie.MUSIC_A = cookie.MUSIC_A;
-		// }
-
-		/**
-		 * 将cookie对象转换为字符串
-		 * @param cookie - cookie对象
-		 * @returns cookie字符串
-		 */
-		function cookieObjToString(cookie: Record<string, string>): string {
-			return Object.keys(cookie)
-				.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(cookie[key])}`)
-				.join("; ");
-		}
-
-		headers["Cookie"] = cookieObjToString(cookie);
+	const cookie = await normalizeCookie(options.cookie);
+	if (uri.indexOf("login") === -1) {
+		cookie["NMTID"] = randomBytes(16).toString("hex");
 	}
 
+	headers["Cookie"] = Object.keys(cookie)
+		.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(cookie[key])}`)
+		.join("; ");
+
 	let url = "";
-	let encryptData: any = "";
+	let encryptData: ConstructorParameters<typeof URLSearchParams>[0] = "";
 	let crypto = options.crypto;
-	let csrfToken = cookie["__csrf"] || "";
+	const csrfToken = cookie["__csrf"] || "";
 
 	if (crypto === "") {
 		// 加密方式为空，以配置文件的加密方式为准
@@ -133,30 +154,30 @@ export async function normalizeArguments(
 			headers["User-Agent"] = options.ua || chooseUserAgent("weapi");
 			data.csrf_token = csrfToken;
 			encryptData = encrypt.weapi(data);
-			url = APP_CONF.domain + "/weapi/" + uri.substr(5);
+			url = `${APP_CONF.domain}/weapi/${uri.slice(5)}`;
 			break;
 
 		case "linuxapi":
 			headers["User-Agent"] = options.ua || chooseUserAgent("linuxapi", "linux");
 			encryptData = encrypt.linuxapi({
 				method: "POST",
-				url: APP_CONF.domain + uri,
+				url: `${APP_CONF.domain}${uri}`,
 				params: data,
 			});
-			url = APP_CONF.domain + "/api/linux/forward";
+			url = `${APP_CONF.domain}/api/linux/forward`;
 			break;
 
 		case "eapi":
 		case "api":
 			// 两种加密方式，都应生成客户端的cookie
-			const header: Record<string, string> = {
+			const header = {
 				osver: cookie.osver, //系统版本
 				deviceId: cookie.deviceId,
 				os: cookie.os, //系统类型
 				appver: cookie.appver, // app版本
 				versioncode: cookie.versioncode || "140", //版本号
 				mobilename: cookie.mobilename || "", //设备model
-				buildver: cookie.buildver || Date.now().toString().substr(0, 10),
+				buildver: cookie.buildver || Date.now().toString().slice(0, 10),
 				resolution: cookie.resolution || "1920x1080", //设备分辨率
 				__csrf: csrfToken,
 				channel: cookie.channel, //下载渠道
@@ -164,31 +185,28 @@ export async function normalizeArguments(
 					.toString()
 					.padStart(4, "0")}`,
 			};
-
 			if (cookie.MUSIC_U) header["MUSIC_U"] = cookie.MUSIC_U;
 			if (cookie.MUSIC_A) header["MUSIC_A"] = cookie.MUSIC_A;
-
 			headers["Cookie"] = Object.keys(header)
-				.map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(header[key]))
+				.map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(header[key])}`)
 				.join("; ");
-
 			headers["User-Agent"] = options.ua || chooseUserAgent("api", "iphone");
 
 			if (crypto === "eapi") {
 				// 使用eapi加密
 				data.header = header;
-				data.e_r =
-					options.e_r != undefined
+				data.e_r = toBoolean(
+					options.e_r !== undefined
 						? options.e_r
-						: data.e_r != undefined
+						: data.e_r !== undefined
 							? data.e_r
-							: APP_CONF.encryptResponse; // 用于加密接口返回值
-				data.e_r = toBoolean(data.e_r);
+							: APP_CONF.encryptResponse,
+				); // 用于加密接口返回值
 				encryptData = encrypt.eapi(uri, data);
-				url = APP_CONF.apiDomain + "/eapi/" + uri.substr(5);
+				url = `${APP_CONF.apiDomain}/eapi/${uri.slice(5)}`;
 			} else if (crypto === "api") {
 				// 不使用任何加密
-				url = APP_CONF.apiDomain + uri;
+				url = `${APP_CONF.apiDomain}${uri}`;
 				encryptData = data;
 			}
 			break;
@@ -198,48 +216,60 @@ export async function normalizeArguments(
 			console.log("[ERR]", "Unknown Crypto:", crypto);
 			break;
 	}
-	return { url, headers, encryptData, e_r: data.e_r };
-}
+	headers["Content-Type"] = "application/x-www-form-urlencoded";
 
-export async function normalzieResponse<Data = any>(
+	const body = new URLSearchParams(encryptData).toString();
+
+	const needDecrypt = crypto === "eapi" && data.e_r;
+
+	return { url, headers, body, needDecrypt };
+}
+/**
+ * 标准化响应
+ * @param res 响应
+ * @param needDecrypt 是否需要解密
+ * @returns 标准化响应
+ */
+export async function normalizeResponse(
 	res: Response,
-	e_r?: boolean,
-): Promise<RequestAnswer<Data>> {
+	needDecrypt?: boolean,
+): Promise<RequestAnswer> {
 	const answer: RequestAnswer = { status: 500, body: {}, cookie: [] };
-	answer.cookie = res.headers.getSetCookie().map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""));
+	// 处理cookies
+	const setCookieHeaders = res.headers.get("set-cookie");
+	answer.cookie = setCookieHeaders
+		? setCookieHeaders.split(",").map((x) => x.replace(/\s*Domain=[^(;|$)]+;*/, ""))
+		: [];
 
 	try {
-		if (e_r) {
+		if (needDecrypt) {
 			// eapi接口返回值被加密，需要解密
-			answer.body = decrypt.eapiRes(
-				Buffer.from(await res.arrayBuffer())
-					.toString("hex")
-					.toUpperCase(),
-			);
+			const arrayBuffer = await res.arrayBuffer();
+			const hexString = Buffer.from(arrayBuffer).toString("hex").toUpperCase();
+			answer.body = decrypt.eapiRes(hexString);
 		} else {
-			// 先读取text，然后尝试解析JSON
-			const textContent = await res.text();
+			// 解析JSON响应
+			const text = await res.text();
 			try {
-				answer.body = JSON.parse(textContent);
-			} catch (_parseError) {
-				// 如果JSON解析失败，直接使用文本内容
-				answer.body = textContent;
+				answer.body = JSON.parse(text);
+			} catch {
+				answer.body = text;
 			}
 		}
 
+		if (answer.body && answer.body.code) {
+			answer.body.code = Number(answer.body.code);
+		}
+
 		answer.status = Number(answer.body?.code || res.status);
-		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body.code) > -1) {
+		if ([201, 302, 400, 502, 800, 801, 802, 803].indexOf(answer.body?.code) > -1) {
 			// 特殊状态码
 			answer.status = 200;
 		}
-	} catch (error) {
-		// 如果所有解析都失败，尝试读取文本内容
-		try {
-			answer.body = await res.text();
-		} catch (textError) {
-			// 如果连text都无法读取，设置默认错误信息
-			answer.body = { error: "Failed to read response body" };
-		}
+	} catch (e) {
+		console.log(e);
+		// can't decrypt and can't parse directly
+		answer.body = await res.text();
 		answer.status = res.status;
 	}
 
