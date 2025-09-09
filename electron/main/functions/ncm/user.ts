@@ -1,7 +1,7 @@
 import store from "@main/store";
 import { procedure } from "@main/tipc";
 import { BrowserWindow } from "electron";
-import { fetchCookies } from "@main/ncm/cookie";
+import { fetchCookies } from "ncm-api/electron";
 import user_account from "ncm-api/module/user_account";
 
 export const account = procedure.handle(async () => {
