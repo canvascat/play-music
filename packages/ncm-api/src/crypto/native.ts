@@ -87,12 +87,10 @@ const aesDecrypt = (
  * @returns 随机字符串
  */
 function randomString(length: number): string {
-	const bytes = randomBytes(length);
-	let result = "";
-	for (let i = 0; i < length; i++) {
-		result += constant.BASE62[bytes[i] % constant.BASE62.length];
-	}
-	return result;
+	return Array.from(
+		randomBytes(length),
+		(byte) => constant.BASE62[byte % constant.BASE62.length],
+	).join("");
 }
 
 /**
@@ -101,16 +99,12 @@ function randomString(length: number): string {
  * @returns 包含加密参数的对象
  */
 const weapi = (object: Record<string, any>): { params: string; encSecKey: string } => {
-	const text = JSON.stringify(object);
 	const secretKey = randomString(16);
-	const encText = aesEncrypt(text, "cbc", constant.PRESET_KEY, constant.IV);
-	const encText2 = aesEncrypt(encText, "cbc", secretKey, constant.IV);
-	const encSecKey = rsaEncrypt(secretKey, constant.PUBLIC_KEY);
+	const text = aesEncrypt(JSON.stringify(object), "cbc", constant.PRESET_KEY, constant.IV);
+	const params = aesEncrypt(text, "cbc", secretKey, constant.IV);
+	const encSecKey = rsaEncrypt(secretKey.split("").reverse().join(""), constant.PUBLIC_KEY);
 
-	return {
-		params: encText2,
-		encSecKey: encSecKey,
-	};
+	return { params, encSecKey };
 };
 
 /**
