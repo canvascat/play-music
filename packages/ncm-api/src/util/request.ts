@@ -1,5 +1,4 @@
 import { normalizeArguments, normalizeResponse, type RequestAnswer } from "./normalize";
-import type { RequestOptions } from "./option";
 
 /**
  * 创建HTTP请求
@@ -8,12 +7,10 @@ import type { RequestOptions } from "./option";
  * @param data - 请求数据
  * @param options - 请求选项
  */
-export default async function request(
-	uri: string,
-	data: Record<string, any>,
-	options: RequestOptions,
-): Promise<RequestAnswer> {
-	const { url, headers, body, needDecrypt } = await normalizeArguments(uri, data, options);
+export default async function request<T = any>(
+	...args: Parameters<typeof normalizeArguments>
+): Promise<RequestAnswer<T>> {
+	const { url, headers, body, needDecrypt } = await normalizeArguments(...args);
 
 	let res: Response;
 	try {

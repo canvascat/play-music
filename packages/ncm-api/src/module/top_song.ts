@@ -1,7 +1,7 @@
 import type { TopSongType } from "../types/const";
 import type { TopSongResponse } from "../types";
 
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 新歌速递

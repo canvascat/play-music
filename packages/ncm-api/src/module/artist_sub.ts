@@ -1,6 +1,6 @@
 import type { SubAction } from "../types/const";
 
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 收藏/取消收藏歌手

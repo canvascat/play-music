@@ -1,5 +1,5 @@
 import type { MultiPageConfig } from "../types/common";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 收藏的歌手列表 关注歌手列表

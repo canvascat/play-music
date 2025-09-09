@@ -1,4 +1,4 @@
-import { request } from "../util/request";
+import request from "../util/request";
 import UNM from "@unblockneteasemusic/rust-napi";
 import { Buffer } from "node:buffer";
 import type { TrackUrlResponse } from "../types";

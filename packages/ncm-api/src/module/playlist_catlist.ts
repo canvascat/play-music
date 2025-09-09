@@ -1,4 +1,4 @@
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 歌单分类

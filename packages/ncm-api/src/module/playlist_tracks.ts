@@ -1,4 +1,4 @@
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 对歌单添加或删除歌曲

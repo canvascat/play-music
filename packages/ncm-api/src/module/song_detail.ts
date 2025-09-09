@@ -1,5 +1,5 @@
 import type { TrackDetailResponse } from "../types";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 获取歌曲详情

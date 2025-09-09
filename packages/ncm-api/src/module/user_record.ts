@@ -1,6 +1,6 @@
 import { UserRecordType } from "../types/const";
 
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 获取用户播放记录

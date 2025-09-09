@@ -3,7 +3,7 @@
 // import uploadPlugin from "../plugins/songUpload";
 // import type { RequestBaseConfig } from "../types/module";
 // import { createOption } from "../util/option";
-// import { request } from "../util/request";
+// import request from "../util/request";
 
 // /**
 //  * ### 云盘上传

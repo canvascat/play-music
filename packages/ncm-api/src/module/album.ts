@@ -1,5 +1,5 @@
 import type { AlbumDetailResponse } from "../types";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 获取专辑内容

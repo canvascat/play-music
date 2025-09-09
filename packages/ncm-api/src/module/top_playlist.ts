@@ -1,6 +1,6 @@
 import type { ListOrder } from "../types/const";
 import type { MultiPageConfig } from "../types/common";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 歌单 ( 网友精选碟 )

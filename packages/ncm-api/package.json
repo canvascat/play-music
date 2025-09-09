@@ -12,7 +12,7 @@
 		"./server": "./src/server/index.ts",
 		"./types": "./src/types/index.ts",
 		"./electron": "./src/electron/index.ts",
-		"./module/user_account": "./src/module/user_account.ts"
+		"./module/*": "./src/module/*.ts"
 	},
 	"files": [
 		"src"

@@ -1,6 +1,6 @@
 import type { ToplistArtistType } from "../types/const";
 import type { MultiPageConfig } from "../types/common";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 歌手榜

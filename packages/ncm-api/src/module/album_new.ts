@@ -1,6 +1,6 @@
 import type { AlbumListArea } from "../types/const";
 import type { MultiPageConfig } from "../types/common";
-import { request } from "../util/request";
+import request from "../util/request";
 
 /**
  * ### 全部新碟
