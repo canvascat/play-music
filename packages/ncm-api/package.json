@@ -26,10 +26,12 @@
 	"license": "ISC",
 	"packageManager": "pnpm@10.14.0",
 	"devDependencies": {
+		"@hono/zod-validator": "^0.7.2",
 		"@types/bun": "^1.2.21",
 		"@unblockneteasemusic/rust-napi": "^0.4.0",
 		"NeteaseCloudMusicApi": "^4.27.0",
-		"hono": "^4.9.5"
+		"hono": "^4.9.5",
+		"zod": "^4.0.13"
 	},
 	"peerDependencies": {
 		"@unblockneteasemusic/rust-napi": "^0.4.0",
