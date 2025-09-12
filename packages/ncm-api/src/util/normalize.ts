@@ -109,13 +109,9 @@ async function normalizeCookie(cookie?: string | Record<string, string>) {
  * @param options 请求选项
  * @returns 标准化请求参数
  */
-export async function normalizeArguments(
-	uri: string,
-	data: Record<string, any> = {},
-	options: RequestOptions | string = {},
-) {
-	options = typeof options === "string" ? { crypto: options } : options;
-	const headers = options.headers || {};
+export async function normalizeArguments(uri: string, options: RequestOptions = {}) {
+	const data = { ...options.data };
+	const headers = { ...options.headers };
 	const ip = options.realIP || options.ip || "";
 	// console.log(ip)
 	if (ip) {
@@ -170,7 +166,7 @@ export async function normalizeArguments(
 		case "eapi":
 		case "api":
 			// 两种加密方式，都应生成客户端的cookie
-			const header = {
+			const header: Record<string, string> = {
 				osver: cookie.osver, //系统版本
 				deviceId: cookie.deviceId,
 				os: cookie.os, //系统类型
