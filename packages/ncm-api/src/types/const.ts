@@ -82,7 +82,7 @@ export const SearchType = {
 	dj: 1009,
 	video: 1014,
 	complex: 1018,
-};
+} as const;
 
 export const CommentType = {
 	song: 0,
@@ -178,6 +178,12 @@ export const UserRecordType = {
 	weekly: 1,
 } as const;
 
+export const PlaylistType = {
+	NROMAL: "NROMAL",
+	VIDEO: "VIDEO",
+	SHARED: "SHARED",
+} as const;
+
 export type SubAction = ConstValue<typeof SubAction>;
 export type AlbumListArea = ConstValue<typeof AlbumListArea>;
 export type ListOrder = ConstValue<typeof ListOrder>;
@@ -203,3 +209,4 @@ export type SoundQualityType = ConstValue<typeof SoundQualityType>;
 export type TopSongType = ConstValue<typeof TopSongType>;
 export type ToplistArtistType = ConstValue<typeof ToplistArtistType>;
 export type UserRecordType = ConstValue<typeof UserRecordType>;
+export type PlaylistType = ConstValue<typeof PlaylistType>;

@@ -295,6 +295,7 @@ export interface User {
 	userType: number;
 	createTime: number;
 	userName: string;
+	avatarImgId_str?: string;
 	avatarImgIdStr?: string;
 	backgroundImgIdStr?: string;
 	avatarDetail?: any;
