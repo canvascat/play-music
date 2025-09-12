@@ -13,5 +13,5 @@ import request from "../util/request";
  *
  */
 export default function playlist_catlist() {
-	return request(`/api/playlist/catalogue`);
+	return request(`/api/playlist/catalogue`, { crypto: "weapi" });
 }

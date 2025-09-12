@@ -14,5 +14,5 @@ import request from "../util/request";
 export default function simi_mv(params: { mvid: string | number }) {
 	const { mvid } = params;
 	const data = { mvid };
-	return request(`/api/discovery/simiMV`, data);
+	return request(`/api/discovery/simiMV`, { data, crypto: "weapi" });
 }

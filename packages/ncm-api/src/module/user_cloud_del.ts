@@ -16,5 +16,5 @@ export default function user_cloud_del(query: { id: string | number }) {
 	const data = {
 		songIds: [query.id],
 	};
-	return request(`/api/cloud/del`, data);
+	return request(`/api/cloud/del`, { data, crypto: "weapi" });
 }

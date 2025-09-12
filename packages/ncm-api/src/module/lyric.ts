@@ -14,13 +14,9 @@ import request from "../util/request";
  *
  */
 export default function lyric(query: { id: string | number }) {
-	const data = {
-		id: query.id,
-		tv: -1,
-		lv: -1,
-		rv: -1,
-		kv: -1,
-		_nmclfl: 1,
-	};
-	return request(`/api/song/lyric`, data);
+	const { id } = query;
+	// const data = { id, tv: -1, lv: -1, rv: -1, kv: -1, _nmclfl: 1 };
+	// return request(`/api/song/lyric`, { data });
+	const data = { id, cp: false, tv: 0, lv: 0, rv: 0, kv: 0, yv: 0, ytv: 0, yrv: 0 };
+	return request(`/api/song/lyric/v1`, { data });
 }

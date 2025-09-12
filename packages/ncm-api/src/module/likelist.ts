@@ -16,5 +16,5 @@ import request from "../util/request";
 export default function likelist(params: { uid: string | number }) {
 	const { uid } = params;
 	const data = { uid };
-	return request(`/api/song/like/get`, data);
+	return request(`/api/song/like/get`, { data });
 }

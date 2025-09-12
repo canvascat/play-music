@@ -24,5 +24,5 @@ export default function playmode_intelligence_list(query: {
 }) {
 	const { id, pid, sid, count = 1 } = query;
 	const data = { songId: id, type: "fromPlayOne", playlistId: pid, startMusicId: sid || id, count };
-	return request(`/api/playmode/intelligence/list`, data);
+	return request(`/api/playmode/intelligence/list`, { data });
 }

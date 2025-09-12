@@ -105,15 +105,17 @@ import request from "../util/request";
  */
 export default function song_detail(query: { ids: string }) {
 	const { ids } = query;
+	const c = JSON.stringify(ids.split(",").map((id) => ({ id: +id })));
+	const data = { c };
 
-	const data = {
-		c:
-			"[" +
-			ids
-				.split(/\s*,\s*/)
-				.map((id) => '{"id":' + id + "}")
-				.join(",") +
-			"]",
-	};
-	return request<TrackDetailResponse>(`/api/v3/song/detail`, data);
+	// const data = {
+	// 	c:
+	// 		"[" +
+	// 		ids
+	// 			.split(/\s*,\s*/)
+	// 			.map((id) => '{"id":' + id + "}")
+	// 			.join(",") +
+	// 		"]",
+	// };
+	return request<TrackDetailResponse>(`/api/v3/song/detail`, { data, crypto: "weapi" });
 }

@@ -25,6 +25,7 @@ export default function album_sub(params: {
 }) {
 	let { t, id, action } = params;
 	action ??= t == 1 ? "sub" : "unsub";
+	const data = { id };
 
-	return request(`/api/album/${action}`, { id }, "weapi");
+	return request(`/api/album/${action}`, { data, crypto: "weapi" });
 }

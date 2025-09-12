@@ -16,5 +16,5 @@ import request from "../util/request";
 export default function mv_detail(params: { mvid?: string | number }) {
 	const { mvid } = params;
 	const data = { id: mvid };
-	return request(`/api/v1/mv/detail`, data);
+	return request(`/api/v1/mv/detail`, { data, crypto: "weapi" });
 }

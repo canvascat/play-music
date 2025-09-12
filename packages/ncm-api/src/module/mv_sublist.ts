@@ -14,5 +14,5 @@ import request from "../util/request";
 export default function mv_sublist(query: MultiPageConfig) {
 	const { limit = 25, offset = 0 } = query;
 	const data = { limit, offset, total: true };
-	return request(`/api/cloudvideo/allvideo/sublist`, data);
+	return request(`/api/cloudvideo/allvideo/sublist`, { data, crypto: "weapi" });
 }

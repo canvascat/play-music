@@ -15,5 +15,5 @@ import request from "../util/request";
 export default function personalized(params: { limit?: string | number }) {
 	const { limit = 30 } = params;
 	const data = { limit, total: true, n: 1000 };
-	return request(`/api/personalized/playlist`, data);
+	return request(`/api/personalized/playlist`, { data, crypto: "weapi" });
 }

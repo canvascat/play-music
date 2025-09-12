@@ -15,5 +15,5 @@ import request from "../util/request";
 export default function fm_trash(params: { id: string | number; time?: string | number }) {
 	const { id, time = 25 } = params;
 	const data = { songId: id, alg: "RT", time };
-	return request(`/api/radio/trash/add`, data);
+	return request(`/api/radio/trash/add`, { data, crypto: "weapi" });
 }

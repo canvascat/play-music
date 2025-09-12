@@ -27,24 +27,19 @@ export default async function playlist_tracks(query: {
 	const { op, pid } = query;
 	const tracks = query.tracks.split(",");
 	let trackIds = JSON.stringify(tracks);
-	let data = {
-		op,
-		pid,
-		trackIds,
-		imme: "true",
-	};
+	let data = { op, pid, trackIds, imme: "true" };
 
 	try {
-		const res = await request(`/api/playlist/manipulate/tracks`, data, "eapi");
+		const res = await request(`/api/playlist/manipulate/tracks`, { data });
 		return {
 			status: 200,
 			body: { ...res },
 		};
-	} catch (error) {
+	} catch (error: any) {
 		if (error.body.code === 512) {
 			trackIds = JSON.stringify([...tracks, ...tracks]);
 			data = { ...data, trackIds };
-			return request(`/api/playlist/manipulate/tracks`, data, "eapi");
+			return request(`/api/playlist/manipulate/tracks`, { data });
 		} else {
 			return {
 				status: 200,

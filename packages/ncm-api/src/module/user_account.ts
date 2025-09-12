@@ -7,5 +7,5 @@ import request from "../util/request";
  *
  */
 export default function user_account() {
-	return request(`/api/nuser/account/get`);
+	return request(`/api/nuser/account/get`, { crypto: "weapi" });
 }

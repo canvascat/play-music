@@ -10,5 +10,5 @@ import request from "../util/request";
  * **调用例子 :** `/recommend/resource`
  */
 export default function recommend_resource() {
-	return request(`/api/v1/discovery/recommend/resource`);
+	return request(`/api/v1/discovery/recommend/resource`, { crypto: "weapi" });
 }

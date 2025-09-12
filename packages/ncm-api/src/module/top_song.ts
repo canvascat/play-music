@@ -36,5 +36,5 @@ export default function top_song(query: { type: TopSongType }) {
 		// offset: query.offset || 0,
 		total: true,
 	};
-	return request<TopSongResponse>(`/api/v1/discovery/new/songs`, data);
+	return request<TopSongResponse>(`/api/v1/discovery/new/songs`, { data, crypto: "weapi" });
 }

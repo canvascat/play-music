@@ -23,5 +23,5 @@ export default function user_cloud(query: MultiPageConfig) {
 		limit: query.limit || 30,
 		offset: query.offset || 0,
 	};
-	return request(`/api/v1/cloud/get`, data);
+	return request(`/api/v1/cloud/get`, { data, crypto: "weapi" });
 }

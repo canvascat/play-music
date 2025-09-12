@@ -12,6 +12,6 @@ import request from "../util/request";
  * **调用例子 :** `/album/detail/dynamic?id=32311`
  *
  */
-export default function album_detail_dynamic(params: { id: string | number }) {
-	return request(`/api/album/detail/dynamic`, params);
+export default function album_detail_dynamic(data: { id: string | number }) {
+	return request(`/api/album/detail/dynamic`, { data, crypto: "weapi" });
 }

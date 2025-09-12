@@ -19,6 +19,7 @@ export default function scrobble(query: {
 	sourceid: string | number;
 	time: string | number;
 }) {
+	const { id, sourceid, time } = query;
 	const data = {
 		logs: JSON.stringify([
 			{
@@ -26,9 +27,9 @@ export default function scrobble(query: {
 				json: {
 					download: 0,
 					end: "playend",
-					id: query.id,
-					sourceId: query.sourceid,
-					time: query.time,
+					id,
+					sourceId: sourceid,
+					time,
 					type: "song",
 					wifi: 0,
 					source: "list",
@@ -39,5 +40,5 @@ export default function scrobble(query: {
 		]),
 	};
 
-	return request(`/api/feedback/weblog`, data);
+	return request(`/api/feedback/weblog`, { data, crypto: "weapi" });
 }

@@ -12,5 +12,5 @@ import request from "../util/request";
  *
  */
 export default function recommend_songs() {
-	return request(`/api/v3/discovery/recommend/songs`);
+	return request(`/api/v3/discovery/recommend/songs`, { crypto: "weapi" });
 }

@@ -21,5 +21,5 @@ export default function mv_sub(params: { t: SubAction; mvid: string | number }) 
 	const { t, mvid } = params;
 	const action = t == 1 ? "sub" : "unsub";
 	const data = { mvId: mvid, mvIds: `["${mvid}"]` };
-	return request(`/api/mv/${action}`, data);
+	return request(`/api/mv/${action}`, { data, crypto: "weapi" });
 }

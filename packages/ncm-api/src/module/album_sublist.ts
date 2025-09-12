@@ -20,5 +20,5 @@ import request from "../util/request";
 export default function album_sublist(params: MultiPageConfig) {
 	const { limit = 25, offset = 0 } = params;
 	const data = { limit, offset, total: true };
-	return request(`/api/album/sublist`, data);
+	return request(`/api/album/sublist`, { data, crypto: "weapi" });
 }

@@ -32,5 +32,5 @@ export default function like(query: {
 		like: query.like,
 		time: "3",
 	};
-	return request(`/api/radio/like`, data);
+	return request(`/api/radio/like`, { data, crypto: "weapi" });
 }

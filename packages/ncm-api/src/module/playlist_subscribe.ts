@@ -22,5 +22,5 @@ export default function playlist_subscribe(query: { t: SubAction; id: string | n
 	const { t, id } = query;
 	const action = t == 1 ? "subscribe" : "unsubscribe";
 	const data = { id };
-	return request(`/api/playlist/${action}`, data);
+	return request(`/api/playlist/${action}`, { data, crypto: "weapi" });
 }

@@ -23,5 +23,5 @@ import request from "../util/request";
 export default function user_playlist(query: { uid: string | number } & MultiPageConfig) {
 	const { uid, limit = 30, offset = 0 } = query;
 	const data = { uid, limit, offset, includeVideo: true };
-	return request(`/api/user/playlist`, data);
+	return request(`/api/user/playlist`, { data, crypto: "weapi" });
 }

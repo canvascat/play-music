@@ -1,5 +1,4 @@
 import { UserRecordType } from "../types/const";
-
 import request from "../util/request";
 
 /**
@@ -19,5 +18,5 @@ import request from "../util/request";
 export default function user_record(query: { uid: string | number; type?: UserRecordType }) {
 	const { uid, type = UserRecordType.all } = query;
 	const data = { uid, type };
-	return request(`/api/v1/play/record`, data);
+	return request(`/api/v1/play/record`, { data, crypto: "weapi" });
 }

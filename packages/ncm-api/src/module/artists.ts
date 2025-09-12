@@ -14,5 +14,5 @@ import request from "../util/request";
  */
 export default function artists(params: { id: string | number }) {
 	const { id } = params;
-	return request(`/api/v1/artist/${id}`);
+	return request(`/api/v1/artist/${id}`, { crypto: "weapi" });
 }

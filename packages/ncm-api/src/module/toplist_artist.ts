@@ -25,5 +25,5 @@ import request from "../util/request";
 export default function toplist_artist(params: { type?: ToplistArtistType } & MultiPageConfig) {
 	const { type = 1, limit = 100, offset = 0 } = params;
 	const data = { type, limit, offset, total: true };
-	return request(`/api/toplist/artist`, data);
+	return request(`/api/toplist/artist`, { data, crypto: "weapi" });
 }

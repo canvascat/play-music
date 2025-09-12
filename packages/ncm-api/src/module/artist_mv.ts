@@ -18,5 +18,5 @@ import request from "../util/request";
 export default function artist_mv(params: { id: string | number } & MultiPageConfig) {
 	const { id, limit, offset } = params;
 	const data = { artistId: id, limit, offset, total: true };
-	return request(`/api/artist/mvs`, data);
+	return request(`/api/artist/mvs`, { data, crypto: "weapi" });
 }

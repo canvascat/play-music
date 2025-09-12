@@ -24,5 +24,5 @@ export default function top_playlist_highquality(query: {
 }) {
 	const { cat = "全部", before = 0, limit = 50 } = query;
 	const data = { cat, limit, lasttime: before, total: true };
-	return request(`/api/playlist/highquality/list`, data);
+	return request(`/api/playlist/highquality/list`, { data, crypto: "weapi" });
 }

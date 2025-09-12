@@ -22,5 +22,5 @@ export default function artist_sub(params: { id: string | number; t: SubAction }
 	const { id, t } = params;
 	const action = t == 1 ? "sub" : "unsub";
 	const data = { artistId: id, artistIds: `[${id}]` };
-	return request(`/api/artist/${action}`, data);
+	return request(`/api/artist/${action}`, { data, crypto: "weapi" });
 }

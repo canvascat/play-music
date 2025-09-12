@@ -16,5 +16,5 @@ import request from "../util/request";
 export default function mv_url(params: { id?: string | number; r?: string | number }) {
 	const { id, r = 1080 } = params;
 	const data = { id, r };
-	return request(`/api/song/enhance/play/mv/url`, data);
+	return request(`/api/song/enhance/play/mv/url`, { data, crypto: "weapi" });
 }

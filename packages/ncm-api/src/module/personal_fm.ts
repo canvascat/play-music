@@ -10,5 +10,5 @@ import request from "../util/request";
  * **调用例子 :** `/personal_fm`
  */
 export default function personal_fm() {
-	return request(`/api/v1/radio/get`);
+	return request(`/api/v1/radio/get`, { crypto: "weapi" });
 }

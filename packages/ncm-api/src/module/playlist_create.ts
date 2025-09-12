@@ -1,6 +1,5 @@
+import { PlaylistType } from "../types";
 import request from "../util/request";
-
-export type PlaylistType = "NROMAL" | "VIDEO";
 
 /**
  * ### 新建歌单
@@ -25,7 +24,7 @@ export default function playlist_create(query: {
 	privacy: 0 | 10;
 	type?: PlaylistType;
 }) {
-	const { name, privacy = 0, type = "NORMAL" } = query;
+	const { name, privacy = 0, type = PlaylistType.NROMAL } = query;
 	const data = { name, privacy, type };
-	return request(`/api/playlist/create`, data);
+	return request(`/api/playlist/create`, { data, crypto: "weapi" });
 }

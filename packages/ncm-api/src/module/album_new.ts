@@ -23,5 +23,5 @@ import request from "../util/request";
 export default function album_new(params: { area?: AlbumListArea } & MultiPageConfig) {
 	const { area = "ALL", limit = 30, offset = 0 } = params;
 	const data = { limit, offset, total: true, area };
-	return request(`/api/album/new`, data);
+	return request(`/api/album/new`, { data, crypto: "weapi" });
 }

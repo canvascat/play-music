@@ -23,5 +23,5 @@ export default function artist_sublist(query: MultiPageConfig) {
 		offset: query.offset || 0,
 		total: true,
 	};
-	return request(`/api/artist/sublist`, data);
+	return request(`/api/artist/sublist`, { data, crypto: "weapi" });
 }

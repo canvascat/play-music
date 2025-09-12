@@ -15,5 +15,5 @@ import request from "../util/request";
 export default function simi_artist(params: { id: string | number }) {
 	const { id } = params;
 	const data = { artistid: id };
-	return request(`/api/discovery/simiArtist`, data);
+	return request(`/api/discovery/simiArtist`, { data, crypto: "weapi" });
 }

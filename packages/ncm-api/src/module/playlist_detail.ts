@@ -16,10 +16,7 @@ import request from "../util/request";
  *
  */
 export default function playlist_detail(query: { id: string | number; s?: string | number }) {
-	const data = {
-		id: query.id,
-		n: 100000,
-		s: query.s || 8,
-	};
-	return request(`/api/v6/playlist/detail`, data);
+	const { id, s = 8 } = query;
+	const data = { id, n: 100000, s };
+	return request(`/api/v6/playlist/detail`, { data });
 }

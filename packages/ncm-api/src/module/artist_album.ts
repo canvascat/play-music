@@ -1,3 +1,4 @@
+import type { ArtistAlbumResponse } from "../types";
 import type { MultiPageConfig } from "../types/common";
 import request from "../util/request";
 
@@ -22,5 +23,5 @@ import request from "../util/request";
 export default function artist_album(params: { id: string | number } & MultiPageConfig) {
 	const { id, limit = 30, offset = 0 } = params;
 	const data = { limit, offset, total: true };
-	return request(`/api/artist/albums/${id}`, data);
+	return request<ArtistAlbumResponse>(`/api/artist/albums/${id}`, { data, crypto: "weapi" });
 }

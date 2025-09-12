@@ -15,5 +15,5 @@ import request from "../util/request";
  */
 export default function album(params: { id: string | number }) {
 	const { id } = params;
-	return request<AlbumDetailResponse>(`/api/v1/album/${id}`);
+	return request<AlbumDetailResponse>(`/api/v1/album/${id}`, { crypto: "weapi" });
 }

@@ -13,8 +13,6 @@ import request from "../util/request";
  *
  */
 export default function playlist_delete(query: { id: string | number }) {
-	const data = {
-		ids: "[" + query.id + "]",
-	};
-	return request(`/api/playlist/remove`, data);
+	const data = { ids: `[${query.id}]` };
+	return request(`/api/playlist/remove`, { data, crypto: "weapi" });
 }

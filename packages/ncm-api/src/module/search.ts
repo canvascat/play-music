@@ -1,4 +1,4 @@
-import type { SearchType } from "../types/const";
+import { SearchType } from "../types/const";
 import type { MultiPageConfig } from "../types/common";
 import request from "../util/request";
 
@@ -28,11 +28,11 @@ export default function search(
 		type?: SearchType;
 	} & MultiPageConfig,
 ) {
-	const { keywords, type = 1, limit = 30, offset = 0 } = params;
-	if (type == 2000) {
-		const data = { keyword: keywords, scene: "normal", limit, offset };
-		return request(`/api/search/voice/get`, data, "eapi");
-	}
+	const { keywords, type = SearchType.single, limit = 30, offset = 0 } = params;
+	// if (type == 2000) {
+	// 	const data = { keyword: keywords, scene: "normal", limit, offset };
+	// 	return request(`/api/search/voice/get`, { data });
+	// }
 	const data = { s: keywords, type, limit, offset };
-	return request(`/api/search/get`, data, "eapi");
+	return request(`/api/search/get`, { data });
 }

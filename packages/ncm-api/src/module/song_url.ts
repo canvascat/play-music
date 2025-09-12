@@ -46,7 +46,7 @@ export default async function song_url(query: { id: string | number; br?: string
 		ids: JSON.stringify(ids),
 		br: parseInt(String(query.br || 999000)),
 	};
-	const res = await request<TrackUrlResponse>(`/api/song/enhance/player/url`, data, "eapi");
+	const res = await request<TrackUrlResponse>(`/api/song/enhance/player/url`, { data });
 
 	res.body.data = res.body.data.sort(
 		(a, b) => ids.indexOf(String(a.id)) - ids.indexOf(String(b.id)),

@@ -13,7 +13,7 @@ import request from "../util/request";
  *
  */
 export default async function user_detail(query: { uid: string | number }) {
-	const res = await request(`/api/v1/user/detail/${query.uid}`);
+	const res = await request(`/api/v1/user/detail/${query.uid}`, { crypto: "weapi" });
 	const result = JSON.stringify(res).replace(/avatarImgId_str/g, "avatarImgIdStr");
 	return JSON.parse(result);
 }

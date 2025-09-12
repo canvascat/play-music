@@ -15,5 +15,5 @@ import request from "../util/request";
 export default function user_cloud_detail(query: { id: string | number }) {
 	const songIds = `${query.id}`.replace(/\s/g, "").split(",");
 	const data = { songIds };
-	return request(`/api/v1/cloud/get/byids`, data);
+	return request(`/api/v1/cloud/get/byids`, { data, crypto: "weapi" });
 }

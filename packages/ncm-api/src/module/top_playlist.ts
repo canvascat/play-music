@@ -27,7 +27,7 @@ export default async function top_playlist(
 ) {
 	const { cat = "全部", order = "hot", limit = 50, offset = 0 } = query;
 	const data = { cat, order, limit, offset, total: true };
-	const res = await request(`/api/playlist/list`, data);
+	const res = await request(`/api/playlist/list`, { data, crypto: "weapi" });
 	const result = JSON.stringify(res).replace(/avatarImgId_str/g, "avatarImgIdStr");
 	return JSON.parse(result);
 }
