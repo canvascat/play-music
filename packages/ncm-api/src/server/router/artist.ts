@@ -18,12 +18,18 @@ const artistRouter = new Hono()
 			"param",
 			z.object({
 				id: z.string(),
+			}),
+		),
+		zValidator(
+			"query",
+			z.object({
 				limit: z.number().default(30),
 				offset: z.number().default(0),
 			}),
 		),
 		async (c) => {
-			const { id, limit, offset } = c.req.valid("param");
+			const { id } = c.req.valid("param");
+			const { limit, offset } = c.req.valid("query");
 			const data = { limit, offset };
 			const cookie = getCookie(c);
 			const { body, status } = await request<ArtistAlbumResponse>(`/api/artist/albums/${id}`, {
@@ -36,9 +42,19 @@ const artistRouter = new Hono()
 	)
 	.get(
 		"/mv/:id",
-		zValidator("param", z.object({ id: z.string() })),
-
-		zValidator("query", z.object({ limit: z.number().default(30), offset: z.number().default(0) })),
+		zValidator(
+			"param",
+			z.object({
+				id: z.string(),
+			}),
+		),
+		zValidator(
+			"query",
+			z.object({
+				limit: z.number().default(30),
+				offset: z.number().default(0),
+			}),
+		),
 		async (c) => {
 			const { id } = c.req.valid("param");
 			const { limit, offset } = c.req.valid("query");
@@ -54,7 +70,18 @@ const artistRouter = new Hono()
 	)
 	.put(
 		"/sub/:id",
-		zValidator("query", z.object({ action: z.enum(["sub", "unsub"]).default("sub") })),
+		zValidator(
+			"param",
+			z.object({
+				id: z.string(),
+			}),
+		),
+		zValidator(
+			"query",
+			z.object({
+				action: z.enum(["sub", "unsub"]).default("sub"),
+			}),
+		),
 		async (c) => {
 			const { id } = c.req.param();
 			const { action } = c.req.valid("query");
