@@ -1,28 +1,5 @@
 import request from "../util/request";
-import UNM from "@unblockneteasemusic/rust-napi";
-import { Buffer } from "node:buffer";
 import type { TrackUrlResponse } from "../types";
-
-let executor: UNM.Executor;
-
-export async function unm(song: UNM.Song, ctx: UNM.Context = {}) {
-	executor ??= new UNM.Executor();
-	const searchResult = await executor.search(executor.list(), song, ctx);
-
-	const songInfo = await executor.retrieve(searchResult, ctx);
-	if (songInfo.source === "bilibili") {
-		const response = await fetch(songInfo.url, {
-			method: "GET",
-			headers: {
-				Referer: "https://www.bilibili.com/",
-				"User-Agent": "okhttp/3.4.1",
-			},
-		});
-		const url = `data:application/octet-stream;base64,${Buffer.from(await response.arrayBuffer()).toString("base64")}`;
-		return { ...songInfo, url };
-	}
-	return songInfo;
-}
 
 /**
  * ### 获取音乐 url
@@ -54,5 +31,3 @@ export default async function song_url(query: { id: string | number; br?: string
 
 	return res;
 }
-
-song_url.unm = unm;
